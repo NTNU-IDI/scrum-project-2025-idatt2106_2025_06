@@ -8,6 +8,7 @@ export default {
   props: ['modelValue'],
   mounted() {
     this.cardEl = this.$refs.props;
+    let selectedEl = null;
 
     const {lng, lat, zoom, bearing, pitch} = this.modelValue;
     const map = new mapboxgl.Map({
@@ -19,106 +20,70 @@ export default {
 
     const updateLocation = () =>
       this.$emit('update:modelValue', this.getLocation());
-    map.on('moveend', updateLocation);
-    map.on('zoomend', updateLocation);
-    map.on('rotateend', updateLocation);
-    map.on('pitchend', updateLocation);
+    ['moveend', 'zoomend', 'rotateend', 'pitchend']
+      .forEach(evt => map.on(evt, updateLocation));
 
     map.on('load', () => {
-      map.addSource('tilfluktsrom', {
-        type: 'geojson',
-        data: '/data/tilfluktsrom-4326.json',
-        generateId: true
-      });
+      fetch('/data/tilfluktsrom-4326.json')
+        .then(res => res.json())
+        .then(data => {
+          data.features.forEach(feature => {
+            const el = document.createElement('div');
+            el.className = 'marker';
+            el.style.cursor = 'pointer';
 
-      map.addLayer({
-        id: 'tilfluktsrom',
-        type: 'circle',
-        source: 'tilfluktsrom',
-        paint: {
-          'circle-color': [
-            'case',
-            ['boolean', ['feature-state', 'selected'], false], '#f00',
-            '#4264fb'
-          ],
-          'circle-radius': [
-            'case',
-            ['boolean', ['feature-state', 'selected'], false], 12,
-            ['boolean', ['feature-state', 'highlight'], false], 12,
-            8
-          ],
-          'circle-stroke-width': 4,
-          'circle-stroke-color': '#fff'
-        }
-      });
+            const icon = document.createElement('div');
+            icon.className = 'icon';
+            icon.style.backgroundImage = 'url(/VaultDoor.svg)';
+            icon.style.width = '60px';
+            icon.style.height = '80px';
+            icon.style.scale = '0.6'
+            icon.style.cursor = 'pointer';
+            icon.style.transition = 'transform 0.1s ease';
 
-      let selectedId = null;
-      let hoveredId = null;
+            // hover
+            icon.addEventListener('mouseenter', () => {
+              icon.style.transform = 'scale(1.1)';
+            });
+            icon.addEventListener('mouseleave', () => {
+              if (el !== selectedEl) {
+                icon.style.transform = 'scale(1)';
+              }
+            });
 
-      // click on a feature to select
-      map.on('click', 'tilfluktsrom', (e) => {
-        const feature = e.features[0];
-        if (selectedId !== null) {
-          map.setFeatureState(
-            {source: 'tilfluktsrom', id: selectedId},
-            {selected: false}
-          );
-        }
-        selectedId = feature.id;
-        map.setFeatureState(
-          {source: 'tilfluktsrom', id: selectedId},
-          {selected: true}
-        );
-        this.showCard(feature.properties);
-      });
+            icon.addEventListener('click', (e) => {
+              e.stopPropagation();
 
-      // click on blank map to clear
-      map.on('click', (e) => {
-        const hits = map.queryRenderedFeatures(e.point, {
-          layers: ['tilfluktsrom']
+              if (selectedEl && selectedEl !== el) {
+                selectedEl.querySelector('.icon').style.transform = 'scale(1)';
+              }
+              selectedEl = el;
+              icon.style.transform = 'scale(1.2)';
+              this.showCard(feature.properties);
+            });
+
+            el.appendChild(icon);
+
+            new mapboxgl.Marker(el)
+              .setLngLat(feature.geometry.coordinates)
+              .addTo(map);
+          });
         });
-        if (!hits.length && selectedId !== null) {
-          map.setFeatureState(
-            {source: 'tilfluktsrom', id: selectedId},
-            {selected: false}
-          );
-          selectedId = null;
-          this.hideCard();
+
+      // deselect
+      map.on('click', () => {
+        if (selectedEl) {
+          selectedEl.querySelector('.icon').style.transform = 'scale(1)';
+          selectedEl = null;
         }
-      });
-
-      // hover
-      map.on('mousemove', 'tilfluktsrom', (e) => {
-        map.getCanvas().style.cursor = 'pointer';
-        const featureId = e.features[0].id;
-
-        if (hoveredId !== null && hoveredId !== featureId) {
-          map.setFeatureState(
-            {source: 'tilfluktsrom', id: hoveredId},
-            {highlight: false}
-          );
-        }
-
-        hoveredId = featureId;
-        map.setFeatureState(
-          {source: 'tilfluktsrom', id: hoveredId},
-          {highlight: true}
-        );
-      });
-
-      map.on('mouseleave', 'tilfluktsrom', () => {
-        map.getCanvas().style.cursor = '';
-        if (hoveredId !== null) {
-          map.setFeatureState(
-            {source: 'tilfluktsrom', id: hoveredId},
-            {highlight: false}
-          );
-          hoveredId = null;
-        }
+        this.hideCard();
       });
     });
 
     this.map = map;
+  },
+  unmounted() {
+    this.map.remove();
   },
   methods: {
     getLocation() {
@@ -143,13 +108,20 @@ export default {
       this.cardEl.style.display = 'none';
     }
   }
-};
+}
 </script>
 
 <template>
-  <div ref="mapContainer"
-       class="map-container flex-1 w-full rounded-xl shadow"></div>
+  <div ref="mapContainer" class="map-container flex-1 w-full rounded-xl shadow"></div>
   <div ref="props"
        class="w-96 h-96 bg-white hidden p-4 absolute right-4 top-14
               overflow-hidden rounded-md"></div>
 </template>
+
+<style scoped>
+.icon {
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: transform 0.1s ease;
+}
+</style>
