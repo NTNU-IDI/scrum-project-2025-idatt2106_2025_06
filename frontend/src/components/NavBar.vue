@@ -3,7 +3,7 @@
 
 <template>
   <nav class="sticky top-0 z-50 w-full py-2 shadow">
-    <div class="flex items-center justify-between max-w-4xl m-auto">
+    <div class="flex items-center justify-between max-w-6xl m-auto">
       <router-link class="flex min-w-40 h-10 gap-4 items-center hover:scale-110 transition" to="/">
         <img alt="logo" src="">
         <p>Krisefikser</p>
