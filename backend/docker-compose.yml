@@ -1,0 +1,42 @@
+services:
+  mysql:
+    image: mysql:8.4
+    ports:
+     - "3306:3306"
+    container_name: mysql
+    environment:
+      - MYSQL_DATABASE=db
+      - MYSQL_USER=myuser
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+    restart: unless-stopped
+    networks:
+      - app_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  springboot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+     - "8080:8080"
+    container_name: springboot
+    environment:
+      - DB_HOST=mysql
+    networks:
+      - app_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_volume:
+
+networks:
+  app_network:
+    driver: bridge
+
