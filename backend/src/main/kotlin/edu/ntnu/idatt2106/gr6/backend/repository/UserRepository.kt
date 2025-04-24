@@ -1,33 +1,88 @@
 package edu.ntnu.idatt2106.gr6.backend.repository
 
+import edu.ntnu.idatt2106.gr6.backend.model.Permission
+import edu.ntnu.idatt2106.gr6.backend.model.Role
 import edu.ntnu.idatt2106.gr6.backend.model.User
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.sql.Statement
+import java.util.UUID
 import javax.sql.DataSource
 
 @Repository
 class UserRepository (
     private val dataSource: DataSource
 ) {
-    fun saveUser(user: User): User {
+    fun save(user: User): User {
+        val userId = UUID.randomUUID()
         val email = user.email
         val name = user.name
         val password = user.password
         dataSource.connection.use { conn ->
-            val sql = "INSERT INTO users (email, name, password) VALUES (?, ?, ?)"
+            val sql = "INSERT INTO users (id, email, name, password) VALUES (?, ?, ?, ?)"
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, email)
-                stmt.setString(2, name)
-                stmt.setString(3, password)
+                stmt.setString(1, userId.toString())
+                stmt.setString(2, email)
+                stmt.setString(3, name)
+                stmt.setString(4, password)
 
                 val affectedRows = stmt.executeUpdate()
                 if (affectedRows == 0) {
                     throw RuntimeException("Creating user failed, no rows affected.")
                 }
-
-                stmt.
             }
         }
+        return user.copy(id = userId)
     }
+
+    fun loginUser(email: String, password: String): User? {
+        dataSource.connection.use { conn ->
+            val sql = "SELECT * FROM users WHERE email = ? AND password = ?"
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, email)
+                stmt.setString(2, password)
+                stmt.executeQuery().use { rows ->
+                    if (rows.next()) {
+                        return mapRowToUser(rows)
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    fun findByEmail(email: String): User? {
+        dataSource.connection.use { conn ->
+            val sql = """
+            SELECT u.*, r.role_name AS role_name 
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.email = ?
+        """
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, email)
+                stmt.executeQuery().use { rows ->
+                    if (rows.next()) {
+                        return mapRowToUser(rows)
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    fun mapRowToUser(rs: ResultSet): User =
+        User(
+            id = UUID.fromString(rs.getString("id")),
+            name = rs.getString("name"),
+            email = rs.getString("email"),
+            createdAt = rs.getTimestamp("created_at").toInstant(),
+            verified = rs.getBoolean("verified"),
+            role = Role(
+                id = rs.getInt("role_id"),
+                name = rs.getString("role_name"),
+                permissions = emptySet(),
+            ),
+            passwordHashed = rs.getString("password"),
+        )
 }

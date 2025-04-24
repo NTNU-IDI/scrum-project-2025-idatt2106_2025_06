@@ -36,6 +36,7 @@ class JwtAuthenticationFilter(
         try {
             val jwt = authHeader.substring(7)
             val email: String? = jwtService.extractEmailFromToken(jwt)
+            logger.info("Extracted email from token: $email")
 
             val authentication: Authentication? = SecurityContextHolder.getContext().authentication
 
