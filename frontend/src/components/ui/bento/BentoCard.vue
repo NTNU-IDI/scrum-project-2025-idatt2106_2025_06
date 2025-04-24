@@ -1,0 +1,50 @@
+<script>
+//ArrowRightIcon funker ikke for vue, må evt finne en alternativ løsning for pil
+//import { ArrowRightIcon } from '@radix-icons/vue';
+
+export default {
+  name: "BentoCard",
+  props: {
+    name: String,
+    customClass: String,
+    background: Object,
+    Icon: [Object, Function, String],
+    description: String,
+    href: String,
+    cta: String
+  },
+  components: {
+    //ArrowRightIcon
+  }
+}
+</script>
+
+<template>
+  <div
+    :class="[
+      'group relative col-span-1 flex flex-col justify-between overflow-hidden rounded-xl',
+      'bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]',
+      'transform-gpu dark:bg-black dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]',
+      customClass
+    ]"
+  >
+    <div>
+      <div class="absolute inset-0 bg-white transition-all duration-300 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700" />
+
+    </div>
+    <div class="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-12 transition-all duration-300 group-hover:-translate-y-10">
+      <component :is="Icon" class="h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75" />
+      <h3 class="text-xl font-semibold text-neutral-700 dark:text-neutral-300">{{ name }}</h3>
+      <p class="max-w-lg text-neutral-400">{{ description }}</p>
+    </div>
+    <div class="pointer-events-none absolute bottom-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+      <button class="pointer-events-auto text-sm text-blue-600 hover:underline">
+        <a :href="href" class="flex items-center gap-2">
+          {{ cta }}
+          <!--<ArrowRightIcon class="h-4 w-4" />-->
+        </a>
+      </button>
+    </div>
+    <div class="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
+  </div>
+</template>
