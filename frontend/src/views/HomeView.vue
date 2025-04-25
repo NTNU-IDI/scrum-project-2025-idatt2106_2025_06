@@ -10,12 +10,13 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
       <BentoCard
         name="Krisescenarioer"
         description="Les om forskjellige krisescenarioer"
+        href="/scenario"
         cta="Les mer"
-        href="/krise"
         :Icon="ArrowRightIcon"
         customClass="col-span-2"
-      >
-      </BentoCard>
+      />
+
+
 
       <!-- Card 2 -->
       <BentoCard
@@ -31,6 +32,7 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
       <!-- Nyheter -->
       <BentoCardCustom
         name="Nyheter"
+        href="/alerts"
         customClass="col-span-1 min-h-[30rem] group hover:group-hover:bg-transparent"
       >
         <div class="h-[25rem] overflow-y-auto space-y-2 p-2">
@@ -63,6 +65,7 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
       <!-- TODO legge til beredskapslager her -->
       <BentoCardCustom
         name="Utgår snart"
+        href="/inventory"
         customClass="col-span-3 min-h-[30rem]"
       >
         <div>
