@@ -1,5 +1,5 @@
 <template>
-  <!-- Hele BentoCard er nå en router-link -->
+  <!-- Hele BentoCard er nå en router-link yay-->
   <router-link
     :to="href"
     :class="[
