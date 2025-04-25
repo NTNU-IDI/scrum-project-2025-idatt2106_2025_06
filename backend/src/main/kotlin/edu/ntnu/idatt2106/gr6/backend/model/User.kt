@@ -12,7 +12,8 @@ data class User(
     val name: String,
     val email: String,
     private val passwordHashed: String,
-    val joinedAt: Instant = Instant.now(),
+    val createdAt: Instant = Instant.now(),
+    val verified: Boolean,
     @ManyToOne
     val role: Role
 ) : UserDetails {

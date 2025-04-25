@@ -7,7 +7,6 @@ import jakarta.persistence.ManyToMany
 data class Role(
     val id: Int = -1,
     val name: String,
-    val description: String,
 
     @ManyToMany
     @JoinTable(

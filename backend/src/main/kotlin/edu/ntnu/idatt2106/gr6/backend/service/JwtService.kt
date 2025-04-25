@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -34,9 +35,8 @@ class JwtService {
                     "UserDetails must be an instance of custom User class",
                 )
             }
-        val email = userDetails.username
+        val emailClaim = userDetails.username
 
-        val emailClaim: Map<String, Any> = mapOf("email" to email)
         val roleClaim=  userDetails.authorities.map { it.authority }
         val permissionsClaim = userDetails.authorities.map { it.authority }
 
@@ -81,7 +81,13 @@ class JwtService {
         val permissions = claims["permissions"] as? List<String>
 
         val authorities = mutableListOf<GrantedAuthority>()
-        authorities.addAll(roles.map )
+        authorities.addAll(
+            roles?.split(",")?.map { it.trim() }?.map { SimpleGrantedAuthority(it) } ?: emptyList()
+        )
+        authorities.addAll(
+            permissions?.map { SimpleGrantedAuthority(it) } ?: emptyList()
+        )
+        return authorities
     }
 
     fun getExpirationTime(): Long {
