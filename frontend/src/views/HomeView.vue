@@ -4,7 +4,7 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
 </script>
 
 <template>
-  <div class="m-auto">
+  <div class="m-auto mt-20">
     <BentoGrid>
       <!-- Card 1 -->
       <BentoCard
@@ -31,16 +31,16 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
       <!-- Nyheter -->
       <BentoCardCustom
         name="Nyheter"
-        customClass="col-span-1 min-h-[20rem] group hover:group-hover:bg-transparent"
+        customClass="col-span-1 min-h-[30rem] group hover:group-hover:bg-transparent"
       >
-        <div class="h-[30rem] overflow-y-scroll space-y-2 p-2" style="overflow: visible;">
+        <div class="h-[25rem] overflow-y-auto space-y-2 p-2">
           <Alert variant="default">
             <AlertTitle>Info: </AlertTitle>
             <AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription>
           </Alert>
           <Alert variant="default">
             <AlertTitle>Info: </AlertTitle>
-            <AlertDescription>Gratis bolle på element. Etter dårlig salg på kanelbolle onsdag, gir nå ntnu ut gratis bolle til alle studenter.</AlertDescription>
+            <AlertDescription>Gratis bolle på Element.</AlertDescription>
           </Alert>
           <Alert variant="default">
             <AlertTitle>Info: </AlertTitle>
@@ -61,7 +61,7 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
       <!-- Utgår snart -->
       <BentoCardCustom
         name="Utgår snart"
-        customClass="col-span-3 min-h-[24rem]"
+        customClass="col-span-3 min-h-[30rem]"
       >
         <div>
           TBA
@@ -69,7 +69,6 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
       </BentoCardCustom>
     </BentoGrid>
   </div>
-
 </template>
 
 <style scoped></style>
