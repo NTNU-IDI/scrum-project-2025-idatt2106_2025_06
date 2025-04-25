@@ -19,4 +19,9 @@ class UserDTOs {
         val email: String,
         val password: String,
     )
+
+    data class LoginUserRequest(
+        val email: String,
+        val password: String,
+    )
 }

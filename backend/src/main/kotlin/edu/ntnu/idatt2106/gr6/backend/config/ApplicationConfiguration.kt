@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import edu.ntnu.idatt2106.gr6.backend.repository.UserRepository
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 @Configuration
 class ApplicationConfiguration(
@@ -18,8 +19,18 @@ class ApplicationConfiguration(
     @Bean
     fun userDetailsService(): UserDetailsService =
         UserDetailsService { email ->
-            userRepository.findByEmail(email)
+            val user = userRepository.findByEmail(email)
                 ?: throw UsernameNotFoundException("User with email $email not found")
+
+            val authorities = user.role.permissions.map { permission ->
+                SimpleGrantedAuthority(permission.name)
+            }
+
+            org.springframework.security.core.userdetails.User(
+                user.email,
+                user.password,
+                authorities
+            )
         }
 
     @Bean
