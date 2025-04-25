@@ -24,9 +24,9 @@ import {Label} from "@/components/ui/label/index.js";
 
 <template>
   <div class="m-auto flex flex-col items-center gap-4">
-    <Card class="max-w-sm">
+    <Card class="">
       <CardHeader>
-        <CardTitle class="text-2xl"> Min side</CardTitle>
+        <CardTitle class="text-2xl w-96"> Min side</CardTitle>
       </CardHeader>
       <CardContent>
         <div class="grid gap-4">
@@ -34,9 +34,13 @@ import {Label} from "@/components/ui/label/index.js";
             <label>
               Personalia:
             </label>
+            <CardDescription>
+              [navn]<br/>
+              [epostadresse]
+            </CardDescription>
             <Dialog>
               <DialogTrigger>
-                <Button class="w-full">Rediger profil</Button>
+                <Button class="w-48">Rediger profil</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -79,12 +83,20 @@ import {Label} from "@/components/ui/label/index.js";
             <label>
               Husstand:
             </label>
-            <Button class="w-full">Rediger husstand</Button>
+            <CardDescription>
+              [navn]<br/>
+              [Husstandsnummer]<br/>
+              [Medlem 1]<br/>
+              [Medlem 2]<br/>
+            </CardDescription>
+            <div class="flex flex-col items-center">
+              <Button class="w-48">Rediger husstand</Button>
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>
-    <Button class="w-full rounded-xl" variant="destructive">Logg ut</Button>
+    <Button class="w-48" variant="destructive">Logg ut</Button>
   </div>
 </template>
 
