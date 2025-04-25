@@ -7,6 +7,12 @@ import MapView from "@/views/MapView.vue";
 import InventoryView from "@/views/InventoryView.vue";
 import LogInView from "@/views/LogInView.vue";
 import SignUpView from "@/views/SignUpView.vue";
+import ScenarioInfoView from '@/views/ScenarioInfoView.vue'
+import InfoView from "@/views/InfoView.vue";
+import ForView from "@/views/BeforeView.vue";
+import UnderView from "@/views/UnderView.vue";
+import EtterView from "@/views/AfterView.vue";
+
 
 const routes = [
   {path: '/', component: HomeView, name: 'home'},
@@ -16,6 +22,11 @@ const routes = [
   {path: '/profile', component: ProfileView, name: 'profile'},
   {path: '/login', component: LogInView, name: 'login'},
   {path: '/signup', component: SignUpView, name: 'signup'},
+  {path: '/scenario', component: ScenarioInfoView, name: 'scenario'},
+  {path: '/info', component: InfoView, name: 'info'},
+  {path: '/for', component: ForView, name: 'for'},
+  {path: '/under', component: UnderView, name: 'under'},
+  {path: '/etter', component: EtterView, name: 'etter'},
 ]
 
 const index = createRouter({
