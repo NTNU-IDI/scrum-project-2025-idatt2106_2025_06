@@ -34,6 +34,8 @@ class ApplicationConfiguration(
             logger.info("User with email $email found with role ${user.role.id} and permissions ${user.role.permissions.map { it.name }}")
 
 
+            logger.info("User with email $email found with roles: ${user.role.permissions.joinToString(", ")}")
+
             org.springframework.security.core.userdetails.User(
                 user.email,
                 user.password,
