@@ -16,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 class ApplicationConfiguration(
     private val userRepository: UserRepository
 ) {
+    private val logger = org.slf4j.LoggerFactory.getLogger(ApplicationConfiguration::class.java)
     @Bean
     fun userDetailsService(): UserDetailsService =
         UserDetailsService { email ->
@@ -25,6 +26,8 @@ class ApplicationConfiguration(
             val authorities = user.role.permissions.map { permission ->
                 SimpleGrantedAuthority(permission.name)
             }
+
+            logger.info("User with email $email found with roles: ${user.role.permissions.joinToString(", ")}")
 
             org.springframework.security.core.userdetails.User(
                 user.email,
