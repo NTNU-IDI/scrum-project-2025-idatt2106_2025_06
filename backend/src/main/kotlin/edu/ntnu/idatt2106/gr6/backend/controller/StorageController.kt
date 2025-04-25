@@ -32,7 +32,7 @@ class StorageController(
      * @return        ResponseEntity containing the created storage and HTTP 201 status.
      */
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')")
+    @PreAuthorize("hasAuthority('GIVE_MODERATOR_ROLE')")
     @Operation(
         summary = "Create new storage",
         description = "Creates a new storage and links it to the current authenticated user"
@@ -58,15 +58,4 @@ class StorageController(
         logger.info("Storage created with ID: ${response.id}")
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
-
-    @GetMapping("/test")
-    @Operation(
-        summary = "Test endpoint",
-        description = "test"
-    )
-    fun test(): ResponseEntity<String> {
-        logger.info("==== ENTERED CONTROLLER ====")
-        return ResponseEntity.ok("Hallo")
-    }
-
 }
