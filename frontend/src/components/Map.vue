@@ -35,8 +35,8 @@ export default {
             const icon = document.createElement('div');
             icon.className = 'icon';
             icon.style.backgroundImage = 'url(/VaultDoor.svg)';
-            icon.style.width = '60px';
-            icon.style.height = '80px';
+            icon.style.width = '52px';
+            icon.style.height = '72px';
             icon.style.scale = '0.6'
             icon.style.cursor = 'pointer';
             icon.style.transition = 'transform 0.1s ease';
