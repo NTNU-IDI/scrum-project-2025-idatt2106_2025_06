@@ -7,6 +7,7 @@ import MapView from "@/views/MapView.vue";
 import InventoryView from "@/views/InventoryView.vue";
 import LogInView from "@/views/LogInView.vue";
 import SignUpView from "@/views/SignUpView.vue";
+import ScenarioInfoView from '@/views/ScenarioInfoView.vue'
 
 const routes = [
   {path: '/', component: HomeView, name: 'home'},
@@ -16,6 +17,7 @@ const routes = [
   {path: '/profile', component: ProfileView, name: 'profile'},
   {path: '/login', component: LogInView, name: 'login'},
   {path: '/signup', component: SignUpView, name: 'signup'},
+  {path: '/scenario', component: ScenarioInfoView, name: 'scenario'},
 ]
 
 const index = createRouter({
