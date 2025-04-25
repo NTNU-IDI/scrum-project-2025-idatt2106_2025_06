@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.controller
 
+import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.LoginUserRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.UserResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.CreateUserRequest
 
@@ -27,5 +28,16 @@ class AuthController(
         val userResponse = authenticationService.signupUser(request.name, request.email, request.password)
         logger.info("User ${request.email} signed up successfully with ID: ${userResponse.id}")
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponse)
+    }
+
+    @PostMapping("/login")
+    @PreAuthorize("permitAll()")
+    fun login(
+        @RequestBody request: LoginUserRequest
+    ) : ResponseEntity<UserResponse> {
+        logger.info("Received login request for user: ${request.email}")
+        val userResponse = authenticationService.loginUser(request)
+        logger.info("User ${request.email} logged in successfully with ID: ${userResponse.id}")
+        return ResponseEntity.ok(userResponse)
     }
 }
