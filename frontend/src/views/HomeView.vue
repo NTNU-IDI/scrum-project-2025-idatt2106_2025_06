@@ -34,6 +34,7 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
         customClass="col-span-1 min-h-[30rem] group hover:group-hover:bg-transparent"
       >
         <div class="h-[25rem] overflow-y-auto space-y-2 p-2">
+          <!-- TODO: Implementere dynamisk generering av alerts fra databasen -->
           <Alert variant="default">
             <AlertTitle>Info: </AlertTitle>
             <AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription>
@@ -59,6 +60,7 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
 
 
       <!-- Utgår snart -->
+      <!-- TODO legge til beredskapslager her -->
       <BentoCardCustom
         name="Utgår snart"
         customClass="col-span-3 min-h-[30rem]"
