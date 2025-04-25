@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.config
 
+import edu.ntnu.idatt2106.gr6.backend.repository.RoleRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -14,7 +15,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 @Configuration
 class ApplicationConfiguration(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val roleRepository: RoleRepository
 ) {
     private val logger = org.slf4j.LoggerFactory.getLogger(ApplicationConfiguration::class.java)
     @Bean
@@ -23,9 +25,14 @@ class ApplicationConfiguration(
             val user = userRepository.findByEmail(email)
                 ?: throw UsernameNotFoundException("User with email $email not found")
 
-            val authorities = user.role.permissions.map { permission ->
-                SimpleGrantedAuthority(permission.name)
-            }
+            val authorities = roleRepository.findPermissionsByRole(user.role.id)
+                .map { permission ->
+                    SimpleGrantedAuthority(permission.name)
+                }
+
+
+            logger.info("User with email $email found with role ${user.role.id} and permissions ${user.role.permissions.map { it.name }}")
+
 
             logger.info("User with email $email found with roles: ${user.role.permissions.joinToString(", ")}")
 
