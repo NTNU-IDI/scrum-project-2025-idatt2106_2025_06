@@ -62,6 +62,7 @@ class JwtAuthenticationFilter(
                 }
             }
             filterChain.doFilter(request, response)
+            logger.info("1")
         } catch (e: Exception) {
             logger.error("Jwt processing error has occurred: ${e.message}", e)
             SecurityContextHolder.clearContext()
