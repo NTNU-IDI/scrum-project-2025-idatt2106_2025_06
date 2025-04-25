@@ -1,6 +1,6 @@
 <script setup>
-import {Button} from "@/components/ui/button/index.js";
-import { BentoCard, BentoGrid } from '@/components/ui/bento'
+import {Alert} from '@/components/ui/alert/index.js'
+import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
 </script>
 
 <template>
@@ -15,9 +15,6 @@ import { BentoCard, BentoGrid } from '@/components/ui/bento'
         :Icon="ArrowRightIcon"
         customClass="col-span-2"
       >
-        <template #background>
-          <div class="absolute inset-0 bg-neutral-200" />
-        </template>
       </BentoCard>
 
       <!-- Card 2 -->
@@ -29,37 +26,47 @@ import { BentoCard, BentoGrid } from '@/components/ui/bento'
         :Icon="ArrowRightIcon"
         customClass="col-span-2"
       >
-        <template #background>
-          <div class="absolute inset-0 bg-neutral-200" />
-        </template>
       </BentoCard>
 
       <!-- Nyheter -->
-      <BentoCard
+      <BentoCardCustom
         name="Nyheter"
-        cta="Gå til nyheter"
-        href="/nyheter"
-        :Icon="ArrowRightIcon"
-        customClass="col-span-1 min-h-[20rem]"
+        customClass="col-span-1 min-h-[20rem] group hover:group-hover:bg-transparent"
       >
-        <template #background>
-          <div class="absolute inset-0 bg-neutral-200" />
-        </template>
-      </BentoCard>
+        <div class="h-[30rem] overflow-y-scroll space-y-2 p-2" style="overflow: visible;">
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription>
+          </Alert>
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>Gratis bolle på element. Etter dårlig salg på kanelbolle onsdag, gir nå ntnu ut gratis bolle til alle studenter.</AlertDescription>
+          </Alert>
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>Snart skal alerts slutte å vises. Dette skal kunne scrolles plis</AlertDescription>
+          </Alert>
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>Håper denne er borte.</AlertDescription>
+          </Alert>
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>Borte... bø!.</AlertDescription>
+          </Alert>
+        </div>
+      </BentoCardCustom>
+
 
       <!-- Utgår snart -->
-      <BentoCard
+      <BentoCardCustom
         name="Utgår snart"
-        description="Du er innlogget og vil se hva som snart går ut på dato"
-        cta="Se detaljer"
-        href="/utgar"
-        :Icon="ArrowRightIcon"
         customClass="col-span-3 min-h-[24rem]"
       >
-        <template #background>
-          <div class="absolute inset-0 bg-neutral-200" />
-        </template>
-      </BentoCard>
+        <div>
+          TBA
+        </div>
+      </BentoCardCustom>
     </BentoGrid>
   </div>
 

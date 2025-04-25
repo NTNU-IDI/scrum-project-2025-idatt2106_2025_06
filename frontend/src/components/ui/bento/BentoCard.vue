@@ -1,24 +1,3 @@
-<script>
-//ArrowRightIcon funker ikke for vue, må evt finne en alternativ løsning for pil
-//import { ArrowRightIcon } from '@radix-icons/vue';
-
-export default {
-  name: "BentoCard",
-  props: {
-    name: String,
-    customClass: String,
-    background: Object,
-    Icon: [Object, Function, String],
-    description: String,
-    href: String,
-    cta: String
-  },
-  components: {
-    //ArrowRightIcon
-  }
-}
-</script>
-
 <template>
   <div
     :class="[
@@ -30,7 +9,6 @@ export default {
   >
     <div>
       <div class="absolute inset-0 bg-white transition-all duration-300 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700" />
-
     </div>
     <div class="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-12 transition-all duration-300 group-hover:-translate-y-10">
       <component :is="Icon" class="h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75" />
@@ -41,10 +19,29 @@ export default {
       <button class="pointer-events-auto text-sm text-blue-600 hover:underline">
         <a :href="href" class="flex items-center gap-2">
           {{ cta }}
-          <!--<ArrowRightIcon class="h-4 w-4" />-->
         </a>
       </button>
     </div>
     <div class="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
+
+    <!-- Use a slot here to add custom content like alerts -->
+    <div class="absolute inset-0 p-4">
+      <slot name="alert"></slot>
+    </div>
   </div>
 </template>
+
+<script>
+export default {
+  name: "BentoCard",
+  props: {
+    name: String,
+    customClass: String,
+    background: Object,
+    Icon: [Object, Function, String],
+    description: String,
+    href: String,
+    cta: String
+  }
+}
+</script>
