@@ -24,30 +24,28 @@ import {ArrowRightIcon} from "lucide-react";
 
     <div class="w-full max-w-2xl mx-auto mt-10 px-4">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <RouterLink to="/for" class="block">
-        <BentoCard class="bg-blue-400"
+        <BentoCard
           name="Før"
           description="Beredskap før en krise inntreffer"
           cta="Les mer"
+          href="/for"
+          bgColor="bg-blue-500"
         />
-        </RouterLink>
-        <RouterLink to="/under" class="block">
         <BentoCard
           name="Under"
           description="Beredskap når en krise har inntruffet"
           cta="Les mer"
           href="/under"
+          bgColor="bg-blue-600"
         />
-        </RouterLink>
 
-        <RouterLink to="/etter" class="block">
         <BentoCard
           name="Etter"
           description="Beredskap etter en krise inntreffer"
           cta="Les mer"
-          to="/etter"
+          href="/etter"
+          bgColor="bg-blue-700"
         />
-        </RouterLink>
       </div>
     </div>
         <!-- <Button class="px-10 py-6 bg-blue-700 hover:bg-blue-400">
