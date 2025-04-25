@@ -1,15 +1,79 @@
 <script setup>
-import {Button} from "@/components/ui/button/index.js";
+import {Alert} from '@/components/ui/alert/index.js'
+import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
 </script>
 
 <template>
-  <div class="m-auto">
-    <p>Home</p>
-    <Button>Lol</Button>
-  </div>
-  <div>
-  </div>
+  <div class="m-auto mt-20">
+    <BentoGrid>
+      <!-- Card 1 -->
+      <BentoCard
+        name="Krisescenarioer"
+        description="Les om forskjellige krisescenarioer"
+        href="/scenario"
+        cta="Les mer"
+        :Icon="ArrowRightIcon"
+        customClass="col-span-2"
+      />
 
+
+
+      <!-- Card 2 -->
+      <BentoCard
+        name="Krisehåndtering"
+        description="Generell info om krisehåndtering (før/under/etter)"
+        cta="Les mer"
+        href="/info"
+        :Icon="ArrowRightIcon"
+        customClass="col-span-2"
+      >
+      </BentoCard>
+
+      <!-- Nyheter -->
+      <BentoCardCustom
+        name="Nyheter"
+        href="/alerts"
+        customClass="col-span-1 min-h-[30rem] group hover:group-hover:bg-transparent"
+      >
+        <div class="h-[25rem] overflow-y-auto space-y-2 p-2">
+          <!-- TODO: Implementere dynamisk generering av alerts fra databasen -->
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription>
+          </Alert>
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>Gratis bolle på Element.</AlertDescription>
+          </Alert>
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>Snart skal alerts slutte å vises. Dette skal kunne scrolles plis</AlertDescription>
+          </Alert>
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>Håper denne er borte.</AlertDescription>
+          </Alert>
+          <Alert variant="default">
+            <AlertTitle>Info: </AlertTitle>
+            <AlertDescription>Borte... bø!.</AlertDescription>
+          </Alert>
+        </div>
+      </BentoCardCustom>
+
+
+      <!-- Utgår snart -->
+      <!-- TODO legge til beredskapslager her -->
+      <BentoCardCustom
+        name="Utgår snart"
+        href="/inventory"
+        customClass="col-span-3 min-h-[30rem]"
+      >
+        <div>
+          TBA
+        </div>
+      </BentoCardCustom>
+    </BentoGrid>
+  </div>
 </template>
 
 <style scoped></style>
