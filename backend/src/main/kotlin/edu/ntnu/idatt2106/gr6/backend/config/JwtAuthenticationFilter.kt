@@ -42,27 +42,26 @@ class JwtAuthenticationFilter(
 
             if (email != null && authentication == null) {
                 val userDetails = userDetailsService.loadUserByUsername(email)
-
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     val userId =
                         jwtService.extractUserIdFromToken(jwt)
                             ?: throw IllegalStateException("UserID not found in valid token")
 
-                    val authorities = jwtService.getAuthoritiesFromToken(jwt)
+                    val userDetailss = userDetailsService.loadUserByUsername(email)
+                        ?: throw IllegalStateException("User not found in repository")
 
                     userContextService.setCurrentUserId(userId)
                     val authToken =
                         UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            authorities,
+                            userDetailss.authorities,
                         )
                     authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
                     SecurityContextHolder.getContext().authentication = authToken
                 }
             }
             filterChain.doFilter(request, response)
-            logger.info("1")
         } catch (e: Exception) {
             logger.error("Jwt processing error has occurred: ${e.message}", e)
             SecurityContextHolder.clearContext()

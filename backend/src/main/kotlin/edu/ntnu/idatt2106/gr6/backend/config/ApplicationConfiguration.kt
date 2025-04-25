@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.gr6.backend.config
 import edu.ntnu.idatt2106.gr6.backend.repository.RoleRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import edu.ntnu.idatt2106.gr6.backend.model.User
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -18,31 +19,25 @@ class ApplicationConfiguration(
     private val userRepository: UserRepository,
     private val roleRepository: RoleRepository
 ) {
-    private val logger = org.slf4j.LoggerFactory.getLogger(ApplicationConfiguration::class.java)
     @Bean
     fun userDetailsService(): UserDetailsService =
         UserDetailsService { email ->
             val user = userRepository.findByEmail(email)
                 ?: throw UsernameNotFoundException("User with email $email not found")
 
-            val authorities = roleRepository.findPermissionsByRole(user.role.id)
-                .map { permission ->
-                    SimpleGrantedAuthority(permission.name)
-                }
+            val role = roleRepository.findRoleByRoleId(user.role.id)
+                ?: throw UsernameNotFoundException("Role with ID ${user.role.id} not found")
 
-
-            logger.info("User with email $email found with role ${user.role.id} and permissions ${user.role.permissions.map { it.name }}")
-
-
-            logger.info("User with email $email found with roles: ${user.role.permissions.joinToString(", ")}")
-
-            org.springframework.security.core.userdetails.User(
-                user.email,
-                user.password,
-                authorities
+            User(
+                id = user.id,
+                email = user.email,
+                passwordHashed = user.password,
+                verified = user.verified,
+                name = user.name,
+                createdAt = user.createdAt,
+                role = role,
             )
         }
-
     @Bean
     fun passwordEncoder(): BCryptPasswordEncoder = BCryptPasswordEncoder()
 

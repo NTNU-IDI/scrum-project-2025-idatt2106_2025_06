@@ -79,7 +79,7 @@ class RoleRepository(
 
     fun findPermissionsByRole(roleId: Int): Set<Permission> {
         val sql = """
-        SELECT p.id, p.permission_name, p.description
+        SELECT p.id, p.name, p.description
         FROM permissions p
         JOIN role_permissions rp ON p.id = rp.permission_id
         WHERE rp.role_id = ?
@@ -94,7 +94,7 @@ class RoleRepository(
                         permissions.add(
                             Permission(
                                 id = rs.getInt("id"),
-                                name = rs.getString("permission_name"),
+                                name = rs.getString("name"),
                                 description = rs.getString("description")
                             )
                         )

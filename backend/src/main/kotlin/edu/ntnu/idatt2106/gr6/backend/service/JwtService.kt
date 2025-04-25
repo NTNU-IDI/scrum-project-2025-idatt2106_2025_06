@@ -17,6 +17,7 @@ import javax.crypto.SecretKey
 
 @Service
 class JwtService {
+    private val logger = org.slf4j.LoggerFactory.getLogger(JwtService::class.java)
     @Value("\${security.jwt.secret-key}")
     private val secret: String? = null
 
