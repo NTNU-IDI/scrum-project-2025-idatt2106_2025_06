@@ -86,3 +86,4 @@ class UserRepository (
             passwordHashed = rs.getString("password"),
         )
 }
+

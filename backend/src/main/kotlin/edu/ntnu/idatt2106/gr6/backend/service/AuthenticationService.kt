@@ -1,12 +1,15 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
+import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.LoginUserRequest
 import edu.ntnu.idatt2106.gr6.backend.repository.UserRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.crypto.password.PasswordEncoder
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.UserResponse
 import edu.ntnu.idatt2106.gr6.backend.model.User
 import edu.ntnu.idatt2106.gr6.backend.repository.RoleRepository
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
+import org.slf4j.LoggerFactory
 
 @Service
 class AuthenticationService(
@@ -16,6 +19,8 @@ class AuthenticationService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService
 ) {
+    private val logger = LoggerFactory.getLogger(AuthenticationService::class.java)
+
     fun signupUser(
         name: String,
         email: String,
@@ -37,6 +42,33 @@ class AuthenticationService(
         return userRepository.save(userToSave).toResponse()
     }
 
+    fun loginUser(request: LoginUserRequest) : UserResponse {
+        val email = request.email
+        val password = request.password
+
+        if (email.isBlank() || password.isBlank()) {
+            throw IllegalArgumentException("Email and password cannot be blank")
+        }
+
+        logger.info("Authenticating user with email: $email")
+        try {
+            authenticationManager.authenticate(
+                UsernamePasswordAuthenticationToken(
+                    email,
+                    password
+                )
+            )
+        } catch (e: Exception) {
+            logger.error("Authentication failed for user $email: ${e.message}")
+            throw IllegalArgumentException("Invalid email or password")
+        }
+
+        logger.info("User $email authenticated successfully.")
+
+        return userRepository.findByEmail(email)?.toResponse()
+            ?: throw IllegalStateException("User $email not found in repository.")
+    }
+
     fun User.toResponse(): UserResponse {
         val token = jwtService.generateToken(this)
         return UserResponse(
@@ -45,7 +77,7 @@ class AuthenticationService(
             email = email,
             createdAt = createdAt,
             role = role.name,
-            permissions = role.permissions.map { it.name }.toSet(),
+            permissions = roleRepository.findPermissionsByRole(role.id).map { it.name }.toSet(),
             token = token,
             expiresIn = jwtService.getExpirationTime(),
         )
