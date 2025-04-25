@@ -1,6 +1,7 @@
 <script>
 import {defineComponent} from "vue";
 import Map from "@/components/Map.vue";
+import {Card} from "@/components/ui/card/index.js";
 
 export default defineComponent({
   data: () => ({
@@ -12,13 +13,14 @@ export default defineComponent({
       zoom: 12
     }
   }),
-  components: {Map}
+  components: {Card, Map}
 })
 
 </script>
 
 <template>
-  <div class="m-auto flex relative flex-1 w-full">
+  <div class="m-auto flex relative flex-1 w-full py-10 gap-6">
+    <Card class="w-72"></Card>
     <Map v-model="location"/>
   </div>
 </template>
