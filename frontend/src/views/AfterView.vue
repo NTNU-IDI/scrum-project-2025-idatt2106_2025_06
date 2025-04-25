@@ -26,7 +26,7 @@ import { Button } from '@/components/ui/button'
         <router-link to="/info">Tilbake</router-link>
       </Button>
       <Button class="px-10 py-6 bg-blue-700 hover:bg-blue-400">
-        <router-link to="/for">Før</router-link>
+        <router-link to="/before">Før</router-link>
       </Button>
     </div>
   </div>

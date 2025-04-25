@@ -1,9 +1,6 @@
 <script setup>
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import BentoGrid from "@/components/ui/bento/BentoGrid.vue";
 import BentoCard from "@/components/ui/bento/BentoCard.vue";
-import {ArrowRightIcon} from "lucide-react";
 </script>
 
 <template>
@@ -28,36 +25,27 @@ import {ArrowRightIcon} from "lucide-react";
           name="Før"
           description="Beredskap før en krise inntreffer"
           cta="Les mer"
-          href="/for"
-          bgColor="bg-blue-500"
+          href="/before"
+          bgColor="bg-blue-100"
         />
         <BentoCard
           name="Under"
           description="Beredskap når en krise har inntruffet"
           cta="Les mer"
-          href="/under"
-          bgColor="bg-blue-600"
+          href="/during"
+          bgColor="bg-blue-200"
         />
 
         <BentoCard
           name="Etter"
           description="Beredskap etter en krise inntreffer"
           cta="Les mer"
-          href="/etter"
-          bgColor="bg-blue-700"
+          href="/after"
+          bgColor="bg-blue-300"
         />
       </div>
     </div>
-        <!-- <Button class="px-10 py-6 bg-blue-700 hover:bg-blue-400">
-          <router-link to="/for">Før</router-link>
-        </Button>
-        <Button class="px-10 py-6 bg-blue-700 hover:bg-blue-400">
-          <router-link to="/under">Under</router-link>
-        </Button>
-        <Button class="px-10 py-6 bg-blue-700 hover:bg-blue-400">
-          <router-link to="/etter">Etter</router-link>
-        </Button> -->
-      </div>
+  </div>
 
 
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <!-- Hele BentoCard er nå en router-link-->
+  <!-- Hele BentoCard er en router-link-->
   <router-link
     :to="href"
     :class="[
@@ -19,7 +19,6 @@
       <p class="max-w-lg text-neutral-400">{{ description }}</p>
     </div>
     <div class="pointer-events-none absolute bottom-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-      <!-- CTA tekst på kortet -->
       <span class="text-sm text-blue-600 hover:underline">
         {{ cta }}
       </span>
@@ -42,11 +41,11 @@ export default {
     background: Object,
     Icon: [Object, Function, String],
     description: String,
-    href: String,  // Brukes nå som 'to' for router-link
+    href: String,
     cta: String,
     bgColor: {
       type: String,
-      default: 'bg-white' // ← fallback
+      default: 'bg-white'
     }
   }
 }

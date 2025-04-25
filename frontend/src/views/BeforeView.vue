@@ -30,7 +30,7 @@ import { Button } from '@/components/ui/button'
         <router-link to="/info">Tilbake</router-link>
       </Button>
       <Button class="px-10 py-6 bg-blue-700 hover:bg-blue-400">
-        <router-link to="/under">Under</router-link>
+        <router-link to="/during">Under</router-link>
       </Button>
   </div>
   </div>

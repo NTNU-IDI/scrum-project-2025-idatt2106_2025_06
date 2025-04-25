@@ -1,5 +1,5 @@
 <template>
-  <!-- Hele BentoCard er nå en router-link-->
+  <!-- Hele BentoCard er en router-link-->
   <router-link
     :to="href"
     :class="[
@@ -9,13 +9,12 @@
       customClass
     ]"
   >
-    <!-- Tittel plassert i øverste venstre hjørne -->
     <div class="absolute top-0 left-0 p-4 text-xl font-semibold text-neutral-700 dark:text-neutral-300 z-10">
       {{ name }}
     </div>
 
     <!-- Slot for custom content (som alerts eller annet innhold), plassert under tittelen -->
-    <div class="relative mt-10 p-4 z-0"> <!-- mt-12 for å legge plass til tittelen -->
+    <div class="relative mt-10 p-4 z-0">
       <slot></slot>
     </div>
   </router-link>
@@ -27,11 +26,10 @@ export default {
   props: {
     name: String,
     customClass: String,
-    href: String  // Sørg for å ta inn href som en prop, slik at vi kan bruke den med router-link
+    href: String
   }
 }
 </script>
 
 <style scoped>
-/* Her kan du legge til annen styling hvis nødvendig */
 </style>
