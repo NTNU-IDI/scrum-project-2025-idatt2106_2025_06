@@ -29,69 +29,67 @@ import {Label} from "@/components/ui/label/index.js";
         <CardTitle class="text-2xl w-96"> Min side</CardTitle>
       </CardHeader>
       <CardContent>
-        <div class="grid gap-4">
-          <div class="grid gap-2">
-            <label>
-              Personalia:
-            </label>
-            <CardDescription>
-              [navn]<br/>
-              [epostadresse]
-            </CardDescription>
-            <Dialog>
-              <DialogTrigger>
-                <Button class="w-48">Rediger profil</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Rediger profil</DialogTitle>
-                  <label>
-                    Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.
-                  </label>
-                  <Input
-                    placeholder="[navn]"
-                    type="text"
-                  />
-                  <Input
-                    placeholder="[epostadresse]"
-                    type="email"
-                  />
-                  <label>
-                    Endre passord?
-                  </label>
-                  <Input
-                    placeholder="Gammelt passord"
-                    type="password"
-                  />
-                  <Input
-                    placeholder="Nytt passord"
-                    type="password"
-                  />
-                  <Input
-                    placeholder="Gjenta nytt passord"
-                    type="password"
-                  />
-                </DialogHeader>
+        <div class="grid gap-2">
+          <label>
+            Personalia:
+          </label>
+          <CardDescription>
+            [navn]<br/>
+            [epostadresse]
+          </CardDescription>
+          <Dialog>
+            <DialogTrigger>
+              <Button class="w-48">Rediger profil</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Rediger profil</DialogTitle>
+                <label>
+                  Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.
+                </label>
+                <Input
+                  placeholder="[navn]"
+                  type="text"
+                />
+                <Input
+                  placeholder="[epostadresse]"
+                  type="email"
+                />
+                <label>
+                  Endre passord?
+                </label>
+                <Input
+                  placeholder="Gammelt passord"
+                  type="password"
+                />
+                <Input
+                  placeholder="Nytt passord"
+                  type="password"
+                />
+                <Input
+                  placeholder="Gjenta nytt passord"
+                  type="password"
+                />
+              </DialogHeader>
 
-                <DialogFooter class="flex flex-col items-center">
-                  <DialogClose>
-                    <Button>Lagre</Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            <label>
-              Husstand:
-            </label>
-            <CardDescription>
-              [navn]<br/>
-              [Husstandsnummer]<br/>
-              [Medlem 1]<br/>
-              [Medlem 2]<br/>
-            </CardDescription>
-            <div class="flex flex-col items-center">
-              <Button class="w-48">Rediger husstand</Button>
-            </div>
+              <DialogFooter class="flex flex-col items-center">
+                <DialogClose>
+                  <Button>Lagre</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <label>
+            Husstand:
+          </label>
+          <CardDescription>
+            [navn]<br/>
+            [Husstandsnummer]<br/>
+            [Medlem 1]<br/>
+            [Medlem 2]<br/>
+          </CardDescription>
+          <div class="flex flex-col items-center">
+            <Button class="w-48">Rediger husstand</Button>
           </div>
         </div>
       </CardContent>
