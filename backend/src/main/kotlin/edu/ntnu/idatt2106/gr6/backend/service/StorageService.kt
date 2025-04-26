@@ -32,6 +32,7 @@ class StorageService(
         // Save the storage itself
         val storage = storageRepository.saveStorage(
             name = request.name,
+            storageOwner = userId.toString(),
             token = request.token,
             latitude = request.latitude,
             longitude = request.longitude

@@ -32,7 +32,7 @@ class StorageController(
      * @return        ResponseEntity containing the created storage and HTTP 201 status.
      */
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('GIVE_MODERATOR_ROLE')")
+    @PreAuthorize("hasAuthority('CREATE_STORAGE')")
     @Operation(
         summary = "Create new storage",
         description = "Creates a new storage and links it to the current authenticated user"
