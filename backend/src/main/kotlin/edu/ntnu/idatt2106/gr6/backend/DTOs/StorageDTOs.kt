@@ -12,6 +12,7 @@ data class CreateStorageRequest(
 data class StorageResponse(
     val id: String,
     val name: String,
+    val storageOwner: String,
     val token: Int,
     val createdAt: Instant,
     val updatedAt: Instant
