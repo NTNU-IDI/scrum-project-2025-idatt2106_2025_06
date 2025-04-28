@@ -32,12 +32,44 @@ import {Input} from "@/components/ui/input/index.js";
 import {DialogClose} from "@/components/ui/dialog/index.js";
 import {Label} from "@/components/ui/label/index.js";
 import {X, UserMinus} from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import router from '@/router/index.js'
+import axios from 'axios'
+import { useSessionStore } from '@/stores/session'
 
-const username = 'username';
-const email = 'email';
-const householdName = 'householdname';
-const householdNumber = 'householdnumber';
-const location = null;
+const username = ref('');
+const email = ref('');
+const householdName = ref('');
+const householdNumber = ref('');
+const location = ref('');
+
+const isLoggedIn = ref(false);
+
+const user = computed(() => session.user)
+
+const session = useSessionStore()
+
+
+onMounted(async () => {
+
+  if (!session.isAuthenticated) {
+    router.push('/login')
+    console.log("Det er noe galt med innloggingen");
+  }
+
+  if (user.value) {
+    username.value = user.value.name
+    email.value = user.value.email
+  }
+});
+
+function openEditProfile() {
+  if (user.value) {
+    username.value = user.value.name;
+    email.value = user.value.email;
+  }
+}
 </script>
 
 <template>
@@ -52,11 +84,11 @@ const location = null;
             Personalia:
           </Label>
           <CardDescription>
-            <p>Brukernavn: {{ username }}</p>
-            <p>Epostadresse: {{ email }}</p><br/>
+            <p v-if="user && user.name">Brukernavn: {{ user.name }}</p>
+            <p v-if="user && user.email">Epostadresse: {{ user.email }}</p><br/>
           </CardDescription>
           <Dialog>
-            <DialogTrigger>
+            <DialogTrigger @click="openEditProfile">
               <Button class="w-48">Rediger profil</Button>
             </DialogTrigger>
             <DialogContent>
@@ -171,7 +203,7 @@ const location = null;
       </CardContent>
     </Card>
     <router-link to="/login">
-      <Button class="w-48" variant="destructive">Logg ut</Button>
+      <Button @click="session.logout" class="w-48" variant="destructive">Logg ut</Button>
     </router-link>
   </div>
 </template>
