@@ -1,7 +1,7 @@
 <script setup>
 import { BentoCardCustom } from '@/components/ui/bento/index.js'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert/index.js'
 import BentoGrid from '@/components/ui/bento/BentoGrid.vue'
+import EventCard from '@/components/EventCard.vue'
 
 const alerts = [
   {
@@ -76,15 +76,12 @@ const alerts = [
         customClass="col-span-4 min-h-[40rem] group hover:group-hover:bg-transparent"
         name="Varslinger"
       >
-        <div class="h-[35rem] overflow-y-auto space-y-2 p-2">
-          <div class="space-y-2">
-            <template v-for="(alert, index) in alerts" :key="index">
-              <Alert class="bg-white">
-                <AlertTitle>{{ alert.title }}</AlertTitle>
-                <AlertDescription>{{ alert.description }}</AlertDescription>
-              </Alert>
-            </template>
-          </div>
+        <div class="h-full overflow-y-auto space-y-2 p-2">
+          <template v-for="(alert, index) in alerts" :key="index">
+            <router-link :to="{ name: 'alert', params: { id: index } }" class="pointer-events-auto">
+              <EventCard title="" />
+            </router-link>
+          </template>
         </div>
       </BentoCardCustom>
     </bento-grid>
