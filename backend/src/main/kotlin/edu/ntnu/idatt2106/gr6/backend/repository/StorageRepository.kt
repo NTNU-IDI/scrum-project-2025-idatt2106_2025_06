@@ -88,6 +88,23 @@ class StorageRepository(private val dataSource: DataSource) {
         }
     }
 
+    fun removeUserFromStorage(userId: String, storageId: String): Boolean {
+        val sql = """
+        DELETE FROM user_storages
+        WHERE user_id = ? AND storage_id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userId)
+                stmt.setString(2, storageId)
+                val rowsDeleted = stmt.executeUpdate()
+                return rowsDeleted > 0
+            }
+        }
+    }
+
+
     fun findUserNamesInStorage(storageId: String): List<String> {
         val sql = """
         SELECT u.name

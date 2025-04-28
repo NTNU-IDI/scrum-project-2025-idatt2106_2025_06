@@ -16,3 +16,8 @@ data class StorageResponse(
     val createdAt: Instant,
     val updatedAt: Instant
 )
+
+data class RemoveUserFromStorageRequest(
+    val storageId: String,
+    val userId: String
+)
