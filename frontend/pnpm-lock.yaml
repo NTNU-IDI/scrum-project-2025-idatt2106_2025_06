@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@internationalized/date':
+        specifier: ^3.8.0
+        version: 3.8.0
+      '@radix-icons/vue':
+        specifier: ^1.0.0
+        version: 1.0.0(vue@3.5.13(typescript@5.8.3))
       '@radix-ui/react-slot':
         specifier: ^1.2.0
         version: 1.2.0(react@19.1.0)
@@ -23,6 +29,9 @@ importers:
       lucide-react:
         specifier: ^0.503.0
         version: 0.503.0(react@19.1.0)
+      lucide-vue-next:
+        specifier: ^0.503.0
+        version: 0.503.0(vue@3.5.13(typescript@5.8.3))
       mapbox-gl:
         specifier: ^3.11.1
         version: 3.11.1
@@ -596,6 +605,11 @@ packages:
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
+
+  '@radix-icons/vue@1.0.0':
+    resolution: {integrity: sha512-gKWWk9tTK/laDRRNe5KLLR8A0qUwx4q4+DN8Fq48hJ904u78R82ayAO3TrxbNLgyn2D0h6rRiGdLzQWj7rPcvA==}
+    peerDependencies:
+      vue: '>= 3'
 
   '@radix-ui/react-compose-refs@1.1.2':
     resolution: {integrity: sha512-z4eqJvfiNnFMHIIvXP3CY57y2WJs5g2v3X0zm9mEJkrkNv4rDxu+sg9Jh8EkXyeqBkB7SOcboo9dMVqhyrACIg==}
@@ -2002,6 +2016,11 @@ packages:
     resolution: {integrity: sha512-HGGkdlPWQ0vTF8jJ5TdIqhQXZi6uh3LnNgfZ8MHiuxFfX3RZeA79r2MW2tHAZKlAVfoNE8esm3p+O6VkIvpj6w==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  lucide-vue-next@0.503.0:
+    resolution: {integrity: sha512-3MrtHIBdh4dPCUZDLxQnvmQ17UzUnBYgezUSIo87Laais8hOz6qIPllp0iG/uS/UIzk7bJxyZRzoZTW/gLSr4A==}
+    peerDependencies:
+      vue: '>=3.0.1'
 
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
@@ -3423,6 +3442,10 @@ snapshots:
   '@pkgr/core@0.2.4': {}
 
   '@polka/url@1.0.0-next.29': {}
+
+  '@radix-icons/vue@1.0.0(vue@3.5.13(typescript@5.8.3))':
+    dependencies:
+      vue: 3.5.13(typescript@5.8.3)
 
   '@radix-ui/react-compose-refs@1.1.2(react@19.1.0)':
     dependencies:
@@ -4890,6 +4913,10 @@ snapshots:
   lucide-react@0.503.0(react@19.1.0):
     dependencies:
       react: 19.1.0
+
+  lucide-vue-next@0.503.0(vue@3.5.13(typescript@5.8.3)):
+    dependencies:
+      vue: 3.5.13(typescript@5.8.3)
 
   magic-string@0.30.17:
     dependencies:
