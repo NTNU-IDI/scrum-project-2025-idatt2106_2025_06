@@ -39,7 +39,13 @@ async function login() {
 
     if (data.token) {
       localStorage.setItem('jwt', data.token)
-      router.push('/');
+      if (data.role === "ROLE_ADMIN") {
+        router.push('/admin');
+      } else if (data.role === "ROLE_MODERATOR") {
+        router.push('/moderator');
+      } else {
+        router.push('/');
+      }
     }
 
   } catch (error) {
