@@ -48,9 +48,9 @@ const location = null;
       </CardHeader>
       <CardContent>
         <div class="grid gap-2">
-          <label>
+          <Label>
             Personalia:
-          </label>
+          </Label>
           <CardDescription>
             <p>Brukernavn: {{ username }}</p>
             <p>Epostadresse: {{ email }}</p><br/>
@@ -62,9 +62,9 @@ const location = null;
             <DialogContent>
               <DialogHeader>
                 <DialogTitle class="text-2xl">Rediger profil</DialogTitle>
-                <label>
+                <Label>
                   Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.
-                </label>
+                </Label>
                 <Input
                   v-model="username"
                   placeholder="Navn"
@@ -75,9 +75,9 @@ const location = null;
                   placeholder="Epostadresse"
                   type="email"
                 /><br/>
-                <label>
+                <Label>
                   Endre passord?
-                </label>
+                </Label>
                 <Input
                   placeholder="Gammelt passord"
                   type="password"
@@ -99,9 +99,9 @@ const location = null;
             </DialogContent>
           </Dialog>
           <br/>
-          <label>
+          <Label>
             Husstand:
-          </label>
+          </Label>
           <CardDescription>
             <p>Husstandsnavn: {{ householdName }}</p>
             <p>Lokasjon: {{ location === null ? 'Ikke spesifisert' : location }}</p>
@@ -118,9 +118,9 @@ const location = null;
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle class="text-2xl">Endre husstand</DialogTitle>
-                  <label>
+                  <Label>
                     Her kan du endre husstanden din. Trykk på "Lagre" når du er ferdig.
-                  </label>
+                  </Label>
                   <Input
                     v-model="householdName"
                     placeholder="Husstandsnavn"
@@ -131,12 +131,12 @@ const location = null;
                     placeholder="Lokasjon (valgfritt)"
                     type="text"
                   /><br/>
-                  <label>
+                  <Label>
                     <p>Husstandsnummer: {{ householdNumber }}</p><br/>
-                  </label>
+                  </Label>
                   <DialogTitle>Medlemmer</DialogTitle>
                   <div class="flex items-center gap-2 justify-between">
-                    <label>[Medlem1]</label>
+                    <Label>[Medlem1]</Label>
                     <AlertDialog>
                       <AlertDialogTrigger as-child>
                         <Button size="icon" variant="outline">
