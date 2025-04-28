@@ -1,5 +1,5 @@
 <template>
-  <!-- Hele BentoCard er en router-link-->
+  <!-- Hele BentoCard er nå en router-link yay-->
   <router-link
     :to="href"
     :class="[
@@ -11,15 +11,16 @@
     ]"
   >
     <div>
-      <div class="absolute inset-0 bgColor transition-all duration-300 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700" />
+      <div :class="['absolute inset-0 transition-all duration-300', bgColor, hoverColor]" />
     </div>
     <div class="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-12 transition-all duration-300 group-hover:-translate-y-10">
       <component :is="Icon" class="h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75" />
-      <h3 class="text-xl font-semibold text-neutral-700 dark:text-neutral-300">{{ name }}</h3>
-      <p class="max-w-lg text-neutral-400">{{ description }}</p>
+      <h3 :class="['text-xl font-semibold text-neutral-700', nameColor]">{{ name }}</h3>
+      <p :class="['max-w-lg', descColor]">{{ description }}</p>
     </div>
     <div class="pointer-events-none absolute bottom-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-      <span class="text-sm text-blue-600 hover:underline">
+      <!-- CTA tekst på kortet -->
+      <span :class="['text-sm', readmoreColor, 'hover:underline']">
         {{ cta }}
       </span>
     </div>
@@ -41,11 +42,27 @@ export default {
     background: Object,
     Icon: [Object, Function, String],
     description: String,
-    href: String,
+    href: String,  // Brukes nå som 'to' for router-link
     cta: String,
     bgColor: {
       type: String,
-      default: 'bg-white'
+      default: 'bg-white' // ← fallback
+    },
+    descColor: {
+      type: String,
+      default: 'text-neutral-400'
+    },
+    hoverColor: {
+      type: String,
+      default: 'group-hover:bg-neutral-100' // fallback hover
+    },
+    nameColor: {
+      type: String,
+      default: 'dark:text-neutral-300' //fallback name text color
+    },
+    readmoreColor: {
+      type: String,
+      default: 'text-blue-600'
     }
   }
 }

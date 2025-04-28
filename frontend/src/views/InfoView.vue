@@ -13,7 +13,14 @@ import BentoCard from "@/components/ui/bento/BentoCard.vue";
         </CardHeader>
         <CardContent>
           <p class="text-base mt-2">
-            Det er viktig å være beredt i tilfelle en krise skulle oppstå. bladi bla.. More info senere. <br />
+            Norske myndigheter anbefaler at flest mulig er forberedt på å klare seg selv i en uke.
+            Det er fordi kommuner og nødetater må prioritere de som ikke klarer seg uten hjelp i en krise. <br />
+            God egenberedskap er en investering i trygghet for deg og dine nærmeste.I tillegg bidrar du til at myndighetene kan prioritere dem som trenger mest hjelp.<br />
+
+            Ved å være forberedt i en uke blir du bedre i stand til å håndtere alt fra små forstyrrelser i hverdagen til større kriser.
+            I tillegg har du bedre tid til å planlegge veien videre om krisen skulle bli langvarig. <br />
+
+            Husk at noen forberedelser er mye bedre enn ingenting!
             Nedenfor finner du informasjon om hva du bør gjøre før, under, og etter en krise.
           </p>
         </CardContent>
@@ -26,14 +33,22 @@ import BentoCard from "@/components/ui/bento/BentoCard.vue";
           description="Beredskap før en krise inntreffer"
           cta="Les mer"
           href="/before"
-          bgColor="bg-blue-100"
+          bgColor="bg-[#155A77]"
+          desc-color="text-white"
+          name-color="text-white"
+          hover-color="group-hover:bg-[#1A6E94]"
+          readmore-color="text-white"
         />
         <BentoCard
           name="Under"
           description="Beredskap når en krise har inntruffet"
           cta="Les mer"
           href="/during"
-          bgColor="bg-blue-200"
+          bgColor="bg-[#1A6E94]"
+          desc-color="text-white"
+          nameColor="text-white"
+          hoverColor="group-hover:bg-[#278AB2]"
+          readmore-color="text-white"
         />
 
         <BentoCard
@@ -41,7 +56,11 @@ import BentoCard from "@/components/ui/bento/BentoCard.vue";
           description="Beredskap etter en krise inntreffer"
           cta="Les mer"
           href="/after"
-          bgColor="bg-blue-300"
+          bgColor="bg-[var(--primary)]"
+          descColor="text-white"
+          nameColor="text-white"
+          hoverColor="group-hover:bg-[var(--hover)]"
+          readmoreColor="text-white"
         />
       </div>
     </div>
