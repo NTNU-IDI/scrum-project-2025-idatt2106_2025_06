@@ -71,4 +71,8 @@ class StorageService(
         return storageRepository.findUserNamesInStorage(storageId)
     }
 
+    @Transactional
+    fun removeUserFromStorage(userId: String, storageId: String): Boolean {
+        return storageRepository.removeUserFromStorage(userId, storageId)
+    }
 }
