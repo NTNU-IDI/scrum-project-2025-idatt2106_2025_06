@@ -21,3 +21,7 @@ data class RemoveUserFromStorageRequest(
     val storageId: String,
     val userId: String
 )
+
+data class JoinStorageRequest(
+    val token: String
+)
