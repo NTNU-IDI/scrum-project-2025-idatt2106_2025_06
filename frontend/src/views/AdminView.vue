@@ -1,9 +1,8 @@
 <script setup>
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.js'
-import { ref } from 'vue'
 import { Button } from '@/components/ui/button/index.js'
-import Map from '@/components/Map.vue'
-import { Alert } from '@/components/ui/alert/index.js'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert/index.js'
+import { ref } from 'vue'
 
 const isAdmin = ref(true) // endre til false for moderator
 </script>
@@ -16,11 +15,11 @@ const isAdmin = ref(true) // endre til false for moderator
         <CardTitle class="text-2xl">Rediger moderatorer</CardTitle>
       </CardHeader>
       <p></p>
-      <CardContent class="flex flex-col gap-2">
-        <Button class="w-full">Legg til moderator</Button>
+      <CardContent class="flex flex-col gap-2 h-full max-h-[calc(100%-80px)]">
+      <Button class="w-full">Legg til moderator</Button>
         <Button class="w-full">Slett moderator</Button>
         <Button class="w-full">Send "tilbakestill-passord-lenke"</Button>
-
+        <div class="grow"></div> <!-- Dette er helt forferdelig hardkoda, men la gå for nå -->
         <Button class="w-full" variant="destructive">Logg ut</Button>
       </CardContent>
     </Card>
@@ -32,7 +31,7 @@ const isAdmin = ref(true) // endre til false for moderator
         <Button class="w-auto justify-self-end">Rediger kart</Button>
       </CardHeader>
       <CardContent>
-        <Map :location="location"/>
+        <!--  Inne her skal det være kart! -->
       </CardContent>
     </Card>
 
@@ -41,11 +40,10 @@ const isAdmin = ref(true) // endre til false for moderator
         <CardTitle class="text-2xl">Varslinger</CardTitle>
         <Button class="w-auto justify-self-end">Legg til ny varsling</Button>
       </CardHeader>
-      <CardContent class="overflow-y-auto max-h-[500px] gap-2">
+      <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2">
+        <!-- Her hentes det fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
         <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription></Alert>
         <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Gratis bolle på Element.</AlertDescription></Alert>
-        <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Snart skal alerts slutte å vises. Dette skal kunne scrolles plis</AlertDescription></Alert>
-        <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Håper denne er borte.</AlertDescription></Alert>
         <Alert variant="default"><AlertTitle>Warning: </AlertTitle><AlertDescription>Systemet er under vedlikehold. Vær tålmodig.</AlertDescription></Alert>
         <Alert variant="default"><AlertTitle>Notice: </AlertTitle><AlertDescription>Brannøvelse pågår. Ikke vær redd om alarmen går.</AlertDescription></Alert>
         <Alert variant="default"><AlertTitle>Alert: </AlertTitle><AlertDescription>Vær forsiktig på vei hjem. Snø og glatte veier forventes.</AlertDescription></Alert>
