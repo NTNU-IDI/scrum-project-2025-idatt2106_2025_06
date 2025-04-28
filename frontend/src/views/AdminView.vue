@@ -38,10 +38,14 @@ const isAdmin = ref(true) // endre til false for moderator
     <Card :class="isAdmin ? 'max-h-[650px] flex-1 basis-1/4 min-w-[200px]' : 'max-h-[650px] flex-1 basis-2/5 min-w-[300px]'">
       <CardHeader class="grid grid-cols-2 items-center w-full">
         <CardTitle class="text-2xl">Varslinger</CardTitle>
-        <Button class="w-auto justify-self-end">Legg til ny varsling</Button>
+          <router-link class="underline" to="/admin/event">
+            <Button class="w-auto justify-self-end">
+              Legg til ny varsling
+            </Button>
+          </router-link>
       </CardHeader>
       <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2">
-        <!-- Her hentes det fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
+        <!-- Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
         <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription></Alert>
         <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Gratis bolle på Element.</AlertDescription></Alert>
         <Alert variant="default"><AlertTitle>Warning: </AlertTitle><AlertDescription>Systemet er under vedlikehold. Vær tålmodig.</AlertDescription></Alert>
