@@ -17,7 +17,7 @@ class StorageRepository(private val dataSource: DataSource) {
         longitude: Double?
     ): Storage {
         val id = UUID.randomUUID()
-        val token = UUID.randomUUID()
+        val token = generateRandomKey()
         val createdAt = Timestamp(System.currentTimeMillis())
         val updatedAt = createdAt
 
@@ -31,7 +31,7 @@ class StorageRepository(private val dataSource: DataSource) {
                 stmt.setString(1, id.toString())
                 stmt.setString(2, name)
                 stmt.setString(3, storageOwner)
-                stmt.setString(4, token.toString())
+                stmt.setString(4, token)
                 stmt.setObject(5, latitude)
                 stmt.setObject(6, longitude)
                 stmt.setTimestamp(7, createdAt)
@@ -168,5 +168,11 @@ class StorageRepository(private val dataSource: DataSource) {
             createdAt = rs.getTimestamp("created_at").toInstant(),
             updatedAt = rs.getTimestamp("updated_at").toInstant()
         )
+    }
+    private fun generateRandomKey(length: Int = 6): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        return (1..length)
+            .map { chars.random() }
+            .joinToString("")
     }
 }
