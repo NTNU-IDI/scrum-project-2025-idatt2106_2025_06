@@ -13,10 +13,23 @@ import {
   CollapsibleContent,
   CollapsibleTrigger
 } from '@/components/ui/collapsible/index.js'
+import { Checkbox } from '@/components/ui/checkbox/index.js'
+import { ChevronDown, ChevronRight } from 'lucide-vue-next';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip/index.js'
+import EditItem from '@/components/EditItem.vue'
+
 
 const props = defineProps({
   tab: { type: String, required: true },
 });
+
+const selectedBoxes = ref(new Set());
+const selectAllBoxes = ref(false);
 
 //const items = ref();
 
@@ -35,12 +48,11 @@ const items = {
       daysLeft: 7
     },
     {
-      id: 3,
-      name: "Tomato Sauce",
+      name: "Tomato",
       amount: "700 g",
       daysLeft: 2,
       items: [
-        { "id": 4, "name": "Pasta", "amount": "500 g", "daysLeft": 4 },
+        { "id": 6, "name": "Pasta", "amount": "500 g", "daysLeft": 4 },
         { "id": 5, "name": "Pasta", "amount": "200 g", "daysLeft": 2 }
       ]
     },
@@ -49,6 +61,15 @@ const items = {
       name: "Olive Oil",
       amount: "500 ml",
       daysLeft: 10
+    },
+    {
+      name: "Ost",
+      amount: "750 g",
+      daysLeft: 5,
+      items: [
+        { "id": 7, "name": "Pasta", "amount": "500 g", "daysLeft": 10 },
+        { "id": 10, "name": "Pasta", "amount": "250 g", "daysLeft": 5 }
+      ]
     }
   ],
   varmeOgLys: [
@@ -120,6 +141,9 @@ const items = {
 };
 
 const currentItems = ref();
+const selectedAllSubBoxes = (subItems) => {
+  return subItems.every(item => selectedBoxes.value.has(item.id));
+};
 
 const fetchItems = async () => {
   let apiPath = '';
@@ -144,6 +168,52 @@ const fetchItems = async () => {
   //items.value = response.data;
 }
 
+const toggleAll = (value) => {
+  selectAllBoxes.value = value;
+
+  if (value) {
+    const allIds = new Set();
+    currentItems.value.forEach(item => {
+      allIds.add(item.id);
+      if (item.items) {
+        item.items.forEach(subItem => {
+          allIds.add(subItem.id);
+        });
+      }
+    });
+    selectedBoxes.value = allIds;
+  } else {
+    selectedBoxes.value.clear();
+  }
+};
+
+const toggleItem = (isChecked, id) => {
+  if (isChecked) {
+    selectedBoxes.value.add(id);
+  } else {
+    selectedBoxes.value.delete(id);
+  }
+
+  // Update selectAll status
+  const totalItems = currentItems.value.reduce((count, item) => {
+    count += 1;
+    if (item.items) count += item.items.length;
+    return count;
+  }, 0);
+
+  selectAllBoxes.value = selectAllBoxes.value.size === totalItems;
+};
+
+const toggleAllSubItem = (isChecked, items) => {
+  if (isChecked) {
+    items.forEach(item => selectedBoxes.value.add(item.id));
+  } else {
+    // If selectAll is false, remove all sub-item IDs from checkedIds
+    items.forEach(item => selectedBoxes.value.delete(item.id));
+  }
+}
+
+
 onMounted(() => {
   fetchItems();
 })
@@ -152,11 +222,24 @@ onMounted(() => {
 <template>
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow class="bg-gray-100">
           <TableHead></TableHead>
           <TableHead class="w-[100px]">Vare</TableHead>
           <TableHead class="text-center">Total mengde</TableHead>
           <TableHead class="text-center">Utløpsdato</TableHead>
+          <TableHead></TableHead>
+          <TableHead>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Checkbox v-model="selectAllBoxes" @update:modelValue="toggleAll"/>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Marker alle</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -164,19 +247,62 @@ onMounted(() => {
         <TableRow>
           <TableCell>
             <CollapsibleTrigger as="button" v-if="item.items">
-              {{ open ? '▼' : '▶' }}
+              <ChevronRight v-if="!open" />
+              <ChevronDown v-if="open" />
             </CollapsibleTrigger>
           </TableCell>
           <TableCell class="font-medium">{{ item.name }}</TableCell>
           <TableCell class="text-center">{{ item.amount}}</TableCell>
           <TableCell class="text-center">{{ item.daysLeft}} dager igjen</TableCell>
+          <TableCell>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <EditItem v-if="!item.items" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Endre</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </TableCell>
+          <TableCell>
+            <Checkbox
+              v-if="item.items"
+              :model-value="selectedAllSubBoxes(item.items)"
+              @update:modelValue="val => toggleAllSubItem(val, item.items)"
+            />
+            <Checkbox
+              v-else-if="!item.items"
+              :model-value="selectedBoxes.has(item.id)"
+              @update:modelValue="val => toggleItem(val, item.id)"
+            />
+          </TableCell>
         </TableRow>
         <CollapsibleContent as="template" v-if="item.items">
-          <TableRow v-for="item in item.items" :key="item.id">
+          <TableRow v-for="item in item.items" :key="item.id" class="bg-gray-50 hover:bg-gray-100">
             <TableCell></TableCell>
             <TableCell class="font-medium"></TableCell>
             <TableCell class="text-center">{{ item.amount}}</TableCell>
             <TableCell class="text-center">{{ item.daysLeft}} dager igjen</TableCell>
+            <TableCell>
+              <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <EditItem />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Edit</p>
+                </TooltipContent>
+              </Tooltip>
+              </TooltipProvider>
+            </TableCell>
+            <TableCell>
+              <Checkbox
+                :model-value="selectedBoxes.has(item.id)"
+                @update:modelValue="val => toggleItem(val, item.id)"
+              />
+            </TableCell>
           </TableRow>
         </CollapsibleContent>
         </Collapsible>
