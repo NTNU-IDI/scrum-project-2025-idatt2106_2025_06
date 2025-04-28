@@ -42,7 +42,7 @@ async function login() {
       if (data.role === "ROLE_ADMIN") {
         router.push('/admin');
       } else if (data.role === "ROLE_MODERATOR") {
-        router.push('/moderator');
+        router.push('/admin');
       } else {
         router.push('/');
       }
