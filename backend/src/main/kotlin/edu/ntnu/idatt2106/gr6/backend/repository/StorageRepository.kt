@@ -75,10 +75,15 @@ class StorageRepository(private val dataSource: DataSource) {
     }
 
     fun addUserToStorage(userId: String, storageId: String) {
+        if (isUserAlreadyInStorage(userId, storageId)) {
+            throw IllegalArgumentException("User is already a member of this storage.")
+        }
+
         val sql = """
-            INSERT INTO user_storages (user_id, storage_id)
-            VALUES (?, ?)
-        """.trimIndent()
+        INSERT INTO user_storages (user_id, storage_id)
+        VALUES (?, ?)
+    """.trimIndent()
+
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, userId)
@@ -87,6 +92,28 @@ class StorageRepository(private val dataSource: DataSource) {
             }
         }
     }
+
+    private fun isUserAlreadyInStorage(userId: String, storageId: String): Boolean {
+        val sql = """
+        SELECT COUNT(*)
+        FROM user_storages
+        WHERE user_id = ? AND storage_id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userId)
+                stmt.setString(2, storageId)
+                stmt.executeQuery().use { rs ->
+                    if (rs.next()) {
+                        return rs.getInt(1) > 0
+                    }
+                }
+            }
+        }
+        return false
+    }
+
 
     fun removeUserFromStorage(userId: String, storageId: String): Boolean {
         val sql = """

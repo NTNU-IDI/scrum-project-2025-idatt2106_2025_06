@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.controller
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateStorageRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.JoinStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.RemoveUserFromStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageResponse
 import edu.ntnu.idatt2106.gr6.backend.service.StorageService
@@ -95,11 +96,11 @@ class StorageController(
         }
     }
 
-    @PostMapping("/join/{token}")
+    @PostMapping("/join")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!Make a uniqe auth for this action, now it is set to 'CREATE_STORAGE'!!!!
     @Operation(
         summary = "Join a storage",
-        description = "Join a storage using its token"
+        description = "Join a storage by sending a token in the JSON body"
     )
     @ApiResponses(
         value = [
@@ -111,20 +112,21 @@ class StorageController(
         ],
     )
     fun joinStorageByToken(
-        @PathVariable
-        @Parameter(description = "Token of the storage to join", required = true)
-        token: String
+        @RequestBody @Valid
+        @Parameter(description = "Request containing storage token", required = true)
+        request: JoinStorageRequest
     ): ResponseEntity<Void> {
-        logger.info("User attempting to join storage with token: $token")
+        logger.info("User attempting to join storage with token: ${request.token}")
 
         return try {
-            storageService.joinStorageByToken(token)
+            storageService.joinStorageByToken(request.token)
             ResponseEntity.ok().build()
         } catch (e: IllegalArgumentException) {
             logger.warn("Join failed: ${e.message}")
             ResponseEntity.status(HttpStatus.NOT_FOUND).build()
         }
     }
+
 
     @GetMapping("/{id}/members")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!Make a uniqe auth for this action, now it is set to 'CREATE_STORAGE'!!!!
