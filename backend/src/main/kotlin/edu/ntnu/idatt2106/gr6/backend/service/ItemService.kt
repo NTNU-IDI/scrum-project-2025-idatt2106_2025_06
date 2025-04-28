@@ -7,6 +7,7 @@ import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import edu.ntnu.idatt2106.gr6.backend.repository.ItemRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.sql.SQLException
 import java.time.Instant
 
 @Service
@@ -30,6 +31,10 @@ class ItemService(
             typeId = request.typeId,
             unitId = request.unitId
         )
+
+        if (item==null) {
+            throw SQLException("Item with name ${request.name} not found")
+        }
 
         // Create item instance linked to the item
         return itemRepository.saveItemInstance(
