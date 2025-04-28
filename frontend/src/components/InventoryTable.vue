@@ -194,7 +194,6 @@ const toggleItem = (isChecked, id) => {
     selectedBoxes.value.delete(id);
   }
 
-  // Update selectAll status
   const totalItems = currentItems.value.reduce((count, item) => {
     count += 1;
     if (item.items) count += item.items.length;
@@ -208,7 +207,6 @@ const toggleAllSubItem = (isChecked, items) => {
   if (isChecked) {
     items.forEach(item => selectedBoxes.value.add(item.id));
   } else {
-    // If selectAll is false, remove all sub-item IDs from checkedIds
     items.forEach(item => selectedBoxes.value.delete(item.id));
   }
 }
