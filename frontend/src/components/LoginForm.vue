@@ -67,21 +67,21 @@ async function login() {
     </CardHeader>
     <CardContent>
       <div class="grid gap-4">
-        <div class="grid gap-2">
-          <Label for="email">Epost</Label>
-          <Input id="email" v-model="email" placeholder="m@example.com" required type="email"/>
-        </div>
-        <div class="grid gap-2">
-          <div class="flex items-center">
-            <Label for="password">Passord</Label>
-            <a class="ml-auto inline-block text-sm underline" href="#">
-              Glemt passord?
-            </a>
+        <form @submit.prevent="login">
+          <div class="grid gap-2">
+            <Label for="email">Epost</Label>
+            <Input id="email" v-model="email" placeholder="m@example.com" required type="email"/>
+            <div class="flex items-center">
+              <Label for="password">Passord</Label>
+              <a class="ml-auto inline-block text-sm underline" href="#">
+                Glemt passord?
+              </a>
+            </div>
+            <Input id="password" v-model="password" required type="password"/>
+            <Button class="w-full" type="submit">Logg inn</Button>
+            <p v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</p>
           </div>
-          <Input id="password" v-model="password" required type="password"/>
-        </div>
-        <Button class="w-full" type="button" @click="login"> Log inn</Button>
-        <p v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</p>
+        </form>
       </div>
       <div class="mt-4 text-center text-sm">
         Har du ikke bruker?
