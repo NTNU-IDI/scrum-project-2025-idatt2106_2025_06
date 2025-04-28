@@ -30,8 +30,8 @@ const routes = [
   {path: '/before', component: BeforeView, name: 'before'},
   {path: '/during', component: DuringView, name: 'during'},
   {path: '/after', component: AfterView, name: 'after'},
-  {path: '/admin/edit-map', component: AdminEditMapView, name: 'admin-edit-map'},
   {path: '/admin', component: AdminView, name: 'admin'},
+  {path: '/admin/edit-map', component: AdminEditMapView, name: 'admin-edit-map'},
   {path: '/admin/event', component: AdminEvent, name: 'event'},
 ]
 
