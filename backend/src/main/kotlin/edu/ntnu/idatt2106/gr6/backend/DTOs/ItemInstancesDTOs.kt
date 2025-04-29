@@ -16,8 +16,9 @@ data class CreateItemInstanceRequest (
 )
 
 data class StorageItemResponse(
+    val id: String,
     val name: String,
     val amount: BigDecimal,
-    val unit: String,
+    val unit: Int,
     val expiryDate: LocalDate?
 )
