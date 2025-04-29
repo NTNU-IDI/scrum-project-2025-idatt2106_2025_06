@@ -14,10 +14,4 @@ import { Input } from '@/components/ui/input/index.js'
 </template>
 
 <style scoped>
-.border{
-  border: 1px solid #D1D5DB;
-  padding: 3px;
-  margin: 10px;
-  border-radius: 0.5rem;
-}
 </style>
