@@ -37,6 +37,7 @@ import { useRouter } from 'vue-router'
 import router from '@/router/index.js'
 import axios from 'axios'
 import { useSessionStore } from '@/stores/session'
+import EditStorage from '@/components/EditStorage.vue'
 
 const username = ref('');
 const email = ref('');
@@ -47,6 +48,7 @@ const location = ref('');
 const isLoggedIn = ref(false);
 
 const user = computed(() => session.user)
+const storage = ref(null);
 
 const session = useSessionStore()
 
@@ -142,62 +144,8 @@ function openEditProfile() {
             [Medlem 1]<br/>
             [Medlem 2]<br/>
           </CardDescription>
-          <div class="flex flex-col items-center">
-            <Dialog>
-              <DialogTrigger>
-                <Button class="w-48">Endre husstand</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle class="text-2xl">Endre husstand</DialogTitle>
-                  <Label>
-                    Her kan du endre husstanden din. Trykk på "Lagre" når du er ferdig.
-                  </Label>
-                  <Input
-                    v-model="householdName"
-                    placeholder="Husstandsnavn"
-                    type="text"
-                  />
-                  <Input
-                    v-model="location"
-                    placeholder="Lokasjon (valgfritt)"
-                    type="text"
-                  /><br/>
-                  <Label>
-                    <p>Husstandsnummer: {{ householdNumber }}</p><br/>
-                  </Label>
-                  <DialogTitle>Medlemmer</DialogTitle>
-                  <div class="flex items-center gap-2 justify-between">
-                    <Label>[Medlem1]</Label>
-                    <AlertDialog>
-                      <AlertDialogTrigger as-child>
-                        <Button size="icon" variant="outline">
-                          <user-minus/>
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Er du sikker på at du ønsker å fjerne medlemmet fra husstanden?
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Nei</AlertDialogCancel>
-                          <AlertDialogAction>Ja</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </DialogHeader>
-
-                <DialogFooter class="flex flex-col items-center">
-                  <DialogClose>
-                    <Button class="w-48">Lagre</Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+          <div>
+            <EditStorage/>
           </div>
         </div>
       </CardContent>
