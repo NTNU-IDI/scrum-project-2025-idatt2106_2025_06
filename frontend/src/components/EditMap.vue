@@ -12,8 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/i
       <TabsTrigger value="event">
         Hendelse
       </TabsTrigger>
-      <TabsTrigger value="post">
-        Innlegg
+      <TabsTrigger value="marker">
+        Markør
       </TabsTrigger>
     </TabsList>
 
@@ -43,24 +43,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/i
         </div>
         <div class="flex align-middle">
           <Label class="m-2" for="severity">Beredskapsnivå</Label>
-          <!--tre valgmuligheter her - grønn, gul eller rød-->
+          <!-- TODO tre valgmuligheter her - grønn, gul eller rød-->
         </div>
         <div class="flex align-middle">
           <Label class="m-2" for="start-date">Tidspunkt</Label>
-          <!--skal komme en kalender/klokke-velger her-->
+          <!-- TODO skal komme en kalender/klokke-velger her-->
         </div>
         <div class="flex align-middle">
           <Label class="m-2" for="radius">Radius</Label>
-          <!--slider her, eller bare en tekstboks? -->
+          <!-- TODO slider her, eller bare en tekstboks? -->
         </div>
-        <Button class="flex-1">Publiser</Button>
-        <Button variant="destructive" class="flex=1">Slett hendlese</Button>
+        <Button class="flex-1">Publiser hendelse</Button>
+        <Button variant="destructive" class="flex=1">Slett</Button>
       </Card>
     </TabsContent>
 
     <!-- Koordinater-tab -->
-    <TabsContent value="post">
+    <TabsContent value="marker">
       <Card class="flex flex-col gap-2 p-5">
+        <div class="flex align-middle">
+          <Label class="m-2" for="position">Posisjon</Label>
+          <Input class="border w-full" id="position" placeholder="Posisjon til markør" />
+        </div>
+        <div class="flex align-middle">
+          <Label class="m-2" for="type">Type</Label>
+          <!-- TODO DropBox her -->
+          <Input class="border w-full" id="type" placeholder="Type markør" />
+        </div>
         <div class="flex align-middle">
           <Label class="m-2" for="name">Navn</Label>
           <Input class="border w-full" id="name" placeholder="Navn på varsel" />
@@ -70,12 +79,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/i
           <Input class="border w-full" id="description" placeholder="Kort innhold av varsling" />
         </div>
         <div class="flex align-middle">
-          <Label class="m-2" for="content">Innhold</Label>
-          <!-- TODO Kanskje legge til en større type tekstboks her -->
-          <Input class="border w-full" id="content" placeholder="Næremere beskrivelse av varsling" />
+          <Label class="m-2" for="opening-hours">Åpningstider</Label>
+          <!-- TODO Velge tid her, denne er ikke obligatorisk -->
+          <Input class="border w-full" id="opening-hours" placeholder="Kort innhold av varsling" />
         </div>
-        <Button class="flex-1">Publiser</Button>
-        <Button variant="destructive" class="flex=1">Slett hendlese</Button>
+        <div class="flex align-middle">
+          <Label class="m-2" for="contact-info">Kontaktinformasjon</Label>
+          <Input class="border w-full" id="contact-info" placeholder="" />
+        </div>
+
+
+        <Button class="flex-1">Plasser markør</Button>
+        <Button variant="destructive" class="flex=1">Slett</Button>
       </Card>
     </TabsContent>
   </Tabs>

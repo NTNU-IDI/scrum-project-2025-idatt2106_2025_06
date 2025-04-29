@@ -13,8 +13,7 @@ import BeforeView from "@/views/BeforeView.vue";
 import DuringView from "@/views/DuringView.vue";
 import AfterView from "@/views/AfterView.vue";
 import AdminView from "@/views/AdminView.vue";
-import AdminEditMapView from "@/views/AdminEditMapView.vue";
-import AdminEvent from "@/views/AdminEventView.vue";
+import AdminMap from "@/views/AdminMapView.vue";
 
 
 const routes = [
@@ -31,8 +30,7 @@ const routes = [
   {path: '/during', component: DuringView, name: 'during'},
   {path: '/after', component: AfterView, name: 'after'},
   {path: '/admin', component: AdminView, name: 'admin'},
-  {path: '/admin/edit-map', component: AdminEditMapView, name: 'admin-edit-map'},
-  {path: '/admin/event', component: AdminEvent, name: 'event'},
+  {path: '/admin/map', component: AdminMap, name: 'map'},
 ]
 
 const index = createRouter({

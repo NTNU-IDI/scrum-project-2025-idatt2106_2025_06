@@ -2,7 +2,7 @@
 import { defineComponent } from "vue";
 import Map from "@/components/Map.vue";
 import SearchAddressCoordinates from '@/components/SearchAddressCoordinates.vue';
-import EditEvent from '@/components/EditEvent.vue';
+import EditEvent from '@/components/EditMap.vue';
 import { Button } from '@/components/ui/button/index.js';
 import { Input } from '@/components/ui/input/index.js'
 

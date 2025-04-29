@@ -24,23 +24,13 @@ const isAdmin = ref(true) // endre til false for moderator
       </CardContent>
     </Card>
 
-    <!-- Disse to vises alltid -->
-    <Card :class="isAdmin ? 'max-h-[650px] flex-1 basis-1/4 min-w-[200px]' : 'max-h-[650px] flex-1 basis-2/5 min-w-[300px]'">
-      <CardHeader class="grid grid-cols-2 items-center w-full">
-        <CardTitle class="text-2xl">Kart</CardTitle>
-        <router-link class="w-auto justify-self-end" to="/admin/edit-map">
-        <Button >Rediger kart</Button>
-        </router-link>
-      </CardHeader>
-      <CardContent>
-        <!--  Inne her skal det være kart! -->
-      </CardContent>
-    </Card>
+    <!-- De to Card under vises alltid -->
 
+    <!-- Redigere innlegg -->
     <Card :class="isAdmin ? 'max-h-[650px] flex-1 basis-1/4 min-w-[200px]' : 'max-h-[650px] flex-1 basis-2/5 min-w-[300px]'">
       <CardHeader class="grid grid-cols-2 items-center w-full">
         <CardTitle class="text-2xl">Varslinger</CardTitle>
-        <router-link class="w-auto justify-self-end" to="/admin/event">
+        <router-link class="w-auto justify-self-end" to="/admin/map">
           <Button >Legg til ny varsling</Button>
         </router-link>
       </CardHeader>
@@ -56,6 +46,19 @@ const isAdmin = ref(true) // endre til false for moderator
         <Alert variant="default"><AlertTitle>Warning: </AlertTitle><AlertDescription>Høy temperatur i kontorlokalene. Vennligst ta nødvendige forholdsregler.</AlertDescription></Alert>
         <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Det er mulig å hente billetter til neste event i resepsjonen fra kl. 10:00.</AlertDescription></Alert>
         <Alert variant="default"><AlertTitle>Alert: </AlertTitle><AlertDescription>Feil på serveren. Vi jobber med å løse problemet så raskt som mulig.</AlertDescription></Alert>
+      </CardContent>
+    </Card>
+
+    <!-- Redigere kart -->
+    <Card :class="isAdmin ? 'max-h-[650px] flex-1 basis-1/4 min-w-[200px]' : 'max-h-[650px] flex-1 basis-2/5 min-w-[300px]'">
+      <CardHeader class="grid grid-cols-2 items-center w-full">
+        <CardTitle class="text-2xl">Kart</CardTitle>
+        <router-link class="w-auto justify-self-end" to="/admin/map">
+        <Button >Rediger kart</Button>
+        </router-link>
+      </CardHeader>
+      <CardContent>
+        <!--  Inne her skal det være kart! -->
       </CardContent>
     </Card>
   </div>
