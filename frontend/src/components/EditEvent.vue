@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button/index.js'
 import { Card, CardDescription } from '@/components/ui/card/index.js'
+import { Label } from '@/components/ui/label'
 </script>
 
 <template>
