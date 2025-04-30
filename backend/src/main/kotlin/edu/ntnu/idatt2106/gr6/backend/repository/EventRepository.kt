@@ -1,9 +1,11 @@
 package edu.ntnu.idatt2106.gr6.backend.repository
 
+import edu.ntnu.idatt2106.gr6.backend.DTOs.Location
 import edu.ntnu.idatt2106.gr6.backend.model.Event
 import edu.ntnu.idatt2106.gr6.backend.model.getEventType
 import edu.ntnu.idatt2106.gr6.backend.model.getLocation
 import edu.ntnu.idatt2106.gr6.backend.model.getSeverity
+import edu.ntnu.idatt2106.gr6.backend.model.getStatus
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 
@@ -13,11 +15,12 @@ import javax.sql.DataSource
 class EventRepository(
     private val dataSource: DataSource
 ) {
+    private val logger = org.slf4j.LoggerFactory.getLogger(EventRepository::class.java)
     fun createEvent(event: Event): Event {
         val sql = """
             INSERT INTO event (id, name, description, type, impact_area_radius_km, mandatory_evacuation_area_radius_km,
-            recommended_evacuation_area_radius_km, severity, start_date, end_date, eta, location)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ST_PointFromText(?, 4326))
+            recommended_evacuation_area_radius_km, severity, start_date, end_date, status, location, content)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ST_PointFromText(?, 4326), ?)
         """.trimIndent()
 
         return dataSource.connection.use { conn ->
@@ -32,8 +35,9 @@ class EventRepository(
                 stmt.setString(8, event.severity.toString())
                 stmt.setTimestamp(9, java.sql.Timestamp.from(event.startDate))
                 stmt.setTimestamp(10, java.sql.Timestamp.from(event.endDate))
-                stmt.setTimestamp(11, event.eta?.let { java.sql.Timestamp.from(it) })
+                stmt.setObject(11, event.status.toString())
                 stmt.setObject(12, event.location?.let { "POINT(${it.longitude} ${it.latitude})" })
+                stmt.setString(13, event.content)
 
                 val affectedRows = stmt.executeUpdate()
                 if (affectedRows == 0) {
@@ -55,7 +59,13 @@ class EventRepository(
     }
 
     fun findAllEvents(): List<Event> {
-        val sql = "SELECT * FROM event ORDER BY created_at DESC"
+        val sql = """
+        SELECT id, name, description, type, impact_area_radius_km,
+        mandatory_evacuation_area_radius_km, recommended_evacuation_area_radius_km,
+        severity, start_date, end_date, status,
+        ST_AsText(location) as location, content, created_at, updated_at
+        FROM event ORDER BY created_at DESC
+    """.trimIndent()
         return dataSource.connection.use { conn->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.executeQuery().use { rs ->
@@ -70,7 +80,13 @@ class EventRepository(
     }
 
     fun findEventById(eventId: String): Event? {
-        val sql = "SELECT * FROM event WHERE id = ?"
+        val sql = """
+            SELECT id, name, description, type, impact_area_radius_km,
+            mandatory_evacuation_area_radius_km, recommended_evacuation_area_radius_km,
+            severity, start_date, end_date, status,
+            ST_AsText(location) as location, content, created_at, updated_at
+            FROM event WHERE id = ?
+        """.trimIndent()
         return dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, eventId)
@@ -89,7 +105,7 @@ class EventRepository(
         val sql = """
             UPDATE event SET name = ?, description = ?, type = ?, impact_area_radius_km = ?, 
             mandatory_evacuation_area_radius_km = ?, recommended_evacuation_area_radius_km = ?, 
-            severity = ?, start_date = ?, end_date = ?, eta = ?, location = ?
+            severity = ?, start_date = ?, end_date = ?, status = ?, location = ST_PointFromText(?, 4326), content = ?
             WHERE id = ?
         """.trimIndent()
 
@@ -104,9 +120,11 @@ class EventRepository(
                 stmt.setString(7, event.severity.toString())
                 stmt.setTimestamp(8, java.sql.Timestamp.from(event.startDate))
                 stmt.setTimestamp(9, java.sql.Timestamp.from(event.endDate))
-                stmt.setTimestamp(10, event.eta?.let { java.sql.Timestamp.from(it) })
-                stmt.setObject(11, event.location)
-                stmt.setString(12, event.id)
+                stmt.setObject(10, event.status.toString())
+                stmt.setObject(11, event.location?.let { "POINT(${it.longitude} ${it.latitude})" })
+                stmt.setString(12, event.content)
+                stmt.setString(13, event.id)
+
 
                 if (stmt.executeUpdate() > 0) {
                     event
@@ -122,6 +140,7 @@ class EventRepository(
             id = rs.getString("id"),
             name = rs.getString("name"),
             description = rs.getString("description"),
+            content = rs.getString("content"),
             type = rs.getEventType(),
             impactAreaRadiusKm = rs.getDouble("impact_area_radius_km"),
             mandatoryEvacuationAreaRadiusKm = rs.getDouble("mandatory_evacuation_area_radius_km"),
@@ -129,10 +148,11 @@ class EventRepository(
             severity = rs.getSeverity(),
             startDate = rs.getTimestamp("start_date").toInstant(),
             endDate = rs.getTimestamp("end_date").toInstant(),
-            eta = rs.getTimestamp("eta")?.toInstant(),
+            status = rs.getStatus(),
             location = rs.getLocation(),
             createdAt = rs.getTimestamp("created_at").toInstant(),
             updatedAt = rs.getTimestamp("updated_at").toInstant()
         )
     }
+
 }

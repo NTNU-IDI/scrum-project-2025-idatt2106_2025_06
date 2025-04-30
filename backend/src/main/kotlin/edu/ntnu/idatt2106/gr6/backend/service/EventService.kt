@@ -2,10 +2,12 @@ package edu.ntnu.idatt2106.gr6.backend.service
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateEventRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.EventResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.UpdateEventRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.toEvent
 import edu.ntnu.idatt2106.gr6.backend.model.Event
 import edu.ntnu.idatt2106.gr6.backend.model.EventType
 import edu.ntnu.idatt2106.gr6.backend.model.Severity
+import edu.ntnu.idatt2106.gr6.backend.model.Status
 import edu.ntnu.idatt2106.gr6.backend.repository.EventRepository
 import edu.ntnu.idatt2106.gr6.backend.util.IdGenerator
 import org.springframework.stereotype.Service
@@ -18,6 +20,7 @@ class EventService(
 ) {
 
     private val logger = org.slf4j.LoggerFactory.getLogger(EventService::class.java)
+
     fun getAllEvents(): List<EventResponse> {
         return eventRepository.findAllEvents().map { event ->
             event.toResponse()
@@ -41,9 +44,26 @@ class EventService(
         return eventRepository.deleteEvent(id)
     }
 
-    fun updateEvent(id: String, request: CreateEventRequest): EventResponse? {
-        val event = eventRepository.findEventById(id) ?: return null
-        val updatedEvent = event.toModel(request)
+    fun updateEvent(request: UpdateEventRequest): EventResponse? {
+        val existingEvent = eventRepository.findEventById(request.id) ?:
+            throw IllegalArgumentException("Event with ID ${request.id} not found")
+
+        val updatedEvent = existingEvent.copy(
+            id = request.id,
+            name = request.name,
+            description = request.description,
+            content = request.content,
+            location = request.location ?: existingEvent.location,
+            startDate = request.startTime ?: existingEvent.startDate,
+            endDate = request.endTime ?: existingEvent.endDate,
+            type = EventType.fromString(request.type),
+            status = Status.fromString(request.status),
+            severity = Severity.fromString(request.severity),
+            impactAreaRadiusKm = request.impactAreaRadiusKm ?: existingEvent.impactAreaRadiusKm,
+            mandatoryEvacuationAreaRadiusKm = request.mandatoryEvacuationAreaRadiusKm ?: existingEvent.mandatoryEvacuationAreaRadiusKm,
+            recommendedEvacuationAreaRadiusKm = request.recommendedEvacuationAreaRadiusKm ?: existingEvent.recommendedEvacuationAreaRadiusKm,
+        )
+
         return eventRepository.updateEvent(updatedEvent).toResponse()
     }
 
@@ -52,11 +72,17 @@ class EventService(
             id = this.id,
             name = this.name,
             description = this.description,
+            content = this.content,
             location = this.location,
+            impactAreaRadiusKm = this.impactAreaRadiusKm,
+            mandatoryEvacuationAreaRadiusKm = this.mandatoryEvacuationAreaRadiusKm,
+            recommendedEvacuationAreaRadiusKm = this.recommendedEvacuationAreaRadiusKm,
             startDate = this.startDate,
             endDate = this.endDate,
             type = this.type.toString(),
-            severity = this.severity.toString()
+            status = this.status.toString(),
+            severity = this.severity.toString(),
+            updatedAt = this.updatedAt,
         )
     }
 
@@ -65,6 +91,7 @@ class EventService(
             id = this.id,
             name = event.name,
             description = event.description,
+            content = event.content,
             location = event.location,
             startDate = startDate,
             endDate = endDate,
@@ -73,7 +100,11 @@ class EventService(
             impactAreaRadiusKm = event.impactAreaRadiusKm,
             mandatoryEvacuationAreaRadiusKm = event.mandatoryEvacuationAreaRadiusKm,
             recommendedEvacuationAreaRadiusKm = event.recommendedEvacuationAreaRadiusKm,
-            eta = event.eta,
+            status = this.status,
         )
+    }
+
+    internal fun locationToString(location: String): String {
+        return location.replace("POINT(", "").replace(")", "")
     }
 }
