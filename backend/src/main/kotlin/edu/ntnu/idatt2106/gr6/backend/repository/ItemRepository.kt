@@ -18,11 +18,16 @@ class ItemRepository(
     private val dataSource: DataSource
 ) {
 
-    fun saveItem(
+    fun createItem(
         name: String,
         typeId: Int,
         unitId: Int
     ): Item {
+        val existingItem = findItemByName(name)
+        if (existingItem != null) {
+            return existingItem
+        }
+
         val id = UUID.randomUUID().toString()
         val createdAt = Timestamp(System.currentTimeMillis())
         val updatedAt = createdAt
@@ -91,24 +96,6 @@ class ItemRepository(
             createdAt = createdAt.toInstant(),
             updatedAt = updatedAt.toInstant()
         )
-    }
-
-    fun findItemByName(name: String): Item? {
-        val sql = """
-        SELECT id, name, type_id, unit_id, created_at, update_at
-        FROM items
-        WHERE name = ?
-    """.trimIndent()
-
-        dataSource.connection.use { conn ->
-            conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, name)
-
-                stmt.executeQuery().use { rs ->
-                    return if (rs.next()) mapRowToItem(rs) else null
-                }
-            }
-        }
     }
 
     fun findItemById(id: String): Item? {
@@ -181,6 +168,27 @@ class ItemRepository(
     }
 
 
+
+
+
+
+    private fun findItemByName(name: String): Item? {
+        val sql = """
+        SELECT id, name, type_id, unit_id, created_at, update_at
+        FROM items
+        WHERE name = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, name)
+
+                stmt.executeQuery().use { rs ->
+                    return if (rs.next()) mapRowToItem(rs) else null
+                }
+            }
+        }
+    }
 
     private fun mapRowToItem(rs: ResultSet): Item {
         return Item(

@@ -15,28 +15,16 @@ class ItemService(
     private val itemRepository: ItemRepository
 ) {
 
-    /**
-     * Creates an item instance.
-     * Reuses an existing item if one with the same name already exists, otherwise creates a new item first.
-     */
     @Transactional
-    fun createItemAndInstance(request: CreateItemInstanceRequest): ItemInstance {
+    fun createItemAndItemInstance(request: CreateItemInstanceRequest): ItemInstance {
         val now = Instant.now()
 
-        // Try to find an existing item with the same name
-        val existingItem = itemRepository.findItemByName(request.name)
-
-        val item = existingItem ?: itemRepository.saveItem(
+        val item = itemRepository.createItem(
             name = request.name,
             typeId = request.typeId,
             unitId = request.unitId
         )
 
-        if (item==null) {
-            throw SQLException("Item with name ${request.name} not found")
-        }
-
-        // Create item instance linked to the item
         return itemRepository.saveItemInstance(
             itemId = item.id,
             storageId = request.storageId,

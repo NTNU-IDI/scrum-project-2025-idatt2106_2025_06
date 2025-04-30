@@ -28,7 +28,7 @@ class ItemController(
     /**
      * Endpoint to create a new item instance (and item if necessary).
      */
-    @PostMapping("/add-item-instance")
+    @PostMapping("/create-item-instance")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')") // SWAP THIS!!!
     @Operation(summary = "Create Item Instance", description = "Creates a new item instance and reuses or creates the associated item.")
     @ApiResponses(
@@ -39,17 +39,21 @@ class ItemController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    fun addItemInstance(
+    fun createItemInstance(
         @RequestBody @Valid request: CreateItemInstanceRequest
     ): ResponseEntity<ItemInstance> {
         logger.info("Received request to add item instance: $request")
 
-        val createdItemInstance = itemService.createItemAndInstance(request)
+        val createdItemInstance = itemService.createItemAndItemInstance(request)
 
         logger.info("Created item instance with id: ${createdItemInstance.id}")
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdItemInstance)
     }
+
+
+
+
 
     @GetMapping("/storage/{storageId}/items")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!!!!!!!!!!!!!!!
