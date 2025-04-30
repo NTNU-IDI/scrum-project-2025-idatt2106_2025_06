@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.DTOs
 
+import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -21,4 +22,8 @@ data class StorageItemResponse(
     val amount: BigDecimal,
     val unit: Int,
     val expiryDate: LocalDate?
+)
+
+data class DeleteItemInstanceRequest(
+    val instances: List<String>
 )

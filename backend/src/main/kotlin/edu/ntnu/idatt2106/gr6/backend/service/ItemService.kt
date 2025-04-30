@@ -65,8 +65,10 @@ class ItemService(
 
 
     @Transactional
-    fun deleteItemInstance(instanceId: String): Boolean {
-        return itemRepository.deleteItemInstanceById(instanceId)
+    fun deleteItemInstances(instanceIds: List<String>) {
+        if (instanceIds.isNotEmpty()) {
+            itemRepository.deleteItemInstancesByIds(instanceIds)
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.controller
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
 import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import edu.ntnu.idatt2106.gr6.backend.service.ItemService
@@ -70,26 +71,22 @@ class ItemController(
         return ResponseEntity.ok(itemInstances)
     }
 
-    @DeleteMapping("/instances/{instanceId}")
+    @DeleteMapping("/instances")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')")
-    @Operation(summary = "Delete an item instance")
+    @Operation(summary = "Delete multiple item instances")
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Item instance deleted"),
-            ApiResponse(responseCode = "404", description = "Item instance not found"),
+            ApiResponse(responseCode = "200", description = "Item instances deleted"),
+            ApiResponse(responseCode = "400", description = "Invalid input"),
             ApiResponse(responseCode = "401", description = "Unauthorized"),
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    fun deleteItemInstance(
-        @PathVariable instanceId: String
+    fun deleteItemInstances(
+        @RequestBody request: DeleteItemInstanceRequest
     ): ResponseEntity<Void> {
-        val deleted = itemService.deleteItemInstance(instanceId)
-
-        return if (deleted) {
-            ResponseEntity.ok().build()
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        itemService.deleteItemInstances(request.instances)
+        return ResponseEntity.ok().build()
     }
+
 }
