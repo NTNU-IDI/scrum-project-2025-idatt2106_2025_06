@@ -1,10 +1,10 @@
 package edu.ntnu.idatt2106.gr6.backend.controller
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
-import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstanceRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstancesRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstancesResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
-import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import edu.ntnu.idatt2106.gr6.backend.service.ItemService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -53,7 +53,23 @@ class ItemController(
     }
 
 
-
+    @DeleteMapping("/item-instances")
+    @PreAuthorize("hasAuthority('CREATE_STORAGE')")
+    @Operation(summary = "Delete one or multiple item instances")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Item instances deleted"),
+            ApiResponse(responseCode = "400", description = "Invalid input"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
+    fun deleteItemInstances(
+        @RequestBody request: DeleteItemInstancesRequest
+    ): ResponseEntity<DeleteItemInstancesResponse> {
+        val deletedCount = itemService.deleteItemInstances(request.instances)
+        return ResponseEntity.ok(DeleteItemInstancesResponse(itemInstancesDeleted = deletedCount))
+    }
 
 
     @GetMapping("/storage/{storageId}/items")
@@ -74,24 +90,6 @@ class ItemController(
         logger.info("Fetching readable items for storage ID: $storageId and type ID: $typeId")
         val itemInstances = itemService.getStorageItemsHumanReadable(storageId, typeId)
         return ResponseEntity.ok(itemInstances)
-    }
-
-    @DeleteMapping("/instances")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')")
-    @Operation(summary = "Delete multiple item instances")
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Item instances deleted"),
-            ApiResponse(responseCode = "400", description = "Invalid input"),
-            ApiResponse(responseCode = "401", description = "Unauthorized"),
-            ApiResponse(responseCode = "500", description = "Internal server error")
-        ]
-    )
-    fun deleteItemInstances(
-        @RequestBody request: DeleteItemInstanceRequest
-    ): ResponseEntity<Void> {
-        itemService.deleteItemInstances(request.instances)
-        return ResponseEntity.ok().build()
     }
 
 }

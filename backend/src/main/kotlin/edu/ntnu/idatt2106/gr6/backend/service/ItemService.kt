@@ -35,6 +35,14 @@ class ItemService(
         return ItemInstanceResponse.fromItemInstance(itemInstance)
     }
 
+    @Transactional
+    fun deleteItemInstances(instanceIds: List<String>): Int {
+        if (instanceIds.isNotEmpty()) {
+            return itemRepository.deleteItemInstancesByIds(instanceIds)
+        }
+        return 0
+    }
+
     fun getStorageItemsHumanReadable(storageId: String, typeId: String): List<StorageItemResponse> {
         val itemInstances = itemRepository.findStorageItemInstances(storageId, typeId)
 
@@ -54,11 +62,6 @@ class ItemService(
     }
 
 
-    @Transactional
-    fun deleteItemInstances(instanceIds: List<String>) {
-        if (instanceIds.isNotEmpty()) {
-            itemRepository.deleteItemInstancesByIds(instanceIds)
-        }
-    }
+
 
 }

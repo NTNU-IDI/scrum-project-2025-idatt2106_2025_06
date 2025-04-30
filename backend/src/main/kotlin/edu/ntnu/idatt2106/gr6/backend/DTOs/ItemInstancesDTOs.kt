@@ -34,14 +34,18 @@ data class CreateItemInstanceRequest (
     val expiryDate: LocalDate?
 )
 
+data class DeleteItemInstancesRequest(
+    val instances: List<String>
+)
+
+data class DeleteItemInstancesResponse (
+    val itemInstancesDeleted: Int
+)
+
 data class StorageItemResponse(
     val id: String,
     val name: String,
     val amount: BigDecimal,
     val unit: Int,
     val expiryDate: LocalDate?
-)
-
-data class DeleteItemInstanceRequest(
-    val instances: List<String>
 )

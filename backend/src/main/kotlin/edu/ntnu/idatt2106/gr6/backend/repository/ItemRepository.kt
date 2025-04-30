@@ -98,6 +98,22 @@ class ItemRepository(
         )
     }
 
+    fun deleteItemInstancesByIds(instanceIds: List<String>): Int {
+        if (instanceIds.isEmpty()) return 0
+
+        val placeholders = instanceIds.joinToString(",") { "?" }
+        val sql = "DELETE FROM item_instances WHERE id IN ($placeholders)"
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                instanceIds.forEachIndexed { index, id ->
+                    stmt.setString(index + 1, id)
+                }
+                return stmt.executeUpdate()
+            }
+        }
+    }
+
     fun findItemById(id: String): Item? {
         val sql = """
             SELECT id, name, type_id, unit_id, created_at, update_at
@@ -149,25 +165,6 @@ class ItemRepository(
         }
         return instances
     }
-
-
-    fun deleteItemInstancesByIds(instanceIds: List<String>) {
-        if (instanceIds.isEmpty()) return
-
-        val placeholders = instanceIds.joinToString(",") { "?" }
-        val sql = "DELETE FROM item_instances WHERE id IN ($placeholders)"
-
-        dataSource.connection.use { conn ->
-            conn.prepareStatement(sql).use { stmt ->
-                instanceIds.forEachIndexed { index, id ->
-                    stmt.setString(index + 1, id)
-                }
-                stmt.executeUpdate()
-            }
-        }
-    }
-
-
 
 
 
