@@ -34,13 +34,13 @@ import {DialogClose} from "@/components/ui/dialog/index.js";
         />
       </DialogHeader>
 
-      <DialogFooter class="flex flex-col items-center">
+      <DialogFooter class="flex gap-2">
         <DialogClose>
-          <Button variant="outline" class="w-48">
+          <Button variant="outline" class="flex-1">
             Avbryt
           </Button>
         </DialogClose>
-        <Button class="w-48" variant="default">
+        <Button class="flex-1" variant="default">
           Fjern
         </Button>
       </DialogFooter>
