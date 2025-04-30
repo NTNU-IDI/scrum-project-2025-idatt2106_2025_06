@@ -35,23 +35,22 @@ import {X, UserMinus} from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import router from '@/router/index.js'
-import axios from 'axios'
 import { useSessionStore } from '@/stores/session'
 import { useStorageStore } from '@/stores/storage'
 import EditStorage from '@/components/EditStorage.vue'
-import { createStorage } from '@/service/storageService.js'
 
 const username = ref('');
 const email = ref('');
+
 const householdName = ref('');
-const householdNumber = ref('');
 const location = ref('');
+
+const joinToken = ref('')
 
 const session = useSessionStore()
 const user = computed(() => session.user)
 
 const storage = useStorageStore()
-const household = computed(() => storage.household)
 
 const storages = computed(() => storage.storages)
 const membersByStorageId = computed(() => storage.membersByStorageId)
@@ -63,6 +62,18 @@ async function createNewStorage() {
 
   if (response) {
     console.log("Husstand opprettet")
+  }
+}
+
+async function joinStorage() {
+  if (!joinToken.value) return
+
+  const success = await storage.join(joinToken.value, session.token)
+  if (success) {
+    console.log('Bli med i husstand: Vellykket')
+    joinToken.value = ''
+  } else {
+    console.error('Kunne ikke bli med i husstand')
   }
 }
 
@@ -171,8 +182,7 @@ function openEditProfile() {
                       </li>
                     </ul>
                     <p v-else>Laster medlemmer...</p>
-                    <EditStorage/>
-
+                    <EditStorage :storage="s" />
                   </div>
                 </div>
               </CardDescription>
@@ -199,6 +209,13 @@ function openEditProfile() {
                 </DialogHeader>
               </DialogContent>
             </Dialog>
+
+            <div class="flex flex-col items-center gap-4 mt-8">
+              <Label>Skriv inn husstandsnummer for å bli med i en husstand:</Label>
+              <Input v-model="joinToken" placeholder="Husstandsnummer" class="w-64" />
+              <Button class="w-48" @click="joinStorage">Bli med i husstand</Button>
+            </div>
+
           </div>
 
           <!--

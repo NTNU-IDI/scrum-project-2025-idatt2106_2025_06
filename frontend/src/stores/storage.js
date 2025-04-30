@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import {
-  createStorage, fetchStorageMembers, fetchStorages } from '@/service/storageService.js'
+  createStorage, fetchStorageMembers, fetchStorages, updateStorage, joinStorage } from '@/service/storageService.js'
 import { ref } from 'vue'
 
 export const useStorageStore = defineStore('storage', () => {
@@ -39,59 +39,25 @@ export const useStorageStore = defineStore('storage', () => {
     return response
   }
 
-  /*
-  async function join(token) {
-    try {
-      const response = await joinStorage(token)
-      return response
-    } catch (error) {
-      console.error('Error joining storage:', error)
-      return false
+  async function editStorage(id, name, location, token) {
+    const updated = await updateStorage(id, name, location, token)
+
+    // Oppdater lokalt lagret storage
+    const index = storages.value.findIndex(s => s.id === id)
+    if (index !== -1) {
+      storages.value[index].name = updated.name
+      storages.value[index].location = updated.location
     }
+
+    return updated
   }
 
-  async function editName(token, name) {
-    try {
-      const response = await editStorageName(token, name)
-      return response
-    } catch (error) {
-      console.error('Error editing storage name:', error)
-      return false
-    }
+  async function join(storageToken, token) {
+      await joinStorage(token, storageToken)
+      await fetchAll(token)
+      return true
   }
 
-  async function editLocation(token, location) {
-    try {
-      const response = await editStorageLocation(token, location)
-      return response
-    } catch (error) {
-      console.error('Error editing storage location:', error)
-      return false
-    }
-  }
-
-  async function removeMember(token, userId) {
-    try {
-      const response = await removeStorageMember(token, userId)
-      return response
-    } catch (error) {
-      console.error('Error removing member:', error)
-      return false
-    }
-  }
-
-  async function getToken() {
-    try {
-      const response = await getStorageToken()
-      return response
-    } catch (error) {
-      console.error('Error getting storage token:', error)
-      return false
-    }
-  }
-
-   */
-
-  return{ fetchAll, create, storages, membersByStorageId }
+  return{ fetchAll, create, join, storages, membersByStorageId, editStorage }
 })
 

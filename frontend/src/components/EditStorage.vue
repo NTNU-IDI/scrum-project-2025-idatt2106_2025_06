@@ -18,9 +18,31 @@ import {
 import { Input } from '@/components/ui/input/index.js'
 import { Label } from '@/components/ui/label/index.js'
 import { UserMinus } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useSessionStore } from '@/stores/session'
+import { useStorageStore } from '@/stores/storage'
 
-const storage = ref(null)
+const props = defineProps({
+  storage: Object
+})
+
+const session = useSessionStore()
+const storageStore = useStorageStore()
+
+const membersByStorageId = computed(() => storageStore.membersByStorageId)
+
+const name = ref(props.storage.name)
+const location = ref(props.storage.location ?? '')
+
+async function saveChanges() {
+  try {
+    await storageStore.editStorage(props.storage.id, name.value, location.value, session.token)
+    console.log('Husstand oppdatert')
+  } catch (err) {
+    console.error('Feil ved oppdatering av husstand:', err)
+  }
+}
+
 </script>
 
 <template>
@@ -32,12 +54,11 @@ const storage = ref(null)
       <DialogContent>
         <DialogHeader>
           <DialogTitle class="text-2xl">Endre husstand</DialogTitle>
-
           <Label>
             Her kan du endre husstanden din. Trykk på "Lagre" når du er ferdig.
           </Label>
           <Input
-            v-model="householdName"
+            v-model="name"
             placeholder="Husstandsnavn"
             type="text"
           />
@@ -46,12 +67,13 @@ const storage = ref(null)
             placeholder="Lokasjon (valgfritt)"
             type="text"
           /><br/>
-          <Label>
-            <p>Husstandsnummer: {{ householdNumber }}</p><br/>
-          </Label>
           <DialogTitle>Medlemmer</DialogTitle>
           <div class="flex items-center gap-2 justify-between">
-            <Label>[Medlem1]</Label>
+            <ul v-if="membersByStorageId[props.storage.id]">
+              <li v-for="(member, index) in membersByStorageId[props.storage.id]" :key="index">
+                {{ member }}
+              </li>
+            </ul>
             <AlertDialog>
               <AlertDialogTrigger as-child>
                 <Button size="icon" variant="outline">
@@ -76,7 +98,7 @@ const storage = ref(null)
 
         <DialogFooter class="flex flex-col items-center">
           <DialogClose>
-            <Button class="w-48">Lagre</Button>
+            <Button class="w-48" @click="saveChanges">Lagre</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
