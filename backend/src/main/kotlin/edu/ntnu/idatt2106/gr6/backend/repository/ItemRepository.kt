@@ -103,6 +103,7 @@ class ItemRepository(
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, name)
+
                 stmt.executeQuery().use { rs ->
                     return if (rs.next()) mapRowToItem(rs) else null
                 }
@@ -110,52 +111,75 @@ class ItemRepository(
         }
     }
 
-    fun findStorageItemsHumanReadable(storageId: String): List<StorageItemResponse> {
+    fun findItemById(id: String): Item? {
         val sql = """
-        SELECT i.name AS item_name, ii.amount, u.unit_name AS unit_name, ii.expiry_date
-        FROM item_instances ii
-        JOIN items i ON ii.item_id = i.id
-        JOIN item_units u ON i.unit_id = u.id
-        WHERE ii.storage_id = ?
-    """.trimIndent()
+            SELECT id, name, type_id, unit_id, created_at, update_at
+            FROM items
+            WHERE id = ?
+        """.trimIndent()
 
-        val items = mutableListOf<StorageItemResponse>()
+            dataSource.connection.use { conn ->
+                conn.prepareStatement(sql).use { stmt ->
+                    stmt.setString(1, id)
+                    stmt.executeQuery().use { rs ->
+                        return if (rs.next()) mapRowToItem(rs) else null
+                    }
+                }
+            }
+    }
+
+    fun findStorageItemInstances(storageId: String, typeId: String): List<ItemInstance> {
+        val sql = """
+            SELECT ii.id, ii.item_id, ii.storage_id, ii.expiry_date, ii.amount, ii.created_at, ii.updated_at
+            FROM item_instances ii
+            JOIN items i ON ii.item_id = i.id
+            WHERE ii.storage_id = ? AND i.type_id = ?
+            ORDER BY i.name ASC
+        """.trimIndent()
+
+        val instances = mutableListOf<ItemInstance>()
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, storageId)
+                stmt.setString(2, typeId)
                 stmt.executeQuery().use { rs ->
                     while (rs.next()) {
-                        items.add(
-                            StorageItemResponse(
-                                name = rs.getString("item_name"),
+                        instances.add(
+                            ItemInstance(
+                                id = rs.getString("id"),
+                                itemId = rs.getString("item_id"),
+                                storageId = rs.getString("storage_id"),
                                 amount = rs.getBigDecimal("amount"),
-                                unit = rs.getString("unit_name"),
-                                expiryDate = rs.getDate("expiry_date")?.toLocalDate() // <-- add expiry date!
+                                expiryDate = rs.getDate("expiry_date")?.toLocalDate(),
+                                createdAt = rs.getTimestamp("created_at").toInstant(),
+                                updatedAt = rs.getTimestamp("updated_at").toInstant()
                             )
                         )
                     }
                 }
             }
         }
-
-        return items
+        return instances
     }
 
-    fun deleteItemInstanceById(instanceId: String): Boolean {
-        val sql = """
-        DELETE FROM item_instances
-        WHERE id = ?
-    """.trimIndent()
+
+    fun deleteItemInstancesByIds(instanceIds: List<String>) {
+        if (instanceIds.isEmpty()) return
+
+        val placeholders = instanceIds.joinToString(",") { "?" }
+        val sql = "DELETE FROM item_instances WHERE id IN ($placeholders)"
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, instanceId)
-                val rowsDeleted = stmt.executeUpdate()
-                return rowsDeleted > 0
+                instanceIds.forEachIndexed { index, id ->
+                    stmt.setString(index + 1, id)
+                }
+                stmt.executeUpdate()
             }
         }
     }
+
 
 
     private fun mapRowToItem(rs: ResultSet): Item {

@@ -4,6 +4,7 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.JoinStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.RemoveUserFromStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageSummary
 import edu.ntnu.idatt2106.gr6.backend.service.StorageService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -183,5 +184,23 @@ class StorageController(
         } else {
             ResponseEntity.status(HttpStatus.NOT_FOUND).build()
         }
+    }
+
+    @GetMapping("/user/{userId}/storages")
+    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!!!!!
+    @Operation(summary = "Get all storages a user is connected to")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successfully fetched storages"),
+            ApiResponse(responseCode = "404", description = "User not found or has no storages"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
+    fun getUserStorages(
+        @PathVariable userId: String
+    ): ResponseEntity<List<StorageSummary>> {
+        val storages = storageService.getStoragesByUserId(userId)
+        return ResponseEntity.ok(storages)
     }
 }
