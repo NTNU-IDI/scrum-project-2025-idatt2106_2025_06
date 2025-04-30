@@ -2,14 +2,10 @@ package edu.ntnu.idatt2106.gr6.backend.service
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
-import edu.ntnu.idatt2106.gr6.backend.model.Item
-import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
+import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleGetItemInstancesResponse
 import edu.ntnu.idatt2106.gr6.backend.repository.ItemRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.sql.SQLException
-import java.time.Instant
 
 @Service
 class ItemService(
@@ -32,7 +28,7 @@ class ItemService(
             expiryDate = request.expiryDate
         )
 
-        return ItemInstanceResponse.fromItemInstance(itemInstance)
+        return ItemInstanceResponse.fromItemInstance(itemInstance, item)
     }
 
     @Transactional
@@ -43,25 +39,16 @@ class ItemService(
         return 0
     }
 
-    fun getStorageItemsHumanReadable(storageId: String, typeId: String): List<StorageItemResponse> {
-        val itemInstances = itemRepository.findStorageItemInstances(storageId, typeId)
+    @Transactional(readOnly = true)
+    fun getItemInstancesByType(storageId: String, typeId: String): List<SimpleGetItemInstancesResponse> {
+        val itemInstances = itemRepository.getItemInstancesByType(storageId, typeId)
 
         return itemInstances.map { instance ->
-            // Fetch extra details if needed (name, unit, etc.)
             val item = itemRepository.findItemById(instance.itemId)
                 ?: throw IllegalStateException("Item not found for id=${instance.itemId}")
 
-            StorageItemResponse(
-                id = instance.id,
-                name = item.name,
-                amount = instance.amount,
-                unit = item.unitId,
-                expiryDate = instance.expiryDate
-            )
+            SimpleGetItemInstancesResponse.fromItemInstance(instance, item)
         }
     }
-
-
-
 
 }

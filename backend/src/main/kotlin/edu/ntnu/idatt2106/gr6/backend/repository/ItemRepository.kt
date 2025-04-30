@@ -1,6 +1,5 @@
 package edu.ntnu.idatt2106.gr6.backend.repository
 
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
 import edu.ntnu.idatt2106.gr6.backend.model.Item
 import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import org.springframework.stereotype.Repository
@@ -8,7 +7,6 @@ import java.math.BigDecimal
 import java.sql.Date
 import java.sql.ResultSet
 import java.sql.Timestamp
-import java.time.Instant
 import java.time.LocalDate
 import java.util.*
 import javax.sql.DataSource
@@ -131,7 +129,7 @@ class ItemRepository(
             }
     }
 
-    fun findStorageItemInstances(storageId: String, typeId: String): List<ItemInstance> {
+    fun getItemInstancesByType(storageId: String, typeId: String): List<ItemInstance> {
         val sql = """
             SELECT ii.id, ii.item_id, ii.storage_id, ii.expiry_date, ii.amount, ii.created_at, ii.updated_at
             FROM item_instances ii

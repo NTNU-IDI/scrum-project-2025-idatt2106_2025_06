@@ -4,7 +4,7 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstancesRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstancesResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleGetItemInstancesResponse
 import edu.ntnu.idatt2106.gr6.backend.service.ItemService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -72,7 +72,7 @@ class ItemController(
     }
 
 
-    @GetMapping("/storage/{storageId}/items")
+    @GetMapping("/storage/{storageId}/item-instances")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!!!!!!!!!!!!!!!
     @Operation(summary = "Get readable item list for a storage")
     @ApiResponses(
@@ -83,12 +83,12 @@ class ItemController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    fun getItemInstancesByTypeAndStorageId(
+    fun getItemInstancesByType(
         @PathVariable storageId: String,
         @RequestParam typeId: String
-    ): ResponseEntity<List<StorageItemResponse>> {
+    ): ResponseEntity<List<SimpleGetItemInstancesResponse>> {
         logger.info("Fetching readable items for storage ID: $storageId and type ID: $typeId")
-        val itemInstances = itemService.getStorageItemsHumanReadable(storageId, typeId)
+        val itemInstances = itemService.getItemInstancesByType(storageId, typeId)
         return ResponseEntity.ok(itemInstances)
     }
 
