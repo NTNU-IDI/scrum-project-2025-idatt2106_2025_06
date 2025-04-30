@@ -164,7 +164,7 @@ const alerts = [
     </Card>
 
     <!-- Redigere kart -->
-    <Card class="'max-h-[650px] flex-1 basis-1/4 min-w-[300px]'">
+    <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
       <CardHeader class="grid grid-cols-2 items-center w-full">
         <CardTitle class="text-2xl whitespace-nowrap">Kart og hendelser</CardTitle>
         <router-link class=" justify-self-end" to="/admin/map">
