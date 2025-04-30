@@ -1,0 +1,2 @@
+ALTER TABLE event
+    ADD COLUMN status VARCHAR(255) NOT NULL DEFAULT 'planned';
