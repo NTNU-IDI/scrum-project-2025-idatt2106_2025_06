@@ -31,9 +31,7 @@ import {Button} from "@/components/ui/button/index.js";
 import {Input} from "@/components/ui/input/index.js";
 import {DialogClose} from "@/components/ui/dialog/index.js";
 import {Label} from "@/components/ui/label/index.js";
-import {X, UserMinus} from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import router from '@/router/index.js'
 import { useSessionStore } from '@/stores/session'
 import { useStorageStore } from '@/stores/storage'
@@ -47,17 +45,17 @@ const location = ref('');
 
 const joinToken = ref('')
 
-const session = useSessionStore()
-const user = computed(() => session.user)
+const sessionStore = useSessionStore()
+const user = computed(() => sessionStore.user)
 
-const storage = useStorageStore()
-
-const storages = computed(() => storage.storages)
-const membersByStorageId = computed(() => storage.membersByStorageId)
+const storageStore = useStorageStore()
+const storages = computed(() => storageStore.storages)
+const membersByStorageId = computed(() => storageStore.membersByStorageId)
 
 async function createNewStorage() {
-  const token = session.token
-  const response = await storage.create(
+  const token = sessionStore.token
+
+  const response = await storageStore.create(
     householdName.value, token)
 
   if (response) {
@@ -68,7 +66,8 @@ async function createNewStorage() {
 async function joinStorage() {
   if (!joinToken.value) return
 
-  const success = await storage.join(joinToken.value, session.token)
+  const success = await storageStore.join(joinToken.value, sessionStore.token)
+
   if (success) {
     console.log('Bli med i husstand: Vellykket')
     joinToken.value = ''
@@ -79,7 +78,7 @@ async function joinStorage() {
 
 
 onMounted(async () => {
-  if (!session.isAuthenticated) {
+  if (!sessionStore.isAuthenticated) {
     router.push('/login')
     console.log("Det er noe galt med innloggingen");
   }
@@ -90,7 +89,7 @@ onMounted(async () => {
   }
 
   try {
-    await storage.fetchAll(session.token)
+    await storageStore.fetchAll(sessionStore.token)
   } catch (error) {
     console.error("Klarte ikke hente husstander og medlemmer:", error)
   }
@@ -162,19 +161,14 @@ function openEditProfile() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-
           <br/>
-
           <Label>Husstander:</Label>
           <div class="flex flex-col items-center gap-2">
-
               <CardDescription>
                 <div v-for="s in storages" :key="s.id" class="flex flex-col gap-4 w-full">
                   <div class="border p-4 rounded-md shadow-sm w-full grid gap-2 mt-4">
-
                     <h3 class="text-xl font-bold">{{ s.name }}</h3>
                     <p>Husstandsnummer: {{ s.token }}</p>
-
                     <h4 class="mt-2 font-semibold">Medlemmer:</h4>
                     <ul v-if="membersByStorageId[s.id]">
                       <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
@@ -186,12 +180,10 @@ function openEditProfile() {
                   </div>
                 </div>
               </CardDescription>
-
             <Dialog>
               <DialogTrigger>
                 <Button class="w-48">Opprett husstand</Button>
               </DialogTrigger>
-
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle class="text-2xl">Opprett husstand</DialogTitle>
@@ -209,39 +201,17 @@ function openEditProfile() {
                 </DialogHeader>
               </DialogContent>
             </Dialog>
-
             <div class="flex flex-col items-center gap-4 mt-8">
               <Label>Skriv inn husstandsnummer for å bli med i en husstand:</Label>
               <Input v-model="joinToken" placeholder="Husstandsnummer" class="w-64" />
               <Button class="w-48" @click="joinStorage">Bli med i husstand</Button>
             </div>
-
           </div>
-
-          <!--
-          <div>
-            <Label>
-              Husstand:
-            </Label>
-            <CardDescription>
-              <p>Husstandsnavn: {{ householdName }}</p>
-              <p>Lokasjon: {{ location === null ? 'Ikke spesifisert' : location }}</p>
-              <p>Husstandsnummer: {{ householdNumber }}</p>
-              <br/>
-              [Medlem 1]<br/>
-              [Medlem 2]<br/>
-            </CardDescription>
-            <div>
-              <EditStorage/>
-            </div>
-          </div>
-          -->
-
         </div>
       </CardContent>
     </Card>
     <router-link to="/login">
-      <Button @click="session.logout" class="w-48" variant="destructive">Logg ut</Button>
+      <Button @click="sessionStore.logout" class="w-48" variant="destructive">Logg ut</Button>
     </router-link>
   </div>
 </template>

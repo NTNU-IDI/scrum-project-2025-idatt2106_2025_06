@@ -26,7 +26,7 @@ const props = defineProps({
   storage: Object
 })
 
-const session = useSessionStore()
+const sessionStore = useSessionStore()
 const storageStore = useStorageStore()
 
 const membersByStorageId = computed(() => storageStore.membersByStorageId)
@@ -36,13 +36,12 @@ const location = ref(props.storage.location ?? '')
 
 async function saveChanges() {
   try {
-    await storageStore.editStorage(props.storage.id, name.value, location.value, session.token)
+    await storageStore.editStorage(props.storage.id, name.value, location.value, sessionStore.token)
     console.log('Husstand oppdatert')
   } catch (err) {
     console.error('Feil ved oppdatering av husstand:', err)
   }
 }
-
 </script>
 
 <template>
@@ -95,7 +94,6 @@ async function saveChanges() {
             </AlertDialog>
           </div>
         </DialogHeader>
-
         <DialogFooter class="flex flex-col items-center">
           <DialogClose>
             <Button class="w-48" @click="saveChanges">Lagre</Button>
