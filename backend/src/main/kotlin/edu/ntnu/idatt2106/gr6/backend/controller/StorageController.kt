@@ -186,7 +186,7 @@ class StorageController(
         }
     }
 
-    @GetMapping("/user/{userId}/storages")
+    @GetMapping("/my-storages")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!!!!!
     @Operation(summary = "Get all storages a user is connected to")
     @ApiResponses(
@@ -198,9 +198,8 @@ class StorageController(
         ]
     )
     fun getUserStorages(
-        @PathVariable userId: String
     ): ResponseEntity<List<StorageSummary>> {
-        val storages = storageService.getStoragesByUserId(userId)
+        val storages = storageService.getStoragesByUserId()
         return ResponseEntity.ok(storages)
     }
 }

@@ -78,7 +78,8 @@ class StorageService(
     }
 
     @Transactional
-    fun getStoragesByUserId(userId: String): List<StorageSummary> {
-        return storageRepository.findStoragesByUserId(userId)
+    fun getStoragesByUserId(): List<StorageSummary> {
+        val userId = userContextService.getCurrentUserId()
+        return storageRepository.findStoragesByUserId(userId.toString())
     }
 }
