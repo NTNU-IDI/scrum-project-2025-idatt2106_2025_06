@@ -45,9 +45,24 @@ class ItemService(
         )
     }
 
-    fun getStorageItemsHumanReadable(storageId: String): List<StorageItemResponse> {
-        return itemRepository.findStorageItemsHumanReadable(storageId)
+    fun getStorageItemsHumanReadable(storageId: String, typeId: String): List<StorageItemResponse> {
+        val itemInstances = itemRepository.findStorageItemInstances(storageId, typeId)
+
+        return itemInstances.map { instance ->
+            // Fetch extra details if needed (name, unit, etc.)
+            val item = itemRepository.findItemById(instance.itemId)
+                ?: throw IllegalStateException("Item not found for id=${instance.itemId}")
+
+            StorageItemResponse(
+                id = instance.id,
+                name = item.name,
+                amount = instance.amount,
+                unit = item.unitId,
+                expiryDate = instance.expiryDate
+            )
+        }
     }
+
 
     @Transactional
     fun deleteItemInstance(instanceId: String): Boolean {
