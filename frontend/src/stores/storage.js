@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-import {
-  createStorage, fetchStorageMembers, fetchStorages, updateStorage, joinStorage } from '@/service/storageService.js'
+import { createStorage, fetchStorageMembers, fetchStorages, updateStorage, joinStorage, removeStorageMember } from '@/service/storageService.js'
 import { ref } from 'vue'
 
 export const useStorageStore = defineStore('storage', () => {
@@ -58,6 +57,12 @@ export const useStorageStore = defineStore('storage', () => {
       return true
   }
 
-  return{ fetchAll, create, join, storages, membersByStorageId, editStorage }
+  async function removeMember(userId, storageId, token) {
+      await removeStorageMember(token, userId, storageId)
+      await fetchAll(token)
+      return true
+  }
+
+  return{ fetchAll, create, join, storages, membersByStorageId, editStorage, removeMember }
 })
 

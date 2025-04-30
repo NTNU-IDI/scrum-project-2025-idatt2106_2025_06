@@ -42,6 +42,19 @@ async function saveChanges() {
     console.error('Feil ved oppdatering av husstand:', err)
   }
 }
+
+async function removeUser(userId) {
+  try {
+    const success = await storageStore.removeMember(userId, props.storage.id, sessionStore.token)
+    if (success) {
+      console.log('Medlem fjernet')
+    } else {
+      console.error('Klarte ikke fjerne medlem')
+    }
+  } catch (e) {
+    console.error('Feil ved fjerning:', e)
+  }
+}
 </script>
 
 <template>
@@ -67,31 +80,36 @@ async function saveChanges() {
             type="text"
           /><br/>
           <DialogTitle>Medlemmer</DialogTitle>
-          <div class="flex items-center gap-2 justify-between">
-            <ul v-if="membersByStorageId[props.storage.id]">
-              <li v-for="(member, index) in membersByStorageId[props.storage.id]" :key="index">
-                {{ member }}
+          <div>
+            <ul v-if="membersByStorageId[props.storage.id]" class="flex flex-col gap-2">
+              <li
+                v-for="(member, index) in membersByStorageId[props.storage.id]"
+                :key="index"
+                class="flex flex-row justify-between items-center w-full"
+              >
+                <span class="text-left">{{ member }}</span>
+
+                <AlertDialog>
+                  <AlertDialogTrigger as-child >
+                    <Button size="icon" variant="outline">
+                      <user-minus/>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Er du sikker på at du ønsker å fjerne medlemmet fra husstanden?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Nei</AlertDialogCancel>
+                      <AlertDialogAction @click="removeUser(member.id)">Ja</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </li>
             </ul>
-            <AlertDialog>
-              <AlertDialogTrigger as-child>
-                <Button size="icon" variant="outline">
-                  <user-minus/>
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Er du sikker på at du ønsker å fjerne medlemmet fra husstanden?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Nei</AlertDialogCancel>
-                  <AlertDialogAction>Ja</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
           </div>
         </DialogHeader>
         <DialogFooter class="flex flex-col items-center">

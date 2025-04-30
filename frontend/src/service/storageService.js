@@ -38,7 +38,7 @@ export async function fetchStorageMembers(storageId, token) {
         Authorization: `Bearer ${token}`,
       },
     })
-    return response.data // Liste av medlemmer
+    return response.data
   } catch (error) {
     console.error(`Failed to fetch members for storage ${storageId}:`, error)
     throw error
@@ -78,3 +78,22 @@ export async function joinStorage(token, storageToken) {
     throw error
   }
 }
+
+export async function removeStorageMember(token, userId, storageId) {
+  try {
+    const response = await axios.post(
+      'http://localhost:8080/api/storages/remove-member',
+      { userId, storageId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error(`Feil ved fjerning av medlem ${userId} fra storage ${storageId}:`, error)
+    throw error
+  }
+}
+
