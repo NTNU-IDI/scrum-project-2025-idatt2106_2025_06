@@ -165,7 +165,7 @@ const events = [
                 :severity="event.severity"
                 :time="event.time"
                 :title="event.title"
-                variant="expand"
+                variant="default"
               />
             </RouterLink>
           </template>

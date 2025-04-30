@@ -21,7 +21,7 @@ const props = defineProps({
 <template>
   <div
     :class="[
-      'flex w-72 overflow-hidden transition-all duration-100 gap-2 z-10 items-center rounded-lg border border-gray-200 bg-white p-4 shadow-sm',
+      'flex w-72 overflow-hidden hover:bg-neutral-50 transition-all duration-100 gap-2 z-10 items-center rounded-lg border border-gray-200 bg-white p-4 shadow-sm',
       variant === 'expand' ? 'group cursor-pointer hover:gap-2' : '',
     ]"
   >
