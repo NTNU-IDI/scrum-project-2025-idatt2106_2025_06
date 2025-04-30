@@ -1,9 +1,6 @@
 <script setup>
 import { Button } from '@/components/ui/button/index.js'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.js'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert/index.js'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/index.js'
-import PublishPost from '@/components/PublishPost.vue'
 import PublishAlert from '@/components/PublishAlert.vue'
 import AlertCard from '@/components/AlertCard.vue'
 
@@ -109,58 +106,24 @@ const alerts = [
       </CardContent>
     </Card>
 
-    <!-- Redigere innlegg og varslinger -->
+    <!-- Redigere varslinger -->
     <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
-      <Tabs default-value="post" class="">
-        <TabsList class="grid w-full grid-cols-2">
-          <TabsTrigger value="post">
-            Innlegg
-          </TabsTrigger>
-          <TabsTrigger value="alert">
-            Varsling
-          </TabsTrigger>
-        </TabsList>
-
-        <!-- Varslinger-tab -->
-        <TabsContent value="post">
-          <div class="flex flex-col gap-2 p-5">
-          <PublishPost/>
-            <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2 p-0">
-              <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Gratis bolle på Element.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Systemet er under vedlikehold. Vær tålmodig.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Brannøvelse pågår. Ikke vær redd om alarmen går.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Vær forsiktig på vei hjem. Snø og glatte veier forventes.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Husk å sende inn oppgaven innen fredag kl. 23:59.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Viktige endringer i åpningstidene. Se nettsiden for detaljer.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Høy temperatur i kontorlokalene. Vennligst ta nødvendige forholdsregler.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Det er mulig å hente billetter til neste event i resepsjonen fra kl. 10:00.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Info: </AlertTitle><AlertDescription>Feil på serveren. Vi jobber med å løse problemet så raskt som mulig.</AlertDescription></Alert>
-            </CardContent>
-          </div>
-        </TabsContent>
-
-        <!-- Innlegg-tab -->
-        <TabsContent value="alert">
-          <div class="flex flex-col gap-2 p-5">
-            <PublishAlert/>
-            <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2 p-0">
-              <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
-              <template v-for="(alert, index) in alerts" :key="index">
-                <AlertCard
-                  :description="alert.description"
-                  :severity="alert.severity"
-                  :time="alert.time"
-                  :title="alert.title"
-                  variant="admin"
-                />
-              </template>
-            </CardContent>
-          </div>
-        </TabsContent>
-      </Tabs>
-
+      <CardHeader class="grid grid-cols-2 items-center w-full">
+        <CardTitle class="text-2xl">Varslinger</CardTitle>
+        <PublishAlert/>
+      </CardHeader>
+        <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2">
+          <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
+          <template v-for="(alert, index) in alerts" :key="index">
+            <AlertCard
+              :description="alert.description"
+              :severity="alert.severity"
+              :time="alert.time"
+              :title="alert.title"
+              variant="admin"
+            />
+          </template>
+        </CardContent>
     </Card>
 
     <!-- Redigere kart -->
