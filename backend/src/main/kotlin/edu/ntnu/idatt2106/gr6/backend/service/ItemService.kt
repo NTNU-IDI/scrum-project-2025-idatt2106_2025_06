@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
 import edu.ntnu.idatt2106.gr6.backend.model.Item
 import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
@@ -16,8 +17,7 @@ class ItemService(
 ) {
 
     @Transactional
-    fun createItemAndItemInstance(request: CreateItemInstanceRequest): ItemInstance {
-        val now = Instant.now()
+    fun createItemAndItemInstance(request: CreateItemInstanceRequest): ItemInstanceResponse {
 
         val item = itemRepository.createItem(
             name = request.name,
@@ -25,12 +25,14 @@ class ItemService(
             unitId = request.unitId
         )
 
-        return itemRepository.saveItemInstance(
+        val itemInstance =  itemRepository.saveItemInstance(
             itemId = item.id,
             storageId = request.storageId,
             amount = request.amount,
             expiryDate = request.expiryDate
         )
+
+        return ItemInstanceResponse.fromItemInstance(itemInstance)
     }
 
     fun getStorageItemsHumanReadable(storageId: String, typeId: String): List<StorageItemResponse> {

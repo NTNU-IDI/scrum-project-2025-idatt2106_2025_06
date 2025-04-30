@@ -6,6 +6,24 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
+data class ItemInstanceResponse (
+    val id: String,
+    val itemId: String,
+    val storageId: String,
+    val amount: BigDecimal,
+    val expiryDate: LocalDate?
+){
+    companion object {
+        fun fromItemInstance(item: ItemInstance) = ItemInstanceResponse(
+            id = item.id,
+            itemId = item.itemId,
+            storageId = item.storageId,
+            amount = item.amount,
+            expiryDate = item.expiryDate
+        )
+    }
+}
+
 data class CreateItemInstanceRequest (
     val name: String,
     val description: String?,

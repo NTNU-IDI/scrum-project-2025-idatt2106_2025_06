@@ -2,6 +2,7 @@ package edu.ntnu.idatt2106.gr6.backend.controller
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstanceRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
 import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import edu.ntnu.idatt2106.gr6.backend.service.ItemService
@@ -41,7 +42,7 @@ class ItemController(
     )
     fun createItemInstance(
         @RequestBody @Valid request: CreateItemInstanceRequest
-    ): ResponseEntity<ItemInstance> {
+    ): ResponseEntity<ItemInstanceResponse> {
         logger.info("Received request to add item instance: $request")
 
         val createdItemInstance = itemService.createItemAndItemInstance(request)
