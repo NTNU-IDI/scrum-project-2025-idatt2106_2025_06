@@ -128,12 +128,12 @@ class ItemRepository(
             }
     }
 
-    fun findStorageItemInstances(storageId: String): List<ItemInstance> {
+    fun findStorageItemInstances(storageId: String, typeId: String): List<ItemInstance> {
         val sql = """
             SELECT ii.id, ii.item_id, ii.storage_id, ii.expiry_date, ii.amount, ii.created_at, ii.updated_at
             FROM item_instances ii
             JOIN items i ON ii.item_id = i.id
-            WHERE ii.storage_id = ?
+            WHERE ii.storage_id = ? AND i.type_id = ?
             ORDER BY i.name ASC
         """.trimIndent()
 
@@ -142,6 +142,7 @@ class ItemRepository(
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, storageId)
+                stmt.setString(2, typeId)
                 stmt.executeQuery().use { rs ->
                     while (rs.next()) {
                         instances.add(
