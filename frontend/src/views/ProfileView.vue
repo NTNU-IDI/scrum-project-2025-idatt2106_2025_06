@@ -111,7 +111,7 @@ function openEditProfile() {
       </CardHeader>
       <CardContent>
         <div class="grid gap-2">
-          <Label>
+          <Label class="text-xl">
             Personalia:
           </Label>
           <CardDescription>
@@ -137,10 +137,23 @@ function openEditProfile() {
                   v-model="email"
                   placeholder="Epostadresse"
                   type="email"
-                /><br/>
-                <Label>
-                  Endre passord?
-                </Label>
+                />
+              </DialogHeader>
+              <DialogFooter class="flex flex-col items-center">
+                <DialogClose>
+                  <Button class="w-48">Lagre</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog>
+            <DialogTrigger>
+              <Button class="w-48">Endre passord</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle class="text-2xl">Endre passord</DialogTitle>
                 <Input
                   placeholder="Gammelt passord"
                   type="password"
@@ -162,11 +175,11 @@ function openEditProfile() {
             </DialogContent>
           </Dialog>
           <br/>
-          <Label>Husstander:</Label>
+          <Label class="text-xl">Husstander:</Label>
           <div class="flex flex-col items-center gap-2">
               <CardDescription>
                 <div v-for="s in storages" :key="s.id" class="flex flex-col gap-4 w-full">
-                  <div class="border p-4 rounded-md shadow-sm w-full grid gap-2 mt-4">
+                  <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
                     <h3 class="text-xl font-bold">{{ s.name }}</h3>
                     <p>Husstandsnummer: {{ s.token }}</p>
                     <h4 class="mt-2 font-semibold">Medlemmer:</h4>
@@ -180,13 +193,14 @@ function openEditProfile() {
                   </div>
                 </div>
               </CardDescription>
+            <br/>
             <Dialog>
               <DialogTrigger>
-                <Button class="w-48">Opprett husstand</Button>
+                <Button class="w-48">Opprett ny husstand</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle class="text-2xl">Opprett husstand</DialogTitle>
+                  <DialogTitle class="text-2xl">Opprett ny husstand</DialogTitle>
                   <Input
                     v-model="householdName"
                     placeholder="Husstandsnavn"
@@ -201,9 +215,9 @@ function openEditProfile() {
                 </DialogHeader>
               </DialogContent>
             </Dialog>
-            <div class="flex flex-col items-center gap-4 mt-8">
-              <Label>Skriv inn husstandsnummer for å bli med i en husstand:</Label>
-              <Input v-model="joinToken" placeholder="Husstandsnummer" class="w-64" />
+            <div class="flex flex-col items-center gap-4 mt-6">
+              <Label>Skriv inn husstandsnummer for å bli med i en annen husstand:</Label>
+              <Input v-model="joinToken" placeholder="Husstandsnummer" class="w-48" />
               <Button class="w-48" @click="joinStorage">Bli med i husstand</Button>
             </div>
           </div>
