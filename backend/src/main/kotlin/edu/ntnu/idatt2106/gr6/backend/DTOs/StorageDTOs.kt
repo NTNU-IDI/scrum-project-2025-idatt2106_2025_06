@@ -4,7 +4,6 @@ import java.time.Instant
 
 data class CreateStorageRequest(
     val name: String,
-    val token: Int,
     val latitude: Double?,  // optional
     val longitude: Double?  // optional
 )
@@ -13,7 +12,22 @@ data class StorageResponse(
     val id: String,
     val name: String,
     val storageOwner: String,
-    val token: Int,
+    val token: String,
     val createdAt: Instant,
     val updatedAt: Instant
+)
+
+data class RemoveUserFromStorageRequest(
+    val storageId: String,
+    val userId: String
+)
+
+data class JoinStorageRequest(
+    val token: String
+)
+
+data class StorageSummary(
+    val id: String,
+    val name: String,
+    val token: String
 )

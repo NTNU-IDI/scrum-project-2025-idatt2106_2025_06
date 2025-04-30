@@ -2,7 +2,7 @@ CREATE TABLE item_instances (
     id          VARCHAR(36)         PRIMARY KEY,
     item_id     VARCHAR(36)         NOT NULL,
     storage_id  VARCHAR(36)         NOT NULL,
-    expiry_date DATE,
+    expiry_date DATE                NULL,
     amount      DECIMAL(10, 2)               NOT NULL,
     created_at  TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
