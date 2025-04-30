@@ -110,7 +110,7 @@ const alerts = [
     </Card>
 
     <!-- Redigere innlegg og varslinger -->
-    <Card class="'max-h-[650px] flex-1 basis-1/4 min-w-[300px]'">
+    <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
       <Tabs default-value="post" class="">
         <TabsList class="grid w-full grid-cols-2">
           <TabsTrigger value="post">
