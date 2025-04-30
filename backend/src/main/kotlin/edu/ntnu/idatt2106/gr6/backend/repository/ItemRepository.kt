@@ -163,20 +163,23 @@ class ItemRepository(
         return instances
     }
 
-    fun deleteItemInstanceById(instanceId: String): Boolean {
-        val sql = """
-        DELETE FROM item_instances
-        WHERE id = ?
-    """.trimIndent()
+
+    fun deleteItemInstancesByIds(instanceIds: List<String>) {
+        if (instanceIds.isEmpty()) return
+
+        val placeholders = instanceIds.joinToString(",") { "?" }
+        val sql = "DELETE FROM item_instances WHERE id IN ($placeholders)"
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, instanceId)
-                val rowsDeleted = stmt.executeUpdate()
-                return rowsDeleted > 0
+                instanceIds.forEachIndexed { index, id ->
+                    stmt.setString(index + 1, id)
+                }
+                stmt.executeUpdate()
             }
         }
     }
+
 
 
     private fun mapRowToItem(rs: ResultSet): Item {

@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.repository
 
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageSummary
 import edu.ntnu.idatt2106.gr6.backend.model.Storage
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -154,6 +155,36 @@ class StorageRepository(private val dataSource: DataSource) {
         }
 
         return names
+    }
+
+    fun findStoragesByUserId(userId: String): List<StorageSummary> {
+        val sql = """
+        SELECT s.id, s.name, s.token
+        FROM storages s
+        JOIN user_storages us ON s.id = us.storage_id
+        WHERE us.user_id = ?
+    """.trimIndent()
+
+        val storages = mutableListOf<StorageSummary>()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userId)
+                stmt.executeQuery().use { rs ->
+                    while (rs.next()) {
+                        storages.add(
+                            StorageSummary(
+                                id = rs.getString("id"),
+                                name = rs.getString("name"),
+                                token = rs.getString("token")
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        return storages
     }
 
 
