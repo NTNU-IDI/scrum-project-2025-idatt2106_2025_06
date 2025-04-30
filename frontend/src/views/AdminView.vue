@@ -5,6 +5,95 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert/index
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/index.js'
 import PublishPost from '@/components/PublishPost.vue'
 import PublishAlert from '@/components/PublishAlert.vue'
+import AlertCard from '@/components/AlertCard.vue'
+
+const alerts = [
+  {
+    id: 1,
+    title: 'GODE NYHETER! lalal',
+    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
+    time: 'Nå',
+    severity: 'red',
+  },
+  {
+    id: 2,
+    title: 'Bolle',
+    description:
+      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
+    time: 'Nå',
+    severity: 'red',
+  },
+  {
+    id: 3,
+    title: 'Gå vekk alerts',
+    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
+    time: '11:42',
+    severity: 'yellow',
+  },
+  {
+    id: 4,
+    title: 'Håp',
+    description: 'Håper denne er borte.',
+    time: '11:42',
+    severity: 'green',
+  },
+  {
+    id: 5,
+    title: 'Bø',
+    description: 'Borte... bø!.',
+  },
+  {
+    id: 6,
+    title: 'GODE NYHETER!',
+    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
+  },
+  {
+    id: 7,
+    title: 'Bolle',
+    description: 'Gratis bolle på Element.',
+  },
+  {
+    id: 8,
+    title: 'Gå vekk alerts',
+    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
+  },
+  {
+    id: 9,
+    title: 'Håp',
+    description: 'Håper denne er borte.',
+  },
+  {
+    id: 10,
+    title: 'Bø',
+    description: 'Borte... bø!.',
+  },
+  {
+    id: 11,
+    title: 'GODE NYHETER!',
+    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
+  },
+  {
+    id: 12,
+    title: 'Bolle',
+    description: 'Gratis bolle på Element.',
+  },
+  {
+    id: 13,
+    title: 'Gå vekk alerts',
+    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
+  },
+  {
+    id: 14,
+    title: 'Håp',
+    description: 'Håper denne er borte.',
+  },
+  {
+    id: 15,
+    title: 'Bø',
+    description: 'Borte... bø!.',
+  },
+]
+
 </script>
 
 <template>
@@ -58,16 +147,15 @@ import PublishAlert from '@/components/PublishAlert.vue'
             <PublishAlert/>
             <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2 p-0">
               <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Gratis bolle på Element.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Systemet er under vedlikehold. Vær tålmodig.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Brannøvelse pågår. Ikke vær redd om alarmen går.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Vær forsiktig på vei hjem. Snø og glatte veier forventes.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Husk å sende inn oppgaven innen fredag kl. 23:59.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Viktige endringer i åpningstidene. Se nettsiden for detaljer.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Høy temperatur i kontorlokalene. Vennligst ta nødvendige forholdsregler.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Det er mulig å hente billetter til neste event i resepsjonen fra kl. 10:00.</AlertDescription></Alert>
-              <Alert variant="default"><AlertTitle>Varsel: </AlertTitle><AlertDescription>Feil på serveren. Vi jobber med å løse problemet så raskt som mulig.</AlertDescription></Alert>
+              <template v-for="(alert, index) in alerts" :key="index">
+                <AlertCard
+                  :description="alert.description"
+                  :severity="alert.severity"
+                  :time="alert.time"
+                  :title="alert.title"
+                  variant="admin"
+                />
+              </template>
             </CardContent>
           </div>
         </TabsContent>

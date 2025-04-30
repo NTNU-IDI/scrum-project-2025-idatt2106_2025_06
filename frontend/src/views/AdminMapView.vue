@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/i
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert/index.js'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/index.js'
 import { Label } from '@/components/ui/label/index.js'
+import EventCard from '@/components/EventCard.vue'
 
 export default defineComponent({
   data() {
@@ -20,10 +21,67 @@ export default defineComponent({
         zoom: 12
       },
       showSearchPopup: true,
-      activeTab: 'event'
+      activeTab: 'event',
+      events: [
+        {
+          id: 1,
+          title: 'GODE NYHETER! lalal',
+          description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
+          time: 'Nå',
+          severity: 'info',
+        },
+        {
+          id: 2,
+          title: 'Bolle',
+          description:
+            'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
+          time: 'Nå',
+          severity: 'red',
+        },
+        {
+          id: 3,
+          title: 'Gå vekk alerts',
+          description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
+          time: '11:42',
+          severity: 'yellow',
+        },
+        {
+          id: 4,
+          title: 'Håp',
+          description: 'Håper denne er borte.',
+          time: '11:42',
+          severity: 'green',
+        },
+        {
+          id: 5,
+          title: 'Bø',
+          description: 'Borte... bø!.',
+        },
+        {
+          id: 6,
+          title: 'GODE NYHETER!',
+          description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
+        },
+        {
+          id: 7,
+          title: 'Bolle',
+          description: 'Gratis bolle på Element.',
+        },
+        {
+          id: 8,
+          title: 'Kanel',
+          description: 'Gratis bolle på Element.',
+        },
+        {
+          id: 9,
+          title: 'Snurr',
+          description: 'Gratis bolle på Element.',
+        },
+      ]
     };
   },
   components: {
+    EventCard,
     TabsTrigger,
     TabsList, Label,
     TabsContent, Tabs,
@@ -38,8 +96,9 @@ export default defineComponent({
     Map
   }
 });
-</script>
 
+
+</script>
 
 <template>
   <div class="m-auto mt-10 flex flex-1 w-full py-10 gap-6">
@@ -148,16 +207,15 @@ export default defineComponent({
         </CardHeader>
         <CardContent class="max-w-[350px] max-h-[85%] overflow-y-auto flex flex-col gap-2">
           <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Gratis bolle på Element.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Systemet er under vedlikehold. Vær tålmodig.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Brannøvelse pågår. Ikke vær redd om alarmen går.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Vær forsiktig på vei hjem. Snø og glatte veier forventes.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Husk å sende inn oppgaven innen fredag kl. 23:59.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Viktige endringer i åpningstidene. Se nettsiden for detaljer.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Høy temperatur i kontorlokalene. Vennligst ta nødvendige forholdsregler.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Det er mulig å hente billetter til neste event i resepsjonen fra kl. 10:00.</AlertDescription></Alert>
-          <Alert variant="default"><AlertTitle>Hendelse: </AlertTitle><AlertDescription>Feil på serveren. Vi jobber med å løse problemet så raskt som mulig.</AlertDescription></Alert>
+          <template v-for="(event, index) in events" :key="index">
+              <EventCard
+                :description="event.description"
+                :severity="event.severity"
+                :time="event.time"
+                :title="event.title"
+                variant="admin"
+              />
+          </template>
         </CardContent>
       </Card>
 
