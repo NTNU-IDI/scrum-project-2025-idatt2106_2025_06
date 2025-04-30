@@ -61,11 +61,12 @@ class ItemController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    fun getItemInstancesByStorageId(
-        @PathVariable storageId: String
+    fun getItemInstancesByTypeAndStorageId(
+        @PathVariable storageId: String,
+        @RequestParam typeId: String
     ): ResponseEntity<List<StorageItemResponse>> {
-        logger.info("Fetching readable items for storage ID: $storageId")
-        val itemInstances = itemService.getStorageItemsHumanReadable(storageId)
+        logger.info("Fetching readable items for storage ID: $storageId and type ID: $typeId")
+        val itemInstances = itemService.getStorageItemsHumanReadable(storageId, typeId)
         return ResponseEntity.ok(itemInstances)
     }
 

@@ -45,8 +45,8 @@ class ItemService(
         )
     }
 
-    fun getStorageItemsHumanReadable(storageId: String): List<StorageItemResponse> {
-        val itemInstances = itemRepository.findStorageItemInstances(storageId)
+    fun getStorageItemsHumanReadable(storageId: String, typeId: String): List<StorageItemResponse> {
+        val itemInstances = itemRepository.findStorageItemInstances(storageId, typeId)
 
         return itemInstances.map { instance ->
             // Fetch extra details if needed (name, unit, etc.)
