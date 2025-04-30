@@ -34,7 +34,6 @@ export default defineComponent({
     CardTitle, CardContent,
     Input,
     Button,
-    EditEvent: EditMap,
     SearchAddressCoordinates,
     Map
   }
@@ -44,6 +43,10 @@ export default defineComponent({
 
 <template>
   <div class="m-auto mt-10 flex flex-1 w-full py-10 gap-6">
+    <RouterLink  class="absolute z-10 top-20 left-30" to="/admin">
+      <Button>Tilbake</Button>
+    </RouterLink>
+
     <!-- Venstre kolonne -->
     <div class="flex flex-col">
       <Tabs v-model="activeTab" class="w-[400px]">
