@@ -6,6 +6,7 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 (2, 4),
 (2, 5),
 (2, 7),
+(2,8),
 (3, 6),
 (3, 5),
 (3, 3),
