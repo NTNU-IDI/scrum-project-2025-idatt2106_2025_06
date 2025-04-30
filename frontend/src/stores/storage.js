@@ -9,6 +9,13 @@ export const useStorageStore = defineStore('storage', () => {
 
   async function fetchAll(token) {
     const response = await fetchStorages(token)
+
+    if (!Array.isArray(response)) {
+      console.error('Forventet at fetchStorages returnerer en liste, men fikk:', response)
+      storages.value = []
+      return
+    }
+
     storages.value = response
 
     for (const storage of storages.value) {
@@ -19,8 +26,14 @@ export const useStorageStore = defineStore('storage', () => {
 
   async function create(name, token) {
     const response = await createStorage(name, token)
-    // Valgfritt: legg til ny storage og hent medlemmer direkte
+
+    if (!Array.isArray(storages.value)) {
+      console.warn('storages.value var ikke en liste – reinitialiserer den.')
+      storages.value = []
+    }
+
     storages.value.push(response)
+
     const members = await fetchStorageMembers(response.id, token)
     membersByStorageId.value[response.id] = members
     return response

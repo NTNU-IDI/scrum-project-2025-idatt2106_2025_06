@@ -19,7 +19,7 @@ export async function createStorage(name, token){
 
 export async function fetchStorages(token) {
   try {
-    const response = await axios.get('http://localhost:8080/api/storages/mine', {
+    const response = await axios.get('http://localhost:8080/api/storages/my-storages', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -33,7 +33,7 @@ export async function fetchStorages(token) {
 
 export async function fetchStorageMembers(storageId, token) {
   try {
-    const response = await axios.get(`http://localhost:8080/api/storages/{id}/members`, {
+    const response = await axios.get(`http://localhost:8080/api/storages/${storageId}/members`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

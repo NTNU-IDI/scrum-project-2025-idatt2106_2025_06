@@ -54,7 +54,7 @@ const storage = useStorageStore()
 const household = computed(() => storage.household)
 
 const storages = computed(() => storage.storages)
-const memberByStorageId = computed(() => storage.memberByStorageId)
+const membersByStorageId = computed(() => storage.membersByStorageId)
 
 async function createNewStorage() {
   const token = session.token
@@ -154,23 +154,26 @@ function openEditProfile() {
 
           <br/>
 
+          <Label>Husstander:</Label>
           <div class="flex flex-col items-center gap-2">
-            <Label>
-              Du er ikke registrert i en husstand.
-            </Label>
-              <Label>Husstand:</Label>
-              <CardDescription>
-                <div v-for="s in storages" :key="s.id" class="border p-4 rounded-md shadow-sm w-full">
-                  <h3 class="text-xl font-bold">{{ s.name }}</h3>
-                  <p>Token: {{ s.token }}</p>
-                  <p>ID: {{ s.id }}</p>
 
-                  <h4 class="mt-2 font-semibold">Medlemmer:</h4>
-                  <ul>
-                    <li v-for="member in membersByStorageId[s.id]" :key="member.id">
-                      {{ member.name }} ({{ member.email }})
-                    </li>
-                  </ul>
+              <CardDescription>
+                <div v-for="s in storages" :key="s.id" class="flex flex-col gap-4 w-full">
+                  <div class="border p-4 rounded-md shadow-sm w-full grid gap-2 mt-4">
+
+                    <h3 class="text-xl font-bold">{{ s.name }}</h3>
+                    <p>Husstandsnummer: {{ s.token }}</p>
+
+                    <h4 class="mt-2 font-semibold">Medlemmer:</h4>
+                    <ul v-if="membersByStorageId[s.id]">
+                      <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
+                        {{ member }}
+                      </li>
+                    </ul>
+                    <p v-else>Laster medlemmer...</p>
+                    <EditStorage/>
+
+                  </div>
                 </div>
               </CardDescription>
 
