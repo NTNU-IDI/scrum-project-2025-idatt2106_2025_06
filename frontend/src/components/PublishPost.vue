@@ -18,16 +18,28 @@ import {DialogClose} from "@/components/ui/dialog/index.js";
 <template>
   <Dialog>
     <DialogTrigger>
-      <Button class="w-48 bg-black text-white">
+      <Button class="w-full bg-black text-white">
         Legg til innlegg
       </Button>
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Legg til innlegg</DialogTitle>
-        <label>
+        <div class="flex align-middle">
+          <Label class="m-2" for="name">Navn: </Label>
+          <Input class="border w-full" id="name" placeholder="Navn på varsel" />
+        </div>
+        <div class="flex align-middle">
+          <Label class="m-2" for="text">Varsel: </Label>
+          <Input class="border w-full" id="test" placeholder="Innhold for varsel" />
+        </div>
+        <div class="flex align-middle">
+          <Label class="m-2" for="text">Type: </Label>
+          <Input class="border w-full" id="test" placeholder="Innhold for varsel" />
+        </div>
+        <Label>
           Her kan du legge til et nytt innlegg. Trykk på "Publiser" når du er ferdig.
-        </label>
+        </Label>
         <Input
           placeholder="Tittel"
           type="text"
@@ -36,9 +48,9 @@ import {DialogClose} from "@/components/ui/dialog/index.js";
           placeholder="Kort beskrivelse"
           type="text"
         />
-        <label>
+        <Label>
           Innhold:
-        </label>
+        </Label>
         <Input
           placeholder="Skriv her..."
           rows="4"
@@ -46,13 +58,13 @@ import {DialogClose} from "@/components/ui/dialog/index.js";
         />
       </DialogHeader>
 
-      <DialogFooter class="flex flex-col items-center">
+      <DialogFooter class="flex gap-2">
         <DialogClose>
-          <Button variant="outline" class="w-48">
+          <Button variant="outline" class="flex-1">
             Avbryt
           </Button>
         </DialogClose>
-        <Button class="w-full" variant="default">
+        <Button class="flex-1" variant="default">
           Publiser
         </Button>
       </DialogFooter>
