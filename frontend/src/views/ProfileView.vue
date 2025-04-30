@@ -37,7 +37,9 @@ import { useRouter } from 'vue-router'
 import router from '@/router/index.js'
 import axios from 'axios'
 import { useSessionStore } from '@/stores/session'
+import { useStorageStore } from '@/stores/storage'
 import EditStorage from '@/components/EditStorage.vue'
+import { createStorage } from '@/service/storageService.js'
 
 const username = ref('');
 const email = ref('');
@@ -45,16 +47,27 @@ const householdName = ref('');
 const householdNumber = ref('');
 const location = ref('');
 
-const isLoggedIn = ref(false);
-
-const user = computed(() => session.user)
-const storage = ref(null);
-
 const session = useSessionStore()
+const user = computed(() => session.user)
+
+const storage = useStorageStore()
+const household = computed(() => storage.household)
+
+const storages = computed(() => storage.storages)
+const memberByStorageId = computed(() => storage.memberByStorageId)
+
+async function createNewStorage() {
+  const token = session.token
+  const response = await storage.create(
+    householdName.value, token)
+
+  if (response) {
+    console.log("Husstand opprettet")
+  }
+}
 
 
 onMounted(async () => {
-
   if (!session.isAuthenticated) {
     router.push('/login')
     console.log("Det er noe galt med innloggingen");
@@ -63,6 +76,12 @@ onMounted(async () => {
   if (user.value) {
     username.value = user.value.name
     email.value = user.value.email
+  }
+
+  try {
+    await storage.fetchAll(session.token)
+  } catch (error) {
+    console.error("Klarte ikke hente husstander og medlemmer:", error)
   }
 });
 
@@ -132,21 +151,72 @@ function openEditProfile() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
           <br/>
-          <Label>
-            Husstand:
-          </Label>
-          <CardDescription>
-            <p>Husstandsnavn: {{ householdName }}</p>
-            <p>Lokasjon: {{ location === null ? 'Ikke spesifisert' : location }}</p>
-            <p>Husstandsnummer: {{ householdNumber }}</p>
-            <br/>
-            [Medlem 1]<br/>
-            [Medlem 2]<br/>
-          </CardDescription>
-          <div>
-            <EditStorage/>
+
+          <div class="flex flex-col items-center gap-2">
+            <Label>
+              Du er ikke registrert i en husstand.
+            </Label>
+              <Label>Husstand:</Label>
+              <CardDescription>
+                <div v-for="s in storages" :key="s.id" class="border p-4 rounded-md shadow-sm w-full">
+                  <h3 class="text-xl font-bold">{{ s.name }}</h3>
+                  <p>Token: {{ s.token }}</p>
+                  <p>ID: {{ s.id }}</p>
+
+                  <h4 class="mt-2 font-semibold">Medlemmer:</h4>
+                  <ul>
+                    <li v-for="member in membersByStorageId[s.id]" :key="member.id">
+                      {{ member.name }} ({{ member.email }})
+                    </li>
+                  </ul>
+                </div>
+              </CardDescription>
+
+            <Dialog>
+              <DialogTrigger>
+                <Button class="w-48">Opprett husstand</Button>
+              </DialogTrigger>
+
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle class="text-2xl">Opprett husstand</DialogTitle>
+                  <Input
+                    v-model="householdName"
+                    placeholder="Husstandsnavn"
+                    type="text"
+                  />
+                  <Input
+                    v-model="location"
+                    placeholder="Lokasjon (valgfritt)"
+                    type="text"
+                  />
+                  <Button @click="createNewStorage()" class="w-48">Opprett</Button>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
           </div>
+
+          <!--
+          <div>
+            <Label>
+              Husstand:
+            </Label>
+            <CardDescription>
+              <p>Husstandsnavn: {{ householdName }}</p>
+              <p>Lokasjon: {{ location === null ? 'Ikke spesifisert' : location }}</p>
+              <p>Husstandsnummer: {{ householdNumber }}</p>
+              <br/>
+              [Medlem 1]<br/>
+              [Medlem 2]<br/>
+            </CardDescription>
+            <div>
+              <EditStorage/>
+            </div>
+          </div>
+          -->
+
         </div>
       </CardContent>
     </Card>

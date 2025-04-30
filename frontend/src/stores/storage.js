@@ -1,21 +1,45 @@
 import { defineStore } from 'pinia'
-import { createStorage } from '@/service/storageService.js'
+import {
+  createStorage, fetchStorageMembers, fetchStorages } from '@/service/storageService.js'
+import { ref } from 'vue'
 
-export const useStorageStore = defineStore('session', () => {
+export const useStorageStore = defineStore('storage', () => {
+  const storages = ref([])
+  const membersByStorageId = ref({})
 
-  async function create(name) {
+  async function fetchAll(token) {
+    const response = await fetchStorages(token)
+    storages.value = response
+
+    for (const storage of storages.value) {
+      const members = await fetchStorageMembers(storage.id, token)
+      membersByStorageId.value[storage.id] = members
+    }
+  }
+
+  async function create(name, token) {
+    const response = await createStorage(name, token)
+    // Valgfritt: legg til ny storage og hent medlemmer direkte
+    storages.value.push(response)
+    const members = await fetchStorageMembers(response.id, token)
+    membersByStorageId.value[response.id] = members
+    return response
+  }
+
+  /*
+  async function join(token) {
     try {
-      const response = await createStorage(name)
+      const response = await joinStorage(token)
       return response
     } catch (error) {
-      console.error('Error creating storage:', error)
+      console.error('Error joining storage:', error)
       return false
     }
   }
 
-  async function editName(id, name) {
+  async function editName(token, name) {
     try {
-      const response = await editStorageName(id, name)
+      const response = await editStorageName(token, name)
       return response
     } catch (error) {
       console.error('Error editing storage name:', error)
@@ -23,9 +47,9 @@ export const useStorageStore = defineStore('session', () => {
     }
   }
 
-  async function editLocation(id, location) {
+  async function editLocation(token, location) {
     try {
-      const response = await editStorageLocation(id, location)
+      const response = await editStorageLocation(token, location)
       return response
     } catch (error) {
       console.error('Error editing storage location:', error)
@@ -33,6 +57,28 @@ export const useStorageStore = defineStore('session', () => {
     }
   }
 
-  return{ create }
+  async function removeMember(token, userId) {
+    try {
+      const response = await removeStorageMember(token, userId)
+      return response
+    } catch (error) {
+      console.error('Error removing member:', error)
+      return false
+    }
+  }
+
+  async function getToken() {
+    try {
+      const response = await getStorageToken()
+      return response
+    } catch (error) {
+      console.error('Error getting storage token:', error)
+      return false
+    }
+  }
+
+   */
+
+  return{ fetchAll, create, storages, membersByStorageId }
 })
 
