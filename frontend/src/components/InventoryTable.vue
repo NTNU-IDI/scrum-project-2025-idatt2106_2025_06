@@ -25,195 +25,132 @@ import EditItem from '@/components/EditItem.vue'
 
 
 const props = defineProps({
-  tab: { type: String, required: true },
+  newItems: { type: Array, required: true },
+  storageId: {type: Number, required: true},
+  tab: { type: String }
 });
-
-const selectedBoxes = ref(new Set());
-const selectAllBoxes = ref(false);
-
-//const items = ref();
-
-const items = {
-  matOgDrikke: [
-    {
-      id: 1,
-      name: "Pasta",
-      amount: "500 g",
-      daysLeft: 4
-    },
-    {
-      id: 2,
-      name: "Rice",
-      amount: "1 kg",
-      daysLeft: 7
-    },
-    {
-      name: "Tomato",
-      amount: "700 g",
-      daysLeft: 2,
-      items: [
-        { "id": 6, "name": "Pasta", "amount": "500 g", "daysLeft": 4 },
-        { "id": 5, "name": "Pasta", "amount": "200 g", "daysLeft": 2 }
-      ]
-    },
-    {
-      id: 4,
-      name: "Olive Oil",
-      amount: "500 ml",
-      daysLeft: 10
-    },
-    {
-      name: "Ost",
-      amount: "750 g",
-      daysLeft: 5,
-      items: [
-        { "id": 7, "name": "Pasta", "amount": "500 g", "daysLeft": 10 },
-        { "id": 10, "name": "Pasta", "amount": "250 g", "daysLeft": 5 }
-      ]
-    }
-  ],
-  varmeOgLys: [
-    {
-      id: 1,
-      name: "LED Bulb",
-      amount: "10 units",
-      daysLeft: 30
-    },
-    {
-      id: 2,
-      name: "Gas Heater",
-      amount: "1 unit",
-      daysLeft: 60
-    },
-    {
-      id: 3,
-      name: "Battery Pack",
-      amount: "5 units",
-      daysLeft: 20
-    }
-  ],
-  informasjon: [
-    {
-      id: 1,
-      name: "User Manual for Heater",
-      amount: "1 copy",
-      daysLeft: 365
-    },
-    {
-      id: 2,
-      name: "Instruction Book for Pasta Cooker",
-      amount: "1 copy",
-      daysLeft: 365
-    },
-    {
-      id: 3,
-      name: "Safety Instructions for Gas Heater",
-      amount: "1 copy",
-      daysLeft: 180
-    }
-  ],
-  legemidOgHygiene: [
-    {
-      id: 1,
-      name: "Pain Reliever (Ibuprofen)",
-      amount: "20 tablets",
-      daysLeft: 15
-    },
-    {
-      id: 2,
-      name: "Toothpaste",
-      amount: "1 tube",
-      daysLeft: 30
-    },
-    {
-      id: 3,
-      name: "Shampoo",
-      amount: "200 ml",
-      daysLeft: 40
-    },
-    {
-      id: 4,
-      name: "Hand Sanitizer",
-      amount: "100 ml",
-      daysLeft: 10
-    }
-  ]
-};
+const emit = defineEmits(['selectionChanged']);
 
 const currentItems = ref();
+
+const selectedBoxes = ref(new Set());
+const areAllBoxesChecked = ref(false);
+const totalItemAmount = ref(0);
+
 const selectedAllSubBoxes = (subItems) => {
   return subItems.every(item => selectedBoxes.value.has(item.id));
 };
 
-const fetchItems = async () => {
-  let apiPath = '';
-
-  if (props.tab === 'matOgDrikke') {
-    apiPath = '/api/matOgDrikke';
-    currentItems.value = items.matOgDrikke;
-  } else if (props.tab === 'varmeOgLys') {
-    apiPath = '/api/varmeOgLys';
-    currentItems.value = items.varmeOgLys;
-  } else if (props.tab === 'informasjon') {
-    apiPath = '/api/informasjon';
-    currentItems.value = items.informasjon;
-  } else if (props.tab === 'legemidOgHygiene') {
-    apiPath = '/api/legemidOgHygiene';
-    currentItems.value = items.legemidOgHygiene;
-
-  }
-
-  //get her, bruke fetch eller axios?
-  //const response = ?
-  //items.value = response.data;
-}
-
 const toggleAll = (value) => {
-  selectAllBoxes.value = value;
+  areAllBoxesChecked.value = value;
 
   if (value) {
-    const allIds = new Set();
     currentItems.value.forEach(item => {
-      allIds.add(item.id);
       if (item.items) {
-        item.items.forEach(subItem => {
-          allIds.add(subItem.id);
-        });
+        item.items.forEach(item => selectedBoxes.value.add(item.id));
+      } else {
+        selectedBoxes.value.add(item.id);
       }
     });
-    selectedBoxes.value = allIds;
   } else {
     selectedBoxes.value.clear();
   }
+  emit('selectionChanged', Array.from(selectedBoxes.value));
 };
 
-const toggleItem = (isChecked, id) => {
-  if (isChecked) {
+const toggleItem = (id, value) => {
+  if (value) {
     selectedBoxes.value.add(id);
   } else {
     selectedBoxes.value.delete(id);
   }
 
-  const totalItems = currentItems.value.reduce((count, item) => {
-    count += 1;
-    if (item.items) count += item.items.length;
-    return count;
-  }, 0);
-
-  selectAllBoxes.value = selectAllBoxes.value.size === totalItems;
+  areAllBoxesChecked.value = selectedBoxes.value.size === totalItemAmount.value;
+  emit('selectionChanged', Array.from(selectedBoxes.value));
 };
 
-const toggleAllSubItem = (isChecked, items) => {
-  if (isChecked) {
+const toggleAllSubItem = (items, value) => {
+  if (value) {
     items.forEach(item => selectedBoxes.value.add(item.id));
   } else {
     items.forEach(item => selectedBoxes.value.delete(item.id));
   }
+
+  areAllBoxesChecked.value = selectedBoxes.value.size === totalItemAmount.value;
+  emit('selectionChanged', Array.from(selectedBoxes.value));
 }
 
+const getAmountAndUnit = (amount, unitId) => {
+  if (unitId === 1) {
+    return amount + " stk";
+  } else if (unitId === 2) {
+    if (amount > 999) {
+      return amount / 1000 + " kg";
+    } else {
+      return amount + " g";
+    }
+  } else if (unitId === 3) {
+    if (amount < 1) {
+      return amount * 10 + " dl";
+    } else {
+      return amount + " liter";
+    }
+  }
+}
+
+const getDaysLeft = (expDate) => {
+  const expirationDate = new Date(expDate);
+  expirationDate.setHours(0, 0, 0, 0);
+
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  const dayDiff = expirationDate - currentDate;
+  const msToDays = 1000 * 60 * 60 * 24;
+
+  const dayAmount = dayDiff / msToDays;
+  if (dayAmount >= 365) {
+    const years = Math.floor(dayAmount / 365);
+    return years + " år";
+  } else if (dayAmount >= 30) {
+    const months = Math.floor(dayAmount / 30);
+    if (months === 12) {
+      return "1 år";
+    } else if (months === 1) {
+      return months + " måned";
+    } else {
+      return months + " måneder";
+    }
+  } else if (dayAmount >= 7) {
+    const weeks = Math.floor(dayAmount / 7);
+    if (weeks === 1) {
+      return weeks + " uke";
+    } else {
+      return weeks + " uker";
+    }
+  } else {
+    return dayAmount + " dager";
+  }
+}
+
+const getExpirationColor = (expDate) => {
+  const expirationDate = new Date(expDate);
+  expirationDate.setHours(0, 0, 0, 0);
+
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  const dayDiff = expirationDate - currentDate;
+  const msToDays = 1000 * 60 * 60 * 24;
+
+  const dayAmount = dayDiff / msToDays;
+  if (dayAmount < 7) {
+    return 'text-red-600 font-medium';
+  }
+}
 
 onMounted(() => {
-  fetchItems();
+  currentItems.value = props.newItems;
 })
 </script>
 
@@ -230,7 +167,7 @@ onMounted(() => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Checkbox v-model="selectAllBoxes" @update:modelValue="toggleAll"/>
+                  <Checkbox v-model="areAllBoxesChecked" @update:modelValue="toggleAll"/>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Marker alle</p>
@@ -250,13 +187,15 @@ onMounted(() => {
             </CollapsibleTrigger>
           </TableCell>
           <TableCell class="font-medium">{{ item.name }}</TableCell>
-          <TableCell class="text-center">{{ item.amount}}</TableCell>
-          <TableCell class="text-center">{{ item.daysLeft}} dager igjen</TableCell>
+          <TableCell class="text-center">{{ getAmountAndUnit(item.amount, item.unit) }}</TableCell>
+          <TableCell class="text-center" :class="getExpirationColor(item.expirationDate)">
+            {{ getDaysLeft(item.expirationDate) }}
+          </TableCell>
           <TableCell>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <EditItem v-if="!item.items" />
+                  <EditItem v-if="!item.items" :item="item" :storageId="storageId" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Endre</p>
@@ -268,12 +207,12 @@ onMounted(() => {
             <Checkbox
               v-if="item.items"
               :model-value="selectedAllSubBoxes(item.items)"
-              @update:modelValue="val => toggleAllSubItem(val, item.items)"
+              @update:modelValue="value => toggleAllSubItem(item.items, value)"
             />
             <Checkbox
               v-else-if="!item.items"
               :model-value="selectedBoxes.has(item.id)"
-              @update:modelValue="val => toggleItem(val, item.id)"
+              @update:modelValue="value => toggleItem(item.id, value)"
             />
           </TableCell>
         </TableRow>
@@ -281,16 +220,18 @@ onMounted(() => {
           <TableRow v-for="item in item.items" :key="item.id" class="bg-gray-50 hover:bg-gray-100">
             <TableCell></TableCell>
             <TableCell class="font-medium"></TableCell>
-            <TableCell class="text-center">{{ item.amount}}</TableCell>
-            <TableCell class="text-center">{{ item.daysLeft}} dager igjen</TableCell>
+            <TableCell class="text-center">{{ getAmountAndUnit(item.amount, item.unit) }}</TableCell>
+            <TableCell class="text-center" :class="getExpirationColor(item.expirationDate)">
+              {{ getDaysLeft(item.expirationDate) }}
+            </TableCell>
             <TableCell>
               <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <EditItem />
+                  <EditItem :item="item" :storageId="storageId" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Edit</p>
+                  <p>Endre</p>
                 </TooltipContent>
               </Tooltip>
               </TooltipProvider>
@@ -298,7 +239,7 @@ onMounted(() => {
             <TableCell>
               <Checkbox
                 :model-value="selectedBoxes.has(item.id)"
-                @update:modelValue="val => toggleItem(val, item.id)"
+                @update:modelValue="value => toggleItem(item.id, value)"
               />
             </TableCell>
           </TableRow>
