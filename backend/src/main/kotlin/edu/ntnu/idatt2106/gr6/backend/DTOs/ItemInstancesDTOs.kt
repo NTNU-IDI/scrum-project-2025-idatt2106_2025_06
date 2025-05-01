@@ -64,3 +64,14 @@ data class DeleteItemInstancesRequest(
 data class DeleteItemInstancesResponse (
     val itemInstancesDeleted: Int
 )
+
+data class EditItemInstanceRequest (
+    val amount: BigDecimal,
+    val expiryDate: LocalDate?
+)
+
+data class EditItemInstanceResponse (
+    val id: String,
+    val amount: BigDecimal,
+    val expiryDate: LocalDate?
+)
