@@ -182,6 +182,7 @@ function openEditProfile() {
                   <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
                     <h3 class="text-xl font-bold">{{ s.name }}</h3>
                     <p>Husstandsnummer: {{ s.token }}</p>
+                    <p>Lokasjon: {{ s.location != null ? s.location : 'Ikke angitt' }}</p>
                     <h4 class="mt-2 font-semibold">Medlemmer:</h4>
                     <ul v-if="membersByStorageId[s.id]">
                       <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
@@ -206,11 +207,13 @@ function openEditProfile() {
                     placeholder="Husstandsnavn"
                     type="text"
                   />
+                  <!--
                   <Input
                     v-model="location"
                     placeholder="Lokasjon (valgfritt)"
                     type="text"
                   />
+                  -->
                   <Button @click="createNewStorage()" class="w-48">Opprett</Button>
                 </DialogHeader>
               </DialogContent>

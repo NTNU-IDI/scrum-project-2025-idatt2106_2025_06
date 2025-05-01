@@ -74,11 +74,13 @@ async function removeUser(userId) {
             placeholder="Husstandsnavn"
             type="text"
           />
+          <!--
           <Input
             v-model="location"
             placeholder="Lokasjon (valgfritt)"
             type="text"
           /><br/>
+          -->
           <DialogTitle>Medlemmer</DialogTitle>
           <div>
             <ul v-if="membersByStorageId[props.storage.id]" class="flex flex-col gap-2">
