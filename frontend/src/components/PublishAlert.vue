@@ -42,8 +42,9 @@ import {DialogClose} from "@/components/ui/dialog/index.js";
         </div>
 
         <div class="flex items-center">
-          <Label class="m-2 w-24" for="time">Tidspunkt:</Label>
-          <Input class="border w-full" id="time" placeholder="Klokkeslett/dato" />
+          <Label class="m-2 w-20" for="date">Tidspunkt:</Label>
+          <Input type="date" id="date" v-model="date" class="w-fit" />
+          <Input type="time" id="date" v-model="time" class="w-fit" />
         </div>
       </DialogHeader>
 

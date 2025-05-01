@@ -1,9 +1,6 @@
 <script setup>
 import { Button } from '@/components/ui/button/index.js'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.js'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert/index.js'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/index.js'
-import PublishPost from '@/components/PublishPost.vue'
 import PublishAlert from '@/components/PublishAlert.vue'
 import AlertCard from '@/components/AlertCard.vue'
 import { ref } from 'vue'
@@ -109,7 +106,7 @@ const alerts = ref([
       </CardContent>
     </Card>
 
-    <!-- Redigere innlegg og varslinger -->
+    <!-- Redigere varslinger -->
     <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
       <Tabs default-value="post" class="">
         <TabsList class="grid w-full grid-cols-2">
@@ -162,10 +159,27 @@ const alerts = ref([
         </TabsContent>
       </Tabs>
 
+
+      <CardHeader class="grid grid-cols-2 items-center w-full">
+        <CardTitle class="text-2xl">Varslinger</CardTitle>
+        <PublishAlert/>
+      </CardHeader>
+        <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2">
+          <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
+          <template v-for="(alert, index) in alerts" :key="index">
+            <AlertCard
+              :description="alert.description"
+              :severity="alert.severity"
+              :time="alert.time"
+              :title="alert.title"
+              variant="admin"
+            />
+          </template>
+        </CardContent>
     </Card>
 
     <!-- Redigere kart -->
-    <Card class="'max-h-[650px] flex-1 basis-1/4 min-w-[300px]'">
+    <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
       <CardHeader class="grid grid-cols-2 items-center w-full">
         <CardTitle class="text-2xl whitespace-nowrap">Kart og hendelser</CardTitle>
         <router-link class=" justify-self-end" to="/admin/map">
