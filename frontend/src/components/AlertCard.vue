@@ -29,7 +29,7 @@ function handleUpdate(updatedAlert) {
 <template>
   <div
     :class="[
-      'flex overflow-hidden min-h-fit hover:bg-neutral-50 transition-all duration-100 gap-2 z-10 items-center rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm',
+      'flex shrink-0 overflow-hidden min-h-fit hover:bg-neutral-50 transition-all duration-100 gap-2 z-10 items-center rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm',
       variant === 'expand' ? 'group cursor-pointer hover:gap-2 w-64' : 'w-full',
     ]"
   >
