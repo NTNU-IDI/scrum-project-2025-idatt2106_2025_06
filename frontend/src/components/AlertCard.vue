@@ -12,6 +12,7 @@ const severityColors = {
 const props = defineProps({
   title: String,
   description: String,
+  date: String,
   time: String,
   severity: { type: String, default: 'info' }, // "info", "red", "yellow", or "green"
   variant: { type: String, default: 'expand' }, // "expand", "short", or "admin"
@@ -63,6 +64,7 @@ function handleUpdate(updatedAlert) {
       :title="props.title"
       :description="props.description"
       :type="props.severity"
+      :date="props.date"
       :time="props.time"
       @update="handleUpdate"
     />

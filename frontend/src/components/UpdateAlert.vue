@@ -7,6 +7,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectValue
+} from '@/components/ui/select/index.js'
 
 import {Button} from "@/components/ui/button/index.js";
 import {Input} from "@/components/ui/input/index.js";
@@ -18,6 +25,7 @@ import { ref, watchEffect } from 'vue'
 const props = defineProps({
   title: String,
   description: String,
+  date: String,
   time: String,
   type: String,
   variant: String
@@ -26,13 +34,15 @@ const props = defineProps({
 const title = ref('')
 const description = ref('')
 const alertType = ref('')
+const alertDate = ref('')
 const alertTime = ref('')
 
 watchEffect(() => {
-    title.value = props.title || ''
-    description.value = props.description || ''
-    alertType.value = props.type || ''
-    alertTime.value = props.time || ''
+  title.value = props.title || ''
+  description.value = props.description || ''
+  alertType.value = props.type || ''
+  alertDate.value = props.date || ''
+  alertTime.value = props.time || ''
   }
 )
 
@@ -43,6 +53,7 @@ function updateAlert() {
     title: title.value,
     description: description.value,
     type: alertType.value,
+    date: alertDate.value,
     time: alertTime.value,
   })
   emit('update', updated)
@@ -72,13 +83,39 @@ function updateAlert() {
         </div>
 
         <div class="flex items-center">
-          <Label class="m-2 w-24" for="type">Type:</Label>
-          <Input id="type" v-model="alertType" placeholder="Type varsel" />
+          <Label class="m-2" for="type">Beredskapsnivå</Label>
+          <!-- Dropdown for valg av type -->
+          <div class="flex gap-2 items-center">
+            <Select id="type" v-model="alertType">
+              <SelectTrigger class="w-[180px]">
+                <SelectValue placeholder="Velg beredskapsnivå" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="info" severity="info">Info</SelectItem>
+                  <SelectItem value="green" severity="green">Lav</SelectItem>
+                  <SelectItem value="yellow" severity="yellow">Middels</SelectItem>
+                  <SelectItem value="red" severity="red">Høy</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div class="flex items-center">
+        <div class="flex gap-2 items-center">
           <Label class="m-2 w-24" for="time">Tidspunkt:</Label>
-          <Input id="time" v-model="alertTime" placeholder="Klokkeslett/dato" />
+          <!-- Kalender for dato -->
+          <input
+            type="date"
+            id="start-date"
+            v-model="alertDate"
+            class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+          />
+          <!-- Klokke for tid -->
+          <input
+            type="time"
+            id="start-time"
+            v-model="alertTime"
+            class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+          />
         </div>
       </DialogHeader>
 

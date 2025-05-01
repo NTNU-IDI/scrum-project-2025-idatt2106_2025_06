@@ -10,28 +10,31 @@ const alerts = ref([
     id: 1,
     title: 'GODE NYHETER! lalal',
     description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-    time: 'Nå',
+    date: '2025-05-01',
+    time: '12:00',
     severity: 'red',
   },
   {
     id: 2,
     title: 'Bolle',
-    description:
-      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-    time: 'Nå',
+    description: 'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
+    date: '2025-05-01',
+    time: '13:00',
     severity: 'red',
   },
   {
     id: 3,
     title: 'Gå vekk alerts',
     description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-    time: '11:42',
+    date: '2025-05-01',
+    time: '14:30',
     severity: 'yellow',
   },
   {
     id: 4,
     title: 'Håp',
     description: 'Håper denne er borte.',
+    date: '2025-05-01',
     time: '11:42',
     severity: 'green',
   },
@@ -39,58 +42,81 @@ const alerts = ref([
     id: 5,
     title: 'Bø',
     description: 'Borte... bø!.',
+    date: '2025-05-01',
+    time: '14:30',
   },
   {
     id: 6,
     title: 'GODE NYHETER!',
     description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
+    date: '2025-05-02',
+    time: '10:00',
   },
   {
     id: 7,
     title: 'Bolle',
     description: 'Gratis bolle på Element.',
+    date: '2025-05-21',
+    time: '14:30',
   },
   {
     id: 8,
     title: 'Gå vekk alerts',
     description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
+    date: '2025-05-03',
+    time: '09:15',
   },
   {
     id: 9,
     title: 'Håp',
     description: 'Håper denne er borte.',
+    date: '2025-05-04',
+    time: '08:45',
   },
   {
     id: 10,
     title: 'Bø',
     description: 'Borte... bø!.',
+    date: '2025-05-05',
+    time: '16:30',
   },
   {
     id: 11,
     title: 'GODE NYHETER!',
     description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
+    date: '2025-05-06',
+    time: '15:00',
   },
   {
     id: 12,
     title: 'Bolle',
     description: 'Gratis bolle på Element.',
+    date: '2025-05-07',
+    time: '12:30',
   },
   {
     id: 13,
     title: 'Gå vekk alerts',
     description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
+    date: '2025-05-08',
+    time: '11:00',
   },
   {
     id: 14,
     title: 'Håp',
     description: 'Håper denne er borte.',
+    date: '2025-05-09',
+    time: '17:45',
   },
   {
     id: 15,
     title: 'Bø',
     description: 'Borte... bø!.',
+    date: '2025-05-10',
+    time: '18:15',
   },
-])
+]);
+
 </script>
 
 <template>
@@ -117,6 +143,7 @@ const alerts = ref([
             <AlertCard
               :description="alert.description"
               :severity="alert.severity"
+              :date="alert.date"
               :time="alert.time"
               :title="alert.title"
               variant="admin"
