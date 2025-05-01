@@ -129,6 +129,23 @@ class ItemRepository(
             }
     }
 
+    fun getItemInstanceById(id: String): ItemInstance? {
+        val sql = """
+        SELECT id, item_id, storage_id, amount, expiry_date, created_at, updated_at
+        FROM item_instances
+        WHERE id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, id)
+                stmt.executeQuery().use { rs ->
+                    return if (rs.next()) mapRowToItemInstance(rs) else null
+                }
+            }
+        }
+    }
+
     fun getItemInstancesByType(storageId: String, typeId: String): List<ItemInstance> {
         val sql = """
             SELECT ii.id, ii.item_id, ii.storage_id, ii.expiry_date, ii.amount, ii.created_at, ii.updated_at
@@ -164,6 +181,29 @@ class ItemRepository(
         return instances
     }
 
+    fun updateItemInstance(
+        id: String,
+        amount: BigDecimal,
+        expiryDate: LocalDate?
+    ): Boolean {
+        val updatedAt = Timestamp(System.currentTimeMillis())
+
+        val sql = """
+        UPDATE item_instances
+        SET amount = ?, expiry_date = ?, updated_at = ?
+        WHERE id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setBigDecimal(1, amount)
+                stmt.setDate(2, expiryDate?.let { Date.valueOf(it) })
+                stmt.setTimestamp(3, updatedAt)
+                stmt.setString(4, id)
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
 
 
 

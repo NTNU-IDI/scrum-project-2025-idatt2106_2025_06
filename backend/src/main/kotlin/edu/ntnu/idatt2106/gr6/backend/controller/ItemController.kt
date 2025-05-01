@@ -3,6 +3,8 @@ package edu.ntnu.idatt2106.gr6.backend.controller
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstancesRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.DeleteItemInstancesResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.EditItemInstanceRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.EditItemInstanceResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleGetItemInstancesResponse
 import edu.ntnu.idatt2106.gr6.backend.service.ItemService
@@ -92,4 +94,30 @@ class ItemController(
         return ResponseEntity.ok(itemInstances)
     }
 
+
+    @PostMapping("/item-instances/{itemInstanceId}/edit")
+    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!!!!!
+    @Operation(summary = "Edit an already existing item instance")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Item instance edited"),
+            ApiResponse(responseCode = "404", description = "Item instance not found")
+        ]
+    )
+    fun editItemInstance(
+        @PathVariable itemInstanceId: String,
+        @RequestBody request: EditItemInstanceRequest
+    ): ResponseEntity<EditItemInstanceResponse> {
+        logger.info("Received request to edit item instance: $request")
+
+        val editedItemInstance = itemService.editItemInstance(itemInstanceId, request)
+
+        val response = EditItemInstanceResponse(
+            id = editedItemInstance.id,
+            amount = editedItemInstance.amount,
+            expiryDate = editedItemInstance.expiryDate
+        )
+
+        return ResponseEntity.ok(response)
+    }
 }
