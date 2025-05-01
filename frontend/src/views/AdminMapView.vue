@@ -155,10 +155,10 @@ export default defineComponent({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="high">Høy</SelectItem>
-                      <SelectItem value="medium">Middels</SelectItem>
-                      <SelectItem value="low">Lav</SelectItem>
-                      <SelectItem value="information">Info</SelectItem>
+                      <SelectItem value="info" severity="info">Info</SelectItem>
+                      <SelectItem value="green" severity="green">Lav</SelectItem>
+                      <SelectItem value="yellow" severity="yellow">Middels</SelectItem>
+                      <SelectItem value="red" severity="red">Høy</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
