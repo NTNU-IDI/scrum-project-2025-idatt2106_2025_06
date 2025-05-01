@@ -13,7 +13,7 @@ const props = defineProps({
 <template>
   <div
     :class="[
-      'flex h-full max-h-60 overflow-hidden gap-4 hover:bg-neutral-50 justify-between border rounded-lg p-4  transition-all duration-200 ease-in-out bg-white shadow-sm ',
+      'flex shrink-0 h-full max-h-60 overflow-hidden gap-4 hover:bg-neutral-50 justify-between border rounded-lg p-4  transition-all duration-200 ease-in-out bg-white shadow-sm ',
       variant === 'admin'
         ? 'max-h-20'
         : 'hover:shadow-md active:translate-y-1 hover:-translate-y-1',
