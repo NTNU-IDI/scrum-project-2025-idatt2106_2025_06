@@ -6,8 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/i
 import PublishPost from '@/components/PublishPost.vue'
 import PublishAlert from '@/components/PublishAlert.vue'
 import AlertCard from '@/components/AlertCard.vue'
+import { ref } from 'vue'
 
-const alerts = [
+const alerts = ref([
   {
     id: 1,
     title: 'GODE NYHETER! lalal',
@@ -92,8 +93,7 @@ const alerts = [
     title: 'Bø',
     description: 'Borte... bø!.',
   },
-]
-
+])
 </script>
 
 <template>
@@ -154,6 +154,7 @@ const alerts = [
                   :time="alert.time"
                   :title="alert.title"
                   variant="admin"
+                  @update="(updated) => updateAle(i, updated)"
                 />
               </template>
             </CardContent>

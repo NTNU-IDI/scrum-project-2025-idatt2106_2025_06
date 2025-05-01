@@ -1,6 +1,6 @@
 <script setup>
-import { Button } from '@/components/ui/button/index.js'
-import { Pencil } from 'lucide-vue-next'
+
+import UpdateAlert from '@/components/UpdateAlert.vue'
 
 const severityColors = {
   info: 'bg-blue-200',
@@ -16,6 +16,13 @@ const props = defineProps({
   severity: { type: String, default: 'info' }, // "info", "red", "yellow", or "green"
   variant: { type: String, default: 'expand' }, // "expand", "short", or "admin"
 })
+
+const emit = defineEmits(['update'])
+
+function handleUpdate(updatedAlert) {
+  emit('update', updatedAlert) // send videre til forelderen (f.eks. AlertsList.vue)
+}
+
 </script>
 
 <template>
@@ -51,8 +58,13 @@ const props = defineProps({
         {{ props.description }}
       </p>
     </div>
-    <Button v-if="props.variant === 'admin'" class="p-2" variant="outline">
-      <Pencil />
-    </Button>
+    <UpdateAlert
+      v-if="props.variant === 'admin'"
+      :title="props.title"
+      :description="props.description"
+      :type="props.severity"
+      :time="props.time"
+      @update="handleUpdate"
+    />
   </div>
 </template>
