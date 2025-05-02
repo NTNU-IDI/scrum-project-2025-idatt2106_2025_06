@@ -1,117 +1,26 @@
-<script>
-import { defineComponent } from "vue";
-import Map from "@/components/Map.vue";
+<script setup>
 import SearchAddressCoordinates from '@/components/SearchAddressCoordinates.vue';
 import { Button } from '@/components/ui/button/index.js';
-import { Input } from '@/components/ui/input/index.js'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.js'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert/index.js'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/index.js'
-import { Label } from '@/components/ui/label/index.js'
-import EventCard from '@/components/EventCard.vue'
-import {
-  Select,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectContent,
-  SelectGroup,
-  SelectValue
-} from '@/components/ui/select/index.js'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.js';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/index.js';
+import EventCard from '@/components/EventCard.vue';
+import EventForm from '@/components/EventForm.vue'
+import { ref } from 'vue';
+import MarkerForm from '@/components/MarkerForm.vue'
 
-export default defineComponent({
-  data() {
-    return {
-      location: {
-        lng: 10.40574,
-        lat: 63.41754,
-        bearing: 0,
-        pitch: 0,
-        zoom: 12
-      },
-      showSearchPopup: true,
-      activeTab: 'event',
-      events: [
-        {
-          id: 1,
-          title: 'GODE NYHETER! lalal',
-          description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-          time: 'Nå',
-          severity: 'info',
-        },
-        {
-          id: 2,
-          title: 'Bolle',
-          description:
-            'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-          time: 'Nå',
-          severity: 'red',
-        },
-        {
-          id: 3,
-          title: 'Gå vekk alerts',
-          description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-          time: '11:42',
-          severity: 'yellow',
-        },
-        {
-          id: 4,
-          title: 'Håp',
-          description: 'Håper denne er borte.',
-          time: '11:42',
-          severity: 'green',
-        },
-        {
-          id: 5,
-          title: 'Bø',
-          description: 'Borte... bø!.',
-        },
-        {
-          id: 6,
-          title: 'GODE NYHETER!',
-          description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-        },
-        {
-          id: 7,
-          title: 'Bolle',
-          description: 'Gratis bolle på Element.',
-        },
-        {
-          id: 8,
-          title: 'Kanel',
-          description: 'Gratis bolle på Element.',
-        },
-        {
-          id: 9,
-          title: 'Snurr',
-          description: 'Gratis bolle på Element.',
-        },
-      ]
-    };
-  },
-  components: {
-    SelectValue,
-    SelectGroup,
-    SelectContent,
-    SelectTrigger,
-    SelectItem,
-    SelectLabel,
-    Select,
-    EventCard,
-    TabsTrigger,
-    TabsList, Label,
-    TabsContent, Tabs,
-    AlertDescription,
-    AlertTitle, Alert,
-    Card,
-    CardHeader,
-    CardTitle, CardContent,
-    Input,
-    Button,
-    SearchAddressCoordinates,
-    Map
-  }
-});
+const activeTab = ref('event');
+
+const events = ref([
+  { id: 1, title: 'GODE NYHETER! lalal', description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.', date: '2025-05-02', time: '14:30', position: 'Sluppen, Trondheim', severity: 'info' },
+  { id: 2, title: 'Bolle', description: 'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.', date: '2025-05-02', time: '09:00', position: 'Element, Gløshaugen', severity: 'red' },
+  { id: 3, title: 'Gå vekk alerts', description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis', date: '2025-05-01', time: '11:42', position: 'Kalvskinnet, Trondheim', severity: 'yellow' },
+  { id: 4, title: 'Håp', description: 'Håper denne er borte.', date: '2023-05-01', time: '11:42', position: 'Solstien 4, Trondheim', severity: 'green' },
+  { id: 5, title: 'Bø', description: 'Borte... bø!', date: '2025-05-03', time: '16:15', position: 'Festningen, Trondheim', severity: 'info' },
+  { id: 6, title: 'GODE NYHETER!', description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.', date: '2025-05-01', time: '14:35', position: 'Sluppen, Trondheim', severity: 'red' },
+  { id: 7, title: 'Bolle', description: 'Gratis bolle på Element.', date: '2025-05-02', time: '10:00', position: 'Element, Gløshaugen', severity: 'green' },
+  { id: 8, title: 'Kanel', description: 'Gratis bolle på Element.', date: '2025-05-02', time: '10:15', position: 'Element, Gløshaugen', severity: 'yellow' },
+  { id: 9, title: 'Snurr', description: 'Gratis bolle på Element.', date: '2025-05-02', time: '10:30', position: 'Element, Gløshaugen', severity: 'info' },
+]);
 </script>
 
 <template>
@@ -134,121 +43,12 @@ export default defineComponent({
 
         <!-- Hendelse-tab -->
         <TabsContent value="event">
-          <Card class="flex flex-col gap-2 p-5">
-            <div class="flex items-center">
-              <Label class="m-2" for="title">Tittel</Label>
-              <Input class="border w-full" id="title" placeholder="Navn på hendelse" />
-            </div>
-
-            <div class="flex items-center">
-              <Label class="m-2" for="description">Beskrivelse</Label>
-              <Input class="border w-full" id="description" placeholder="Detaljert beskrivelse av hendelsen" />
-            </div>
-
-            <div class="flex align-middle items-center">
-              <Label class="m-2" for="severity">Beredskapsnivå</Label>
-              <!-- Dropdown for valg av beredskapsnivå -->
-              <div class="flex gap-2 items-center">
-                <Select v-model="selectedSeverity">
-                  <SelectTrigger class="w-[180px]">
-                    <SelectValue placeholder="Velg beredskapsnivå" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="info" severity="info">Info</SelectItem>
-                      <SelectItem value="green" severity="green">Lav</SelectItem>
-                      <SelectItem value="yellow" severity="yellow">Middels</SelectItem>
-                      <SelectItem value="red" severity="red">Høy</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div class="flex items-center">
-              <Label class="m-2" for="position">Posisjon</Label>
-              <Input class="border w-full" id="position" placeholder="Adresse eller koordinater" />
-            </div>
-
-            <div class="flex items-center">
-              <Label class="m-2" for="radius">Radius</Label>
-              <input type="number" step="10" class="h-9 rounded-md border border-input max-w-[100px] text-right" id="radius" placeholder="1000" />
-              <p class="ml-2">meter</p>
-            </div>
-
-            <div class="flex items-center">
-              <Label class="m-2" for="event">Type</Label>
-              <!-- TODO dropdown her istedet? -->
-              <Input class="border w-full" id="event" placeholder="Jordskjelv" />
-            </div>
-
-            <div class="flex items-center">
-              <Label class="m-2" for="summary">Sammendrag</Label>
-              <Input class="border w-full" id="summary" placeholder="Sammendrag av hendelsen" />
-            </div>
-
-            <div class="flex align-middle items-center">
-              <Label class="m-2" for="start-date">Tidspunkt</Label>
-
-              <div class="flex gap-2 items-center">
-                <!-- Kalender for dato -->
-                <input
-                  type="date"
-                  id="start-date"
-                  v-model="date"
-                  class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                />
-                <!-- Klokke for tid -->
-                <input
-                  type="time"
-                  id="start-time"
-                  v-model="time"
-                  class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-            <Button class="flex-1">Publiser hendelse</Button>
-            <Button variant="destructive" class="flex=1">Slett</Button>
-          </Card>
+          <EventForm/>
         </TabsContent>
 
         <!-- Markør-tab -->
         <TabsContent value="marker">
-          <Card class="flex flex-col gap-2 p-5">
-            <div class="flex align-middle">
-              <Label class="m-2" for="title">Tittel</Label>
-              <Input class="border w-full" id="title" placeholder="Navn på markør" />
-            </div>
-
-            <div class="flex align-middle">
-              <Label class="m-2" for="position">Posisjon</Label>
-              <Input class="border w-full" id="position" placeholder="Posisjon til markør" />
-            </div>
-
-            <div class="flex align-middle">
-              <Label class="m-2" for="type">Type</Label>
-              <!-- TODO DropBox her -->
-              <Input class="border w-full" id="type" placeholder="Type markør" />
-            </div>
-
-            <div class="flex align-middle">
-              <Label class="m-2" for="description">Beskrivelse</Label>
-              <Input class="border w-full" id="description" placeholder="Kort innhold av varsling" />
-            </div>
-
-            <div class="flex align-middle">
-              <Label class="m-2" for="opening-hours">Åpningstider</Label>
-              <Input class="border w-full" id="opening-hours" placeholder="eks 08:00-16:00" />
-            </div>
-
-            <div class="flex align-middle">
-              <Label class="m-2" for="contact-info">Kontaktinformasjon</Label>
-              <Input class="border w-full" id="contact-info" placeholder="tlf eller email" />
-            </div>
-
-            <Button class="flex-1">Plasser markør</Button>
-            <Button variant="destructive" class="flex=1">Slett</Button>
-          </Card>
+          <MarkerForm/>
         </TabsContent>
       </Tabs>
     </div>
@@ -259,8 +59,9 @@ export default defineComponent({
       />
 
       <Card v-if="activeTab === 'event'" class="h-[100%] absolute top-0 right-0 z-30">
-        <CardHeader>
+        <CardHeader class="grid grid-cols-2 items-center w-full">
           <CardTitle class="text-2xl">Hendelser</CardTitle>
+          <Button class="justify-self-end">Ny hendelse</Button>
         </CardHeader>
         <CardContent class="max-w-[350px] max-h-[85%] overflow-y-auto flex flex-col gap-2">
           <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
@@ -269,6 +70,7 @@ export default defineComponent({
                 :description="event.description"
                 :severity="event.severity"
                 :time="event.time"
+                :date="event.date"
                 :title="event.title"
                 variant="admin"
               />
