@@ -81,9 +81,37 @@ class UserRepository (
             role = Role(
                 id = rs.getInt("role_id"),
                 name = rs.getString("role_name"),
-                permissions = emptySet(),
+                permissions = fetchPermissions(rs.getInt("role_id")),
             ),
             passwordHashed = rs.getString("password"),
         )
+
+    fun fetchPermissions(roleId: Int): Set<Permission> {
+        val permissions = mutableSetOf<Permission>()
+
+        val sql = """
+        SELECT p.id, p.name, p.description
+        FROM role_permissions rp
+        JOIN permissions p ON rp.permission_id = p.id
+        WHERE rp.role_id = ?
+    """
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setInt(1, roleId)
+                stmt.executeQuery().use { rows ->
+                    while (rows.next()) {
+                        val permission = Permission(
+                            id = rows.getInt("id"),
+                            name = rows.getString("name"),
+                            description = rows.getString("description")
+                        )
+                        permissions.add(permission)
+                    }
+                }
+            }
+        }
+        return permissions
+    }
 }
 
