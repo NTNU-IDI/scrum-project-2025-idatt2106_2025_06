@@ -1,8 +1,8 @@
-import axios from 'axios';
+import api from '@/config/api.js'
 
 export async function loginUser(email, password) {
   try {
-    const response = await axios.post('http://localhost:8080/api/auth/login', { email, password });
+    const response = await api.post('/auth/login', { email, password })
     return response.data;
   } catch (error) {
     console.error('Login error:', error);
@@ -12,7 +12,7 @@ export async function loginUser(email, password) {
 
 export async function signupUser(email, name, password) {
   try {
-    const response = await axios.post('http://localhost:8080/api/auth/signup', { email, name, password });
+    const response = await api().post('/auth/signup', { email, name, password })
     return response.data;
   } catch (error) {
     console.error('Signup error:', error);
