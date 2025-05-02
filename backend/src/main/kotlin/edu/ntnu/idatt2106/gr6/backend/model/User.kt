@@ -26,7 +26,6 @@ data class User(
         authorities.addAll(role.permissions.map { permission ->
             SimpleGrantedAuthority(permission.name)
         })
-        println("Authorities: $authorities")
         return authorities
     }
 

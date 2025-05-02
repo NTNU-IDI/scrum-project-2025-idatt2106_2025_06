@@ -9,7 +9,7 @@ import javax.annotation.PostConstruct
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class EnvConfig {
-
+    private val logger = org.slf4j.LoggerFactory.getLogger(EnvConfig::class.java)
     @PostConstruct
     fun loadEnv() {
         try {
@@ -27,11 +27,8 @@ class EnvConfig {
                 }
             }
 
-            // Optionally, print out the loaded environment variables
-            println("Loaded JWT_SECRET_KEY: ${System.getProperty("JWT_SECRET_KEY")}")
-
         } catch (e: Exception) {
-            println("Error loading .env file: ${e.message}")
+            logger.error("Error while loading environment", e)
         }
     }
 }
