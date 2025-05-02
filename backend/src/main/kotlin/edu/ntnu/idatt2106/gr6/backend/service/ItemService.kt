@@ -1,16 +1,26 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.EditItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleGetItemInstancesResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleItemResponse
+import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import edu.ntnu.idatt2106.gr6.backend.repository.ItemRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class ItemService(
     private val itemRepository: ItemRepository
 ) {
+
+    fun getAllItems(): List<SimpleItemResponse> {
+        return itemRepository.getAllItems().map { SimpleItemResponse.fromItem(it) }
+    }
+
 
     @Transactional
     fun createItemAndItemInstance(request: CreateItemInstanceRequest): ItemInstanceResponse {
@@ -51,4 +61,11 @@ class ItemService(
         }
     }
 
+    fun editItemInstance(itemInstanceId: String, request: EditItemInstanceRequest): ItemInstance {
+        val updated = itemRepository.updateItemInstance(itemInstanceId, request.amount, request.expiryDate)
+        if (!updated) throw ResponseStatusException(HttpStatus.NOT_FOUND, "ItemInstance is not found")
+
+        return itemRepository.getItemInstanceById(itemInstanceId)
+            ?: throw IllegalStateException("Could not retrieve updated item instance")
+    }
 }

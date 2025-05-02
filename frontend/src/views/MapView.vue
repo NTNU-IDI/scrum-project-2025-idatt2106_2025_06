@@ -7,10 +7,10 @@
       <div class="flex flex-col gap-10">
         <div class="flex items-center justify-between">
           <div class="flex w-full flex-col">
-            <p class="block text-sm font-semibold mb-1">Hjemmet mitt</p>
-            <p class="text-neutral-500">Nedre Allé 23, 7030 Trondheim</p>
+            <p class="block text-sm font-semibold mb-1">Din posisjon</p>
+            <p class="text-neutral-500">Aktivert</p>
           </div>
-          <Button class="size-5 h-auto" variant="outline">
+          <Button class="size-5 h-auto" variant="outline" @click="$refs.mapRef.flyToUser()">
             <Navigation />
           </Button>
         </div>
@@ -107,7 +107,7 @@
       </div>
     </aside>
 
-    <Map v-model="location" :settings="settings" class="flex-1" />
+    <Map ref="mapRef" v-model="location" :settings="settings" class="flex-1" />
   </div>
 </template>
 
@@ -142,6 +142,7 @@ const settings = reactive({
   showDefibrillators: true,
   showFoodStations: true,
   minCapacity: 0,
+  geoLocationEnabled: true,
 })
 </script>
 
