@@ -57,6 +57,27 @@ class ItemRepository(
         )
     }
 
+    fun getAllItems(): List<Item> {
+        val sql = """
+        SELECT id, name, type_id, unit_id, created_at, update_at
+        FROM items
+        ORDER BY name
+    """.trimIndent()
+
+        val items = mutableListOf<Item>()
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.executeQuery().use { rs ->
+                    while (rs.next()) {
+                        items.add(mapRowToItem(rs))
+                    }
+                }
+            }
+        }
+        return items
+    }
+
+
     fun saveItemInstance(
         itemId: String,
         storageId: String,

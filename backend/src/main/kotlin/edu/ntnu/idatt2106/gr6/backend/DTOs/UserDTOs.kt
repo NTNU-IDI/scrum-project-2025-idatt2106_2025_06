@@ -25,6 +25,27 @@ class UserDTOs {
         val password: String,
     )
 
+    data class EditUserNameEmailRequest(
+        val name: String,
+        val email: String
+    )
+
+    data class EditUserNameEmailResponse(
+        val id: String,
+        val name: String,
+        val email: String,
+        val token: String
+    )
+
+    data class ChangePasswordRequest(
+        val oldPassword: String,
+        val newPassword: String
+    )
+
+    data class ChangePasswordResponse(
+        val message: String
+    )
+
     data class UpdateUserLocationRequest(
         val location: Location
     )

@@ -4,6 +4,7 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.EditItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleGetItemInstancesResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleItemResponse
 import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import edu.ntnu.idatt2106.gr6.backend.repository.ItemRepository
 import org.springframework.http.HttpStatus
@@ -15,6 +16,11 @@ import org.springframework.web.server.ResponseStatusException
 class ItemService(
     private val itemRepository: ItemRepository
 ) {
+
+    fun getAllItems(): List<SimpleItemResponse> {
+        return itemRepository.getAllItems().map { SimpleItemResponse.fromItem(it) }
+    }
+
 
     @Transactional
     fun createItemAndItemInstance(request: CreateItemInstanceRequest): ItemInstanceResponse {
