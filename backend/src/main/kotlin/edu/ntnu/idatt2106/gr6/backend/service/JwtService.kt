@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
 import edu.ntnu.idatt2106.gr6.backend.model.User
+import edu.ntnu.idatt2106.gr6.backend.repository.RoleRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
@@ -10,13 +11,13 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
+// import org.springframework.security.core.userdetails.UserDetailsService
+// import org.springframework.security.core.userdetails.UsernameNotFoundException
 import java.util.*
 import javax.crypto.SecretKey
 
 @Service
-class JwtService {
+class JwtService(private val roleRepository: RoleRepository) {
     private val logger = org.slf4j.LoggerFactory.getLogger(JwtService::class.java)
     @Value("\${security.jwt.secret-key}")
     private val secret: String? = null
@@ -24,29 +25,25 @@ class JwtService {
     @Value("\${security.jwt.expiration-time}")
     private var expiration: Long = 0
 
-    fun generateToken(userDetails: UserDetails): String {
+    fun generateToken(user: User): String {
         val now = System.currentTimeMillis()
         val expirationTime = now + expiration
 
-        val userId =
-            if (userDetails is User) {
-                userDetails.id
-            } else {
-                throw IllegalArgumentException(
-                    "UserDetails must be an instance of custom User class",
-                )
-            }
-        val emailClaim = userDetails.username
+        val userId = user.id
+        val emailClaim = user.email
+        val roleClaim=  user.authorities.map { it.authority }
 
-        val roleClaim=  userDetails.authorities.map { it.authority }
-        val permissionsClaim = userDetails.authorities.map { it.authority }
+
+        val authoritiesClaim = roleRepository
+            .findPermissionsByRole(user.role.id)
+            .map { it.name }
 
         return Jwts
             .builder()
             .subject(userId.toString())
             .claim("email", emailClaim)
             .claim("role", roleClaim)
-            .claim("permissions", permissionsClaim)
+            .claim("authorities", authoritiesClaim)
             .issuedAt(Date(now))
             .expiration(Date(expirationTime))
             .signWith(getSignInKey())
