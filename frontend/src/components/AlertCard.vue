@@ -1,6 +1,6 @@
 <script setup>
-import { Button } from '@/components/ui/button/index.js'
-import { Pencil } from 'lucide-vue-next'
+
+import UpdateAlert from '@/components/UpdateAlert.vue'
 
 const severityColors = {
   info: 'bg-blue-200',
@@ -12,16 +12,23 @@ const severityColors = {
 const props = defineProps({
   title: String,
   description: String,
+  date: String,
   time: String,
   severity: { type: String, default: 'info' }, // "info", "red", "yellow", or "green"
   variant: { type: String, default: 'expand' }, // "expand", "short", or "admin"
 })
+
+const emit = defineEmits(['update'])
+
+function handleUpdate(updatedAlert) {
+  emit('update', updatedAlert)
+}
 </script>
 
 <template>
   <div
     :class="[
-      'flex overflow-hidden min-h-fit hover:bg-neutral-50 transition-all duration-100 gap-2 z-10 items-center rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm',
+      'flex shrink-0 overflow-hidden min-h-fit hover:bg-neutral-50 transition-all duration-100 gap-2 z-10 items-center rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm',
       variant === 'expand' ? 'group cursor-pointer hover:gap-2 w-64' : 'w-full',
     ]"
   >
@@ -51,8 +58,14 @@ const props = defineProps({
         {{ props.description }}
       </p>
     </div>
-    <Button v-if="props.variant === 'admin'" class="p-2" variant="outline">
-      <Pencil />
-    </Button>
+    <UpdateAlert
+      v-if="props.variant === 'admin'"
+      :title="props.title"
+      :description="props.description"
+      :type="props.severity"
+      :date="props.date"
+      :time="props.time"
+      @update="handleUpdate"
+    />
   </div>
 </template>

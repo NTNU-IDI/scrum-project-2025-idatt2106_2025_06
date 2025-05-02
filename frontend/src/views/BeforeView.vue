@@ -26,12 +26,16 @@ import { Button } from '@/components/ui/button'
     </Card>
 
     <div class="mt-12 flex flex-wrap justify-center gap-6">
-      <Button class="px-10 py-6 bg-blue-300 hover:bg-blue-400">
-        <router-link to="/info">Tilbake</router-link>
-      </Button>
-      <Button class="px-10 py-6 bg-blue-700 hover:bg-blue-400">
-        <router-link to="/during">Under</router-link>
-      </Button>
+      <router-link to="/info">
+        <Button class="px-10 py-6">
+          Tilbake
+        </Button>
+      </router-link>
+      <router-link to="/during">
+        <Button class="px-10 py-6">
+          Under
+        </Button>
+      </router-link>
   </div>
   </div>
 
