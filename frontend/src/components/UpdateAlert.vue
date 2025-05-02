@@ -128,7 +128,6 @@ function updateAlert() {
         </div>
       </DialogHeader>
 
-
       <DialogFooter class="flex gap-2">
         <DialogClose>
           <Button variant="outline" class="flex-1">
