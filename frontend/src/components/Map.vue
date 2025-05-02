@@ -19,6 +19,15 @@ export default {
     modelValue: { type: Object, required: true },
     settings: { type: Object, required: true },
   },
+  data() {
+    return {
+      selectedEl: null,
+      latitude: null, // Latitude will be stored here
+      longitude: null, // Longitude will be stored here
+      errorMessage: null, // For storing error messages
+      isLoading: false, // To show loading status
+    }
+  },
   emits: ['update:modelValue'],
   mounted() {
     // Initialize map
@@ -36,6 +45,7 @@ export default {
     // Track markers for filtering
     this.markerObjs = []
 
+    this.getGeolocation()
     map.on('load', () => {
       fetch('/data/tilfluktsrom-4326.json')
         .then((res) => res.json())
@@ -125,7 +135,48 @@ export default {
         zoom: this.map.getZoom(),
       }
     },
+    getGeolocation() {
+      if ('geolocation' in navigator) {
+        this.isLoading = true // Set loading to true while waiting for geolocation
 
+        // Request the user's current position
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            // Success callback: update latitude and longitude
+            this.latitude = position.coords.latitude
+            this.longitude = position.coords.longitude
+            this.isLoading = false // Stop loading once we have the coordinates
+            console.log(
+              'Client location: ' + position.coords.latitude + ', ' + position.coords.longitude,
+            )
+            this.userMarker = new mapboxgl.Marker({
+              color: '#007cbf',
+            })
+              .setLngLat([this.longitude, this.latitude])
+              .addTo(this.map)
+          },
+          (error) => {
+            // Error callback: handle different error cases
+            this.isLoading = false
+            this.errorMessage = `Error: ${error.message}` // Show the error message
+          },
+        )
+      } else {
+        // If geolocation is not supported by the browser
+        this.errorMessage = 'Geolocation is not supported by your browser.'
+      }
+    },
+    flyToUser() {
+      if (this.latitude != null && this.longitude != null && this.map) {
+        this.map.flyTo({
+          center: [this.longitude, this.latitude],
+          zoom: 14,
+          essential: true, // for accessibility
+        })
+      } else {
+        console.warn('User location not available yet.')
+      }
+    },
     applySettings(settings) {
       // Show/hide markers based on searchQuery, showShelters, minCapacity
       this.markerObjs.forEach(({ el, props }) => {
