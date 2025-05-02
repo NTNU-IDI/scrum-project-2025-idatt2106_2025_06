@@ -24,4 +24,17 @@ class UserDTOs {
         val email: String,
         val password: String,
     )
+
+    data class UpdateUserLocationRequest(
+        val location: Location
+    )
+
+    data class GetUserLocationRequest(
+        val userId: String,
+    )
+
+    data class UserLocationResponse(
+        val userId: String,
+        val location: Location,
+    )
 }
