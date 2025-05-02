@@ -1,5 +1,4 @@
 <template>
-  <!-- Hele BentoCard er nå en router-link yay-->
   <router-link
     :to="href"
     :class="[
@@ -19,14 +18,13 @@
       <p :class="['max-w-lg', descColor]">{{ description }}</p>
     </div>
     <div class="pointer-events-none absolute bottom-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-      <!-- CTA tekst på kortet -->
+
       <span :class="['text-sm', readmoreColor, 'hover:underline']">
         {{ cta }}
       </span>
     </div>
     <div class="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
 
-    <!-- Slot for eventuelle tilpassede innhold -->
     <div class="absolute inset-0 p-4">
       <slot name="alert"></slot>
     </div>
@@ -42,11 +40,11 @@ export default {
     background: Object,
     Icon: [Object, Function, String],
     description: String,
-    href: String,  // Brukes nå som 'to' for router-link
+    href: String,
     cta: String,
     bgColor: {
       type: String,
-      default: 'bg-white' // ← fallback
+      default: 'bg-white'
     },
     descColor: {
       type: String,
@@ -54,11 +52,11 @@ export default {
     },
     hoverColor: {
       type: String,
-      default: 'group-hover:bg-neutral-100' // fallback hover
+      default: 'group-hover:bg-neutral-100'
     },
     nameColor: {
       type: String,
-      default: 'dark:text-neutral-300' //fallback name text color
+      default: 'dark:text-neutral-300'
     },
     readmoreColor: {
       type: String,
