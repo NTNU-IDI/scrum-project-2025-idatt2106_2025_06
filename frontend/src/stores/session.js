@@ -1,14 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import router from '@/router'
+import router from '@/router/router.js'
 import { loginUser, signupUser } from '@/service/authService.js'
 
 export const useSessionStore = defineStore('session', () => {
   const token = ref(sessionStorage.getItem('token'))
   const user = ref(JSON.parse(sessionStorage.getItem('user') ?? 'null'))
 
+  const isModerator = computed(() => user.value?.role === 'MODERATOR')
+  const isAdmin = computed(() => user.value?.role === 'ADMIN')
   const isAuthenticated = computed(() => !!token.value)
-  const isAdmin = computed(() => user.value && user.value.admin)
+  const hasAccessToAdmin = computed(() =>
+    ['ADMIN', 'MODERATOR'].includes(user.value?.role)
+  )
 
   function setToken(response) {
     if (!response) {
@@ -29,6 +33,8 @@ export const useSessionStore = defineStore('session', () => {
       name: response.name,
       joinedAt: response.joinedAt,
       admin: response.admin,
+      role: response.role,
+      permissions: response.permissions
     }
     sessionStorage.setItem('user', JSON.stringify(user.value))
   }
@@ -60,5 +66,5 @@ export const useSessionStore = defineStore('session', () => {
     router.push('/login')
   }
 
-  return { token, user, isAuthenticated, isAdmin, login, signup, logout }
+  return { token, user, isModerator, isAdmin, hasAccessToAdmin, isAuthenticated, login, signup, logout }
 })

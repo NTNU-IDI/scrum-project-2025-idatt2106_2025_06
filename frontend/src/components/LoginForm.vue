@@ -35,9 +35,11 @@ async function login() {
   try {
     const success = await session.login(email.value, password.value)
     if (success) {
-
-      router.push('/');
-
+      if (['ADMIN', 'MODERATOR'].includes(session.user?.role)) {
+        router.push('/admin')
+      } else {
+        router.push('/')
+      }
     } else {
       errorMessage.value = 'Feil e-post eller passord.'
     }

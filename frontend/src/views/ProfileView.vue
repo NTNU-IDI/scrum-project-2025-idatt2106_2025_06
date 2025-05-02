@@ -32,7 +32,7 @@ import {Input} from "@/components/ui/input/index.js";
 import {DialogClose} from "@/components/ui/dialog/index.js";
 import {Label} from "@/components/ui/label/index.js";
 import { computed, onMounted, ref } from 'vue'
-import router from '@/router/index.js'
+import router from '@/router/router.js'
 import { useSessionStore } from '@/stores/session'
 import { useStorageStore } from '@/stores/storage'
 import EditStorage from '@/components/EditStorage.vue'
