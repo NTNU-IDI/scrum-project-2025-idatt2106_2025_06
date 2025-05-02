@@ -72,14 +72,22 @@ function updateAlert() {
       <DialogHeader>
         <DialogTitle>Oppdater varsling</DialogTitle>
 
-        <div class="flex items-center">
-          <Label class="m-2 w-24" for="title">Navn:</Label>
+        <div class="flex flex-col gap-4">
+
+        <div class="flex gap-4 items-start">
+          <Label class="w-24 pt-2 text-right" for="title">Navn:</Label>
           <Input id="title" v-model="title" placeholder="Navn på varsel" />
         </div>
 
-        <div class="flex items-center">
-          <Label class="m-2 w-24" for="text">Varsel:</Label>
-          <Input id="text" v-model="description" placeholder="Innhold for varsel" />
+        <div class="flex gap-4 items-start">
+          <Label class="w-24 pt-2 text-right" for="text">Varsel:</Label>
+          <textarea
+            id="text"
+            v-model="description"
+            placeholder="Innhold for varsel"
+            rows="4"
+            class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500 w-full"
+          />
         </div>
 
         <div class="flex items-center">
@@ -116,6 +124,7 @@ function updateAlert() {
             v-model="alertTime"
             class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
           />
+        </div>
         </div>
       </DialogHeader>
 

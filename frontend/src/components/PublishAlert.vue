@@ -29,22 +29,36 @@ const alertTime = ref('')
 
 const emit = defineEmits(['update'])
 
-function publishAlert() {
-  // Når "Publiser" trykkes, send nytt varsel til backend
-  console.log('Publisert varsel:', {
+async function publishAlert() {
+  const payload = {
     title: title.value,
     description: description.value,
     type: alertType.value,
-    date: alertDate.value,
-    time: alertTime.value,
-  })
-  emit('update', {
-    title: title.value,
-    description: description.value,
-    type: alertType.value,
-    date: alertDate.value,
-    time: alertTime.value,
-  })
+    timestamp: `${alertDate.value}T${alertTime.value}`,
+  }
+
+  try {
+    const response = await fetch('http://localhost:8080/api/alerts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      throw new Error('feil ved publisering av varsel')
+    }
+
+    const savedAlert = await response.json()
+    console.log('Varsel lagret:', savedAlert)
+
+    emit('update', savedAlert)
+
+  } catch (error) {
+    console.error('Feil under publisering', error)
+    alert('kunne ikke publisere varsel')
+  }
 }
 
 // Sett dato og tid til sanntid når komponenten lastes
@@ -69,14 +83,22 @@ onMounted(() => {
       <DialogHeader>
         <DialogTitle>Publiser nytt varsel</DialogTitle>
 
-        <div class="flex items-center">
-          <Label class="m-2 w-24" for="title">Navn:</Label>
+        <div class="flex flex-col gap-4">
+
+        <div class="flex gap-4 items-start">
+          <Label class="w-24 pt-2 text-right" for="title">Navn:</Label>
           <Input id="title" v-model="title" placeholder="Navn på varsel" />
         </div>
 
-        <div class="flex items-center">
-          <Label class="m-2 w-24" for="text">Varsel:</Label>
-          <Input id="text" v-model="description" placeholder="Innhold for varsel" />
+        <div class="flex gap-4 items-start">
+          <Label class="w-24 pt-2 text-right" for="text">Varsel:</Label>
+          <textarea
+            id="text"
+            v-model="description"
+            placeholder="Innhold for varsel"
+            rows="4"
+            class="p-2 border rounded-md focus:ring-blue-500 w-full"
+          />
         </div>
 
         <div class="flex items-center">
@@ -113,6 +135,7 @@ onMounted(() => {
             v-model="alertTime"
             class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
           />
+        </div>
         </div>
       </DialogHeader>
 
