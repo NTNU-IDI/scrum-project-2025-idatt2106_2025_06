@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.DTOs
 
+import org.aspectj.bridge.Message
 import java.time.Instant
 import java.util.UUID
 
@@ -38,4 +39,12 @@ class UserDTOs {
         val token: String
     )
 
+    data class ChangePasswordRequest(
+        val oldPassword: String,
+        val newPassword: String
+    )
+
+    data class ChangePasswordResponse(
+        val message: String
+    )
 }

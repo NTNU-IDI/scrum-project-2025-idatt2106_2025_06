@@ -67,6 +67,18 @@ class UserRepository (
         }
     }
 
+    fun updatePassword(userId: UUID, hashedPassword: String): Boolean {
+        dataSource.connection.use { conn ->
+            val sql = "UPDATE users SET password = ? WHERE id = ?"
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, hashedPassword)
+                stmt.setString(2, userId.toString())
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+
 
     fun findById(userId: UUID): User? {
         val sql = """
