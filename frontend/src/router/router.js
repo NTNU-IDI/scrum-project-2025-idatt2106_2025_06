@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import { storeToRefs } from 'pinia'
 
 import HomeView from '../views/HomeView.vue'
 import AlertsView from '../views/AlertsView.vue'
@@ -12,14 +13,16 @@ import InfoView from "@/views/InfoView.vue";
 import BeforeView from "@/views/BeforeView.vue";
 import DuringView from "@/views/DuringView.vue";
 import AfterView from "@/views/AfterView.vue";
+// import AdminView from "@/views/AdminView.vue";
+import { useSessionStore } from '@/stores/session.js'
 
 
 const routes = [
   {path: '/', component: HomeView, name: 'home'},
   {path: '/alerts', component: AlertsView, name: 'alerts'},
-  {path: '/inventory', component: InventoryView, name: 'inventory'},
+  {path: '/inventory', component: InventoryView, name: 'inventory', meta: { requiresAuth: true } },
   {path: '/map', component: MapView, name: 'map'},
-  {path: '/profile', component: ProfileView, name: 'profile'},
+  {path: '/profile', component: ProfileView, name: 'profile', meta: { requiresAuth: true } },
   {path: '/login', component: LogInView, name: 'login'},
   {path: '/signup', component: SignUpView, name: 'signup'},
   {path: '/scenario', component: ScenarioInfoView, name: 'scenario'},
@@ -27,11 +30,38 @@ const routes = [
   {path: '/before', component: BeforeView, name: 'before'},
   {path: '/during', component: DuringView, name: 'during'},
   {path: '/after', component: AfterView, name: 'after'},
+  {
+    path: '/admin',
+    // component: () => import('@/views/AdminView.vue'),
+    name: 'admin',
+    meta: { requiresAdminAccess: true },
+  }
 ]
 
-const index = createRouter({
+const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
-export default index
+router.beforeEach((to, from, next) => {
+  const session = useSessionStore()
+
+  if ((to.path === '/login' || to.path === '/signup') && session.isAuthenticated) {
+    return next('/')
+  }
+
+  if (to.meta.requiresAuth && !session.isAuthenticated) {
+    return next('/login')
+  }
+
+  if (to.meta.requiresAdminAccess) {
+    const role = session.user?.role
+    if (!['ADMIN', 'MODERATOR'].includes(role)) {
+      return next('/')
+    }
+  }
+
+  next()
+})
+
+export default router
