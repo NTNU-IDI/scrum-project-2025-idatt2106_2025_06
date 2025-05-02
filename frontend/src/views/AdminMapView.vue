@@ -11,10 +11,10 @@ import MarkerForm from '@/components/MarkerForm.vue'
 const activeTab = ref('event');
 
 const events = ref([
-  { id: 1, title: 'GODE NYHETER! lalal', description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.', date: '2025-05-01', time: '14:30', position: 'Sluppen, Trondheim', severity: 'info' },
+  { id: 1, title: 'GODE NYHETER! lalal', description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.', date: '2025-05-02', time: '14:30', position: 'Sluppen, Trondheim', severity: 'info' },
   { id: 2, title: 'Bolle', description: 'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.', date: '2025-05-02', time: '09:00', position: 'Element, Gløshaugen', severity: 'red' },
   { id: 3, title: 'Gå vekk alerts', description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis', date: '2025-05-01', time: '11:42', position: 'Kalvskinnet, Trondheim', severity: 'yellow' },
-  { id: 4, title: 'Håp', description: 'Håper denne er borte.', date: '2025-05-01', time: '11:42', position: 'Solstien 4, Trondheim', severity: 'green' },
+  { id: 4, title: 'Håp', description: 'Håper denne er borte.', date: '2023-05-01', time: '11:42', position: 'Solstien 4, Trondheim', severity: 'green' },
   { id: 5, title: 'Bø', description: 'Borte... bø!', date: '2025-05-03', time: '16:15', position: 'Festningen, Trondheim', severity: 'info' },
   { id: 6, title: 'GODE NYHETER!', description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.', date: '2025-05-01', time: '14:35', position: 'Sluppen, Trondheim', severity: 'red' },
   { id: 7, title: 'Bolle', description: 'Gratis bolle på Element.', date: '2025-05-02', time: '10:00', position: 'Element, Gløshaugen', severity: 'green' },
@@ -70,6 +70,7 @@ const events = ref([
                 :description="event.description"
                 :severity="event.severity"
                 :time="event.time"
+                :date="event.date"
                 :title="event.title"
                 variant="admin"
               />
