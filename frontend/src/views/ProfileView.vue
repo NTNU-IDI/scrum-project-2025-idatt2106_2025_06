@@ -214,7 +214,9 @@ function openEditProfile() {
                     type="text"
                   />
                   -->
-                  <Button @click="createNewStorage()" class="w-48">Opprett</Button>
+                  <DialogClose>
+                    <Button @click="createNewStorage()" class="w-48">Opprett</Button>
+                  </DialogClose>
                 </DialogHeader>
               </DialogContent>
             </Dialog>
