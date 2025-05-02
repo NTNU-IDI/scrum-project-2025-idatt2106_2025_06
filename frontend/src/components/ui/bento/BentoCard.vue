@@ -50,17 +50,13 @@ export default {
       type: String,
       default: 'text-neutral-400'
     },
-    hoverColor: {
-      type: String,
-      default: 'group-hover:bg-neutral-100'
-    },
     nameColor: {
       type: String,
       default: 'dark:text-neutral-300'
     },
     readmoreColor: {
       type: String,
-      default: 'text-blue-600'
+      default: 'text-gray-600'
     }
   }
 }

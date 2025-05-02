@@ -36,12 +36,12 @@ import { Button } from '@/components/ui/button'
 
     <div class="mt-12 flex flex-wrap justify-center gap-6">
       <router-link to="/info">
-        <Button class="px-10 py-6 bg-[var(--secondary)] hover:bg-[var(--hover-secondary)] text-black">
+        <Button class="px-10 py-6">
           Tilbake
         </Button>
       </router-link>
       <router-link to="/before">
-        <Button class="px-10 py-6 bg-[var(--primary)] hover:bg-[var(--hover)] text-white">
+        <Button class="px-10 py-6">
           Før
         </Button>
       </router-link>

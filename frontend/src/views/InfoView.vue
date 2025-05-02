@@ -33,22 +33,12 @@ import BentoCard from "@/components/ui/bento/BentoCard.vue";
           description="Beredskap før en krise inntreffer"
           cta="Les mer"
           href="/before"
-          bgColor="bg-[#155A77]"
-          desc-color="text-white"
-          name-color="text-white"
-          hover-color="group-hover:bg-[#1A6E94]"
-          readmore-color="text-white"
         />
         <BentoCard
           name="Under"
           description="Beredskap når en krise har inntruffet"
           cta="Les mer"
           href="/during"
-          bgColor="bg-[#1A6E94]"
-          desc-color="text-white"
-          nameColor="text-white"
-          hoverColor="group-hover:bg-[#278AB2]"
-          readmore-color="text-white"
         />
 
         <BentoCard
@@ -56,11 +46,6 @@ import BentoCard from "@/components/ui/bento/BentoCard.vue";
           description="Beredskap etter en krise inntreffer"
           cta="Les mer"
           href="/after"
-          bgColor="bg-[var(--primary)]"
-          descColor="text-white"
-          nameColor="text-white"
-          hoverColor="group-hover:bg-[var(--hover)]"
-          readmoreColor="text-white"
         />
       </div>
     </div>
