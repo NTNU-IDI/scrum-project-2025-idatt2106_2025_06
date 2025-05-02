@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.DTOs
 
 import java.time.Instant
+import java.util.UUID
 
 class UserDTOs {
     data class UserResponse(
@@ -24,4 +25,17 @@ class UserDTOs {
         val email: String,
         val password: String,
     )
+
+    data class EditUserNameEmailRequest(
+        val name: String,
+        val email: String
+    )
+
+    data class EditUserNameEmailResponse(
+        val id: String,
+        val name: String,
+        val email: String,
+        val token: String
+    )
+
 }

@@ -51,6 +51,45 @@ class UserRepository (
         return null
     }
 
+    fun updateUser(userId: UUID, newName: String, newEmail: String): Boolean {
+        val sql = """
+        UPDATE users SET name = ?, email = ? WHERE id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, newName)
+                stmt.setString(2, newEmail)
+                stmt.setString(3, userId.toString())
+
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+
+    fun findById(userId: UUID): User? {
+        val sql = """
+        SELECT u.*, r.role_name AS role_name 
+        FROM users u
+        JOIN roles r ON u.role_id = r.id
+        WHERE u.id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userId.toString())
+                stmt.executeQuery().use { rows ->
+                    if (rows.next()) {
+                        return mapRowToUser(rows)
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+
     fun findByEmail(email: String): User? {
         dataSource.connection.use { conn ->
             val sql = """
@@ -71,7 +110,7 @@ class UserRepository (
         return null
     }
 
-    fun mapRowToUser(rs: ResultSet): User =
+     fun mapRowToUser(rs: ResultSet): User =
         User(
             id = UUID.fromString(rs.getString("id")),
             name = rs.getString("name"),
