@@ -1,6 +1,6 @@
 <script setup>
-import {Alert} from '@/components/ui/alert/index.js'
 import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
+import AlertCard from '@/components/AlertCard.vue'
 </script>
 
 <template>
@@ -8,69 +8,57 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
     <BentoGrid>
       <!-- Card 1 -->
       <BentoCard
-        name="Krisescenarioer"
+        :Icon="ArrowRightIcon"
+        cta="Les mer"
+        customClass="col-span-2"
         description="Les om forskjellige krisescenarioer"
         href="/scenario"
-        cta="Les mer"
-        :Icon="ArrowRightIcon"
-        customClass="col-span-2"
+        name="Krisescenarioer"
       />
-
-
 
       <!-- Card 2 -->
       <BentoCard
-        name="Krisehåndtering"
-        description="Generell info om krisehåndtering (før/under/etter)"
-        cta="Les mer"
-        href="/info"
         :Icon="ArrowRightIcon"
+        cta="Les mer"
         customClass="col-span-2"
+        description="Generell info om krisehåndtering (før/under/etter)"
+        href="/info"
+        name="Krisehåndtering"
       >
       </BentoCard>
 
       <!-- Nyheter -->
       <BentoCardCustom
-        name="Nyheter"
-        href="/alerts"
         customClass="col-span-1 min-h-[30rem] group hover:group-hover:bg-transparent"
+        href="/alerts"
+        name="Nyheter"
       >
-        <div class="h-[25rem] overflow-y-auto space-y-2 p-2">
+        <div class="h-[25rem] overflow-y-auto flex flex-col gap-2">
           <!-- TODO: Implementere dynamisk generering av alerts fra databasen -->
-          <Alert variant="default">
-            <AlertTitle>Info: </AlertTitle>
-            <AlertDescription>En bombe er sluppet på sluppen, alle eksamener avlyst.</AlertDescription>
-          </Alert>
-          <Alert variant="default">
-            <AlertTitle>Info: </AlertTitle>
-            <AlertDescription>Gratis bolle på Element.</AlertDescription>
-          </Alert>
-          <Alert variant="default">
-            <AlertTitle>Info: </AlertTitle>
-            <AlertDescription>Snart skal alerts slutte å vises. Dette skal kunne scrolles plis</AlertDescription>
-          </Alert>
-          <Alert variant="default">
-            <AlertTitle>Info: </AlertTitle>
-            <AlertDescription>Håper denne er borte.</AlertDescription>
-          </Alert>
-          <Alert variant="default">
-            <AlertTitle>Info: </AlertTitle>
-            <AlertDescription>Borte... bø!.</AlertDescription>
-          </Alert>
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
         </div>
       </BentoCardCustom>
 
-
       <!-- Utgår snart -->
       <!-- TODO legge til beredskapslager her -->
-      <BentoCardCustom
-        name="Utgår snart"
-        href="/inventory"
-        customClass="col-span-3 min-h-[30rem]"
-      >
-        <div>
-          TBA
-        </div>
+      <BentoCardCustom customClass="col-span-3 min-h-[30rem]" href="/inventory" name="Utgår snart">
+        <div>TBA</div>
       </BentoCardCustom>
     </BentoGrid>
   </div>

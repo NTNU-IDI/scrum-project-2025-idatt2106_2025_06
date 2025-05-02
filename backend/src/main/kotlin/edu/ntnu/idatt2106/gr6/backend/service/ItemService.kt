@@ -1,74 +1,65 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateItemInstanceRequest
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
-import edu.ntnu.idatt2106.gr6.backend.model.Item
+import edu.ntnu.idatt2106.gr6.backend.DTOs.EditItemInstanceRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleGetItemInstancesResponse
 import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import edu.ntnu.idatt2106.gr6.backend.repository.ItemRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.sql.SQLException
-import java.time.Instant
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class ItemService(
     private val itemRepository: ItemRepository
 ) {
 
-    /**
-     * Creates an item instance.
-     * Reuses an existing item if one with the same name already exists, otherwise creates a new item first.
-     */
     @Transactional
-    fun createItemAndInstance(request: CreateItemInstanceRequest): ItemInstance {
-        val now = Instant.now()
+    fun createItemAndItemInstance(request: CreateItemInstanceRequest): ItemInstanceResponse {
 
-        // Try to find an existing item with the same name
-        val existingItem = itemRepository.findItemByName(request.name)
-
-        val item = existingItem ?: itemRepository.saveItem(
+        val item = itemRepository.createItem(
             name = request.name,
             typeId = request.typeId,
             unitId = request.unitId
         )
 
-        if (item==null) {
-            throw SQLException("Item with name ${request.name} not found")
-        }
-
-        // Create item instance linked to the item
-        return itemRepository.saveItemInstance(
+        val itemInstance =  itemRepository.saveItemInstance(
             itemId = item.id,
             storageId = request.storageId,
             amount = request.amount,
             expiryDate = request.expiryDate
         )
+
+        return ItemInstanceResponse.fromItemInstance(itemInstance, item)
     }
 
-    fun getStorageItemsHumanReadable(storageId: String, typeId: String): List<StorageItemResponse> {
-        val itemInstances = itemRepository.findStorageItemInstances(storageId, typeId)
+    @Transactional
+    fun deleteItemInstances(instanceIds: List<String>): Int {
+        if (instanceIds.isNotEmpty()) {
+            return itemRepository.deleteItemInstancesByIds(instanceIds)
+        }
+        return 0
+    }
+
+    @Transactional(readOnly = true)
+    fun getItemInstancesByType(storageId: String, typeId: String): List<SimpleGetItemInstancesResponse> {
+        val itemInstances = itemRepository.getItemInstancesByType(storageId, typeId)
 
         return itemInstances.map { instance ->
-            // Fetch extra details if needed (name, unit, etc.)
             val item = itemRepository.findItemById(instance.itemId)
                 ?: throw IllegalStateException("Item not found for id=${instance.itemId}")
 
-            StorageItemResponse(
-                id = instance.id,
-                name = item.name,
-                amount = instance.amount,
-                unit = item.unitId,
-                expiryDate = instance.expiryDate
-            )
+            SimpleGetItemInstancesResponse.fromItemInstance(instance, item)
         }
     }
 
+    fun editItemInstance(itemInstanceId: String, request: EditItemInstanceRequest): ItemInstance {
+        val updated = itemRepository.updateItemInstance(itemInstanceId, request.amount, request.expiryDate)
+        if (!updated) throw ResponseStatusException(HttpStatus.NOT_FOUND, "ItemInstance is not found")
 
-    @Transactional
-    fun deleteItemInstances(instanceIds: List<String>) {
-        if (instanceIds.isNotEmpty()) {
-            itemRepository.deleteItemInstancesByIds(instanceIds)
-        }
+        return itemRepository.getItemInstanceById(itemInstanceId)
+            ?: throw IllegalStateException("Could not retrieve updated item instance")
     }
-
 }

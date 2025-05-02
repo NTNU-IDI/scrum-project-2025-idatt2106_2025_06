@@ -155,7 +155,7 @@ const events = [
       </template>
     </div>
 
-    <div class="mt-24">
+    <div class="mt-16">
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
           <template v-for="(event, index) in events" :key="index">
@@ -165,7 +165,7 @@ const events = [
                 :severity="event.severity"
                 :time="event.time"
                 :title="event.title"
-                variant="expand"
+                variant="default"
               />
             </RouterLink>
           </template>

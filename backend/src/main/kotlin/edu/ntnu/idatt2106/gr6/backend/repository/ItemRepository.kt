@@ -1,6 +1,5 @@
 package edu.ntnu.idatt2106.gr6.backend.repository
 
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageItemResponse
 import edu.ntnu.idatt2106.gr6.backend.model.Item
 import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import org.springframework.stereotype.Repository
@@ -8,7 +7,6 @@ import java.math.BigDecimal
 import java.sql.Date
 import java.sql.ResultSet
 import java.sql.Timestamp
-import java.time.Instant
 import java.time.LocalDate
 import java.util.*
 import javax.sql.DataSource
@@ -18,11 +16,16 @@ class ItemRepository(
     private val dataSource: DataSource
 ) {
 
-    fun saveItem(
+    fun createItem(
         name: String,
         typeId: Int,
         unitId: Int
     ): Item {
+        val existingItem = findItemByName(name)
+        if (existingItem != null) {
+            return existingItem
+        }
+
         val id = UUID.randomUUID().toString()
         val createdAt = Timestamp(System.currentTimeMillis())
         val updatedAt = createdAt
@@ -93,20 +96,18 @@ class ItemRepository(
         )
     }
 
-    fun findItemByName(name: String): Item? {
-        val sql = """
-        SELECT id, name, type_id, unit_id, created_at, update_at
-        FROM items
-        WHERE name = ?
-    """.trimIndent()
+    fun deleteItemInstancesByIds(instanceIds: List<String>): Int {
+        if (instanceIds.isEmpty()) return 0
+
+        val placeholders = instanceIds.joinToString(",") { "?" }
+        val sql = "DELETE FROM item_instances WHERE id IN ($placeholders)"
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, name)
-
-                stmt.executeQuery().use { rs ->
-                    return if (rs.next()) mapRowToItem(rs) else null
+                instanceIds.forEachIndexed { index, id ->
+                    stmt.setString(index + 1, id)
                 }
+                return stmt.executeUpdate()
             }
         }
     }
@@ -128,7 +129,24 @@ class ItemRepository(
             }
     }
 
-    fun findStorageItemInstances(storageId: String, typeId: String): List<ItemInstance> {
+    fun getItemInstanceById(id: String): ItemInstance? {
+        val sql = """
+        SELECT id, item_id, storage_id, amount, expiry_date, created_at, updated_at
+        FROM item_instances
+        WHERE id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, id)
+                stmt.executeQuery().use { rs ->
+                    return if (rs.next()) mapRowToItemInstance(rs) else null
+                }
+            }
+        }
+    }
+
+    fun getItemInstancesByType(storageId: String, typeId: String): List<ItemInstance> {
         val sql = """
             SELECT ii.id, ii.item_id, ii.storage_id, ii.expiry_date, ii.amount, ii.created_at, ii.updated_at
             FROM item_instances ii
@@ -163,24 +181,49 @@ class ItemRepository(
         return instances
     }
 
+    fun updateItemInstance(
+        id: String,
+        amount: BigDecimal,
+        expiryDate: LocalDate?
+    ): Boolean {
+        val updatedAt = Timestamp(System.currentTimeMillis())
 
-    fun deleteItemInstancesByIds(instanceIds: List<String>) {
-        if (instanceIds.isEmpty()) return
-
-        val placeholders = instanceIds.joinToString(",") { "?" }
-        val sql = "DELETE FROM item_instances WHERE id IN ($placeholders)"
+        val sql = """
+        UPDATE item_instances
+        SET amount = ?, expiry_date = ?, updated_at = ?
+        WHERE id = ?
+    """.trimIndent()
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                instanceIds.forEachIndexed { index, id ->
-                    stmt.setString(index + 1, id)
-                }
-                stmt.executeUpdate()
+                stmt.setBigDecimal(1, amount)
+                stmt.setDate(2, expiryDate?.let { Date.valueOf(it) })
+                stmt.setTimestamp(3, updatedAt)
+                stmt.setString(4, id)
+                return stmt.executeUpdate() > 0
             }
         }
     }
 
 
+
+    private fun findItemByName(name: String): Item? {
+        val sql = """
+        SELECT id, name, type_id, unit_id, created_at, update_at
+        FROM items
+        WHERE name = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, name)
+
+                stmt.executeQuery().use { rs ->
+                    return if (rs.next()) mapRowToItem(rs) else null
+                }
+            }
+        }
+    }
 
     private fun mapRowToItem(rs: ResultSet): Item {
         return Item(
