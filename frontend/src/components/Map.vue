@@ -22,15 +22,14 @@ export default {
   data() {
     return {
       selectedEl: null,
-      latitude: null, // Latitude will be stored here
-      longitude: null, // Longitude will be stored here
-      errorMessage: null, // For storing error messages
-      isLoading: false, // To show loading status
+      latitude: null,
+      longitude: null,
+      errorMessage: null,
+      isLoading: false,
     }
   },
   emits: ['update:modelValue'],
   mounted() {
-    // Initialize map
     const { lng, lat, zoom, bearing, pitch } = this.modelValue
     const map = new mapboxgl.Map({
       container: this.$refs.mapContainer,
@@ -42,7 +41,6 @@ export default {
     })
     this.map = map
 
-    // Track markers for filtering
     this.markerObjs = []
 
     this.getGeolocation()
@@ -94,11 +92,9 @@ export default {
             this.markerObjs.push({ marker, el, props })
           })
 
-          // Apply initial filters
           this.applySettings(this.settings)
         })
 
-      // Deselect on map click
       map.on('click', () => {
         if (this.selectedEl) {
           this.selectedEl.querySelector('.icon').style.transform = 'scale(1)'
@@ -108,11 +104,9 @@ export default {
       })
     })
 
-    // Emit viewport changes back to parent
     const updateLocation = () => this.$emit('update:modelValue', this.getLocation())
     ;['moveend', 'zoomend', 'rotateend', 'pitchend'].forEach((evt) => map.on(evt, updateLocation))
 
-    // Watch for settings changes from parent
     this.$watch(
       () => this.settings,
       (newSettings) => this.applySettings(newSettings),
@@ -137,15 +131,13 @@ export default {
     },
     getGeolocation() {
       if ('geolocation' in navigator) {
-        this.isLoading = true // Set loading to true while waiting for geolocation
+        this.isLoading = true
 
-        // Request the user's current position
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            // Success callback: update latitude and longitude
             this.latitude = position.coords.latitude
             this.longitude = position.coords.longitude
-            this.isLoading = false // Stop loading once we have the coordinates
+            this.isLoading = false
             console.log(
               'Client location: ' + position.coords.latitude + ', ' + position.coords.longitude,
             )
@@ -156,13 +148,11 @@ export default {
               .addTo(this.map)
           },
           (error) => {
-            // Error callback: handle different error cases
             this.isLoading = false
-            this.errorMessage = `Error: ${error.message}` // Show the error message
+            this.errorMessage = `Error: ${error.message}`
           },
         )
       } else {
-        // If geolocation is not supported by the browser
         this.errorMessage = 'Geolocation is not supported by your browser.'
       }
     },
@@ -171,14 +161,13 @@ export default {
         this.map.flyTo({
           center: [this.longitude, this.latitude],
           zoom: 14,
-          essential: true, // for accessibility
+          essential: true,
         })
       } else {
         console.warn('User location not available yet.')
       }
     },
     applySettings(settings) {
-      // Show/hide markers based on searchQuery, showShelters, minCapacity
       this.markerObjs.forEach(({ el, props }) => {
         let visible = true
         if (!settings.showShelters) visible = false
