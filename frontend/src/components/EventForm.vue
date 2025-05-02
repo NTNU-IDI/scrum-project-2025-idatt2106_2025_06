@@ -17,7 +17,6 @@ const selectedSeverity = ref(null)
 const date = ref(null)
 const time = ref(null)
 
-// Emit event when form is submitted
 const emit = defineEmits(['submit'])
 </script>
 

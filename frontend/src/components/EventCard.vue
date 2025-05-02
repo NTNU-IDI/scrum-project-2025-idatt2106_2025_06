@@ -19,12 +19,9 @@ const props = defineProps({
   variant: String,
 })
 
-// Funksjon for å sjekke om datoen er i dag
 const isToday = () => {
   const today = new Date()
   const inputDate = new Date(props.date)
-
-  // Sjekker om datoen er i dag (sammenligner år, måned, dag)
   return (
     today.getFullYear() === inputDate.getFullYear() &&
     today.getMonth() === inputDate.getMonth() &&
@@ -32,16 +29,15 @@ const isToday = () => {
   )
 }
 
-// Funksjon for å formatere datoen
 const formatDate = () => {
   const dateObj = new Date(props.date)
   const today = new Date()
 
-  // Hvis året er det samme, skjul årstallet
+  // Skjul årstall hvis datoen er fra i år
   if (dateObj.getFullYear() === today.getFullYear()) {
     return dateObj.toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })
   }
-  // Hvis året er forskjellig, vis årstallet også
+  // Vis årstall hvis datoen er fra et annet år
   return dateObj.toLocaleDateString('no-NO', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 </script>
@@ -59,7 +55,6 @@ const formatDate = () => {
       <div class="flex flex-col flex-grow min-h-0">
         <div class="flex justify-between items-start">
           <div class="flex items-center gap-2">
-            <!-- Dynamisk ikon basert på severity -->
             <div
               :class="[
                 'shrink-0 flex items-center justify-center rounded-full w-6 h-6',
@@ -78,12 +73,9 @@ const formatDate = () => {
             </h1>
           </div>
 
-          <!-- Vis kun klokkesett hvis det er i dag -->
           <p v-if="isToday()" class="text-neutral-500 text-sm">{{ props.time }}</p>
+          <p v-if="!isToday()" class="text-neutral-500 text-sm">{{ formatDate() }}</p>
         </div>
-
-        <!-- Hvis det ikke er i dag, vis datoen med formatet uten årstall -->
-        <p v-if="!isToday()" class="text-neutral-500 text-sm">{{ formatDate() }}</p>
 
         <p
           :class="[

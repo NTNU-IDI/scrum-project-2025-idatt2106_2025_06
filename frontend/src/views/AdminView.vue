@@ -121,7 +121,6 @@ const alerts = ref([
 
 <template>
   <div class="m-auto flex flex-wrap relative w-full py-10 gap-6 items-stretch mt-10">
-    <!-- Redigere og legge til nye infosider om forskjellige scenarioer -->
     <Card class="flex-1 basis-1/4 min-w-[200px] gap-6 max-h-[650px]">
       <CardHeader>
         <CardTitle class="text-2xl">Rediger scenario informasjon</CardTitle>
@@ -131,7 +130,6 @@ const alerts = ref([
       </CardContent>
     </Card>
 
-    <!-- Redigere varslinger -->
     <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
       <CardHeader class="grid grid-cols-2 items-center w-full">
         <CardTitle class="text-2xl">Varslinger</CardTitle>
@@ -152,7 +150,6 @@ const alerts = ref([
         </CardContent>
     </Card>
 
-    <!-- Redigere kart -->
     <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
       <CardHeader class="grid grid-cols-2 items-center w-full">
         <CardTitle class="text-2xl whitespace-nowrap">Kart og hendelser</CardTitle>
@@ -160,14 +157,9 @@ const alerts = ref([
         <Button>Rediger</Button>
         </router-link>
       </CardHeader>
-      <CardContent class="h-[80%]">
-        <!-- TODO Inne her skal det være hendelser! -->
-        <div class="bg-blue-300 flex h-[40%] m-2">
-
-        </div>
-
+      <CardContent class="h-[85%]">
         <!-- TODO Inne her skal det være kart! -->
-        <div class="bg-blue-200 flex h-[60%] m-2">
+        <div class="bg-blue-200 flex h-[100%] m-2">
 
         </div>
       </CardContent>

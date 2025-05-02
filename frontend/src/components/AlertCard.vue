@@ -21,7 +21,7 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 
 function handleUpdate(updatedAlert) {
-  emit('update', updatedAlert) // send videre til forelderen (f.eks. AlertsList.vue)
+  emit('update', updatedAlert)
 }
 </script>
 

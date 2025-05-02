@@ -61,7 +61,6 @@ async function publishAlert() {
   }
 }
 
-// Sett dato og tid til sanntid når komponenten lastes
 onMounted(() => {
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().split('T')[0]; // Formater datoen som YYYY-MM-DD

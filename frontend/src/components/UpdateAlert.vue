@@ -57,7 +57,6 @@ function updateAlert() {
     time: alertTime.value,
   })
   emit('update', updated)
-  //TODO: send til backend
 }
 </script>
 
@@ -110,14 +109,12 @@ function updateAlert() {
 
         <div class="flex gap-2 items-center">
           <Label class="m-2 w-24" for="time">Tidspunkt:</Label>
-          <!-- Kalender for dato -->
           <input
             type="date"
             id="start-date"
             v-model="alertDate"
             class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
           />
-          <!-- Klokke for tid -->
           <input
             type="time"
             id="start-time"

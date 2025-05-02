@@ -29,7 +29,6 @@ const events = ref([
       <Button>Tilbake</Button>
     </RouterLink>
 
-    <!-- Venstre kolonne -->
     <div class="flex flex-col">
       <Tabs v-model="activeTab" class="w-[400px]">
         <TabsList class="grid w-full grid-cols-2">
@@ -41,12 +40,10 @@ const events = ref([
           </TabsTrigger>
         </TabsList>
 
-        <!-- Hendelse-tab -->
         <TabsContent value="event">
           <EventForm/>
         </TabsContent>
 
-        <!-- Markør-tab -->
         <TabsContent value="marker">
           <MarkerForm/>
         </TabsContent>
@@ -64,7 +61,6 @@ const events = ref([
           <Button class="justify-self-end">Ny hendelse</Button>
         </CardHeader>
         <CardContent class="max-w-[350px] max-h-[85%] overflow-y-auto flex flex-col gap-2">
-          <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
           <template v-for="(event, index) in events" :key="index">
               <EventCard
                 :description="event.description"
@@ -78,7 +74,6 @@ const events = ref([
         </CardContent>
       </Card>
 
-      <!-- TODO Kartet -->
       <div class="w-full h-full rounded bg-blue-200"></div>
     </div>
   </div>
