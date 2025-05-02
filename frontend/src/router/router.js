@@ -1,5 +1,4 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import { storeToRefs } from 'pinia'
 
 import HomeView from '../views/HomeView.vue'
 import AlertsView from '../views/AlertsView.vue'
@@ -13,7 +12,7 @@ import InfoView from "@/views/InfoView.vue";
 import BeforeView from "@/views/BeforeView.vue";
 import DuringView from "@/views/DuringView.vue";
 import AfterView from "@/views/AfterView.vue";
-// import AdminView from "@/views/AdminView.vue";
+import AdminView from "@/views/AdminView.vue";
 import { useSessionStore } from '@/stores/session.js'
 
 
@@ -32,7 +31,7 @@ const routes = [
   {path: '/after', component: AfterView, name: 'after'},
   {
     path: '/admin',
-    // component: () => import('@/views/AdminView.vue'),
+    component: () => import('@/views/AdminView.vue'),
     name: 'admin',
     meta: { requiresAdminAccess: true },
   }
