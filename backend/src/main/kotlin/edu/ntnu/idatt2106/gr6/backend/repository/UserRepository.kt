@@ -78,8 +78,6 @@ class UserRepository (
         }
     }
 
-
-
     fun findById(userId: UUID): User? {
         val sql = """
         SELECT u.*, r.role_name AS role_name 
@@ -99,6 +97,28 @@ class UserRepository (
             }
         }
         return null
+    }
+
+    fun updateUserTrackingPreferences(userId: UUID, trackingEnabled: Boolean): Boolean {
+        val sql = "UPDATE users SET tracking_enabled = ? WHERE id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setBoolean(1, trackingEnabled)
+                stmt.setString(2, userId.toString())
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+    fun deleteUserTrackingHistory(userId: UUID): Boolean {
+        val sql = "UPDATE users SET location = ? WHERE id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, null)
+                stmt.setString(2, userId.toString())
+                return stmt.executeUpdate() > 0
+            }
+        }
     }
 
 
