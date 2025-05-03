@@ -4,6 +4,7 @@ import edu.ntnu.idatt2106.gr6.backend.BaseIntegrationTest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateEventRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.Location
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UpdateEventRequest
+import edu.ntnu.idatt2106.gr6.backend.exception.EventDoesNotExistException
 import edu.ntnu.idatt2106.gr6.backend.service.EventService
 import org.flywaydb.core.internal.jdbc.JdbcTemplate
 import org.junit.Before
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
@@ -172,8 +174,13 @@ class EventServiceTest: BaseIntegrationTest() {
             val event = eventService.createEvent(createEventRequest1)
             val eventId = event.id
             eventService.deleteEventById(eventId)
-            val retrievedEvent = eventService.getEventById(eventId)
-            assert(retrievedEvent == null)
+
+            try {
+                eventService.getEventById(eventId)
+                fail("Expected EventDoesNotExistException but no exception was thrown")
+            } catch (e: EventDoesNotExistException) {
+                assert(e.message!!.contains("Event with id $eventId does not exist"))
+            }
         }
 
         @Test
@@ -221,7 +228,7 @@ class EventServiceTest: BaseIntegrationTest() {
             try {
                 eventService.getEventById(invalidId)
             } catch (e: Exception) {
-                assert(e.message!!.contains("Event not found"))
+                assert(e.message!!.contains("Event with id $invalidId does not exist."))
             }
         }
 
@@ -261,7 +268,7 @@ class EventServiceTest: BaseIntegrationTest() {
             try {
                 eventService.deleteEventById(invalidId)
             } catch (e: Exception) {
-                assert(e.message!!.contains("Event not found"))
+                assert(e.message!!.contains("Event with id $invalidId does not exist."))
             }
         }
     }
