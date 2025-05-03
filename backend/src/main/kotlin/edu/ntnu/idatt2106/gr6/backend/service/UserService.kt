@@ -1,8 +1,10 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
+import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.EditUserNameEmailRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.EditUserNameEmailResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.ChangePasswordRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.ChangeUserTrackingPreferenceRequest
 import edu.ntnu.idatt2106.gr6.backend.repository.UserRepository
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -59,6 +61,28 @@ class UserService(
 
         if (!updated) {
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update password")
+        }
+
+        return true
+    }
+
+    fun updateUserTrackingPreferences(request: ChangeUserTrackingPreferenceRequest): Boolean {
+        val userId: UUID = userContextService.getCurrentUserId()
+
+        val updated = userRepository.updateUserTrackingPreferences(userId, request.trackingEnabled)
+        if (!updated) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        }
+
+        return true
+    }
+
+    fun deleteUserTrackingHistory(): Boolean {
+        val userId: UUID = userContextService.getCurrentUserId()
+
+        val updated = userRepository.deleteUserTrackingHistory(userId)
+        if (!updated) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         }
 
         return true
