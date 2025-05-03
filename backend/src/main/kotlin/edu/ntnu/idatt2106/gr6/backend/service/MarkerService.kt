@@ -4,6 +4,8 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs
 import edu.ntnu.idatt2106.gr6.backend.repository.MarkerRepository
 import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.CreateMarkerRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.CreateMarkerResponse
+import edu.ntnu.idatt2106.gr6.backend.exception.IdGeneratorMaxAttemptsReachedException
+import edu.ntnu.idatt2106.gr6.backend.exception.MarkerNotFoundException
 import edu.ntnu.idatt2106.gr6.backend.model.Marker
 import edu.ntnu.idatt2106.gr6.backend.util.IdGenerator
 import edu.ntnu.idatt2106.gr6.backend.model.MarkerType
@@ -20,7 +22,12 @@ class MarkerService(
 
     fun createMarker(request: CreateMarkerRequest): CreateMarkerResponse {
         var markerId: String
+        var attempts = 0
+        val maxAttempts = 10
         do {
+            if (++attempts >= maxAttempts) {
+                throw IdGeneratorMaxAttemptsReachedException.forEventName(request.name)
+            }
             markerId = idGenerator.generateId(10)
         } while (markerRepository.findMarkerById(markerId) != null)
         val savedMarker = markerRepository.createMarker(request.toMarker(markerId))
@@ -37,12 +44,15 @@ class MarkerService(
     }
 
     fun deleteMarkerById(id: String): Boolean {
-        return markerRepository.deleteMarkerById(id)
+        if (!markerRepository.deleteMarkerById(id)) {
+            throw MarkerNotFoundException.forMarkerId(id)
+        }
+        return true
     }
 
     fun updateMarker(request: MarkerDTOs.UpdateMarkerRequest): CreateMarkerResponse {
         val existingMarker = markerRepository.findMarkerById(request.id)
-            ?: throw IllegalArgumentException("Marker with ID ${request.id} not found")
+            ?: throw MarkerNotFoundException.forMarkerId(request.id)
 
         val updatedMarker = existingMarker.copy(
             name = request.name,
@@ -56,27 +66,24 @@ class MarkerService(
             type = MarkerType.fromString(request.type)
         )
 
-        logger.info(updatedMarker.toString())
-
         return markerRepository.updateMarker(updatedMarker).toResponse()
     }
 
     fun getMarkerById(id: String): CreateMarkerResponse? {
         val marker = markerRepository.findMarkerById(id)
-        return if (marker != null) {
-            CreateMarkerResponse(
-                id = marker.id,
-                name = marker.name,
-                location = marker.location,
-                description = marker.description,
-                contactInfo = marker.contactInfo,
-                openingHours = marker.openingHours,
-                imageId = marker.imageId,
-                type = marker.type.toString()
-            )
-        } else {
-            null
+        if (marker == null) {
+            throw MarkerNotFoundException.forMarkerId(id)
         }
+        return CreateMarkerResponse(
+            id = marker.id,
+            name = marker.name,
+            location = marker.location,
+            description = marker.description,
+            contactInfo = marker.contactInfo,
+            openingHours = marker.openingHours,
+            imageId = marker.imageId,
+            type = marker.type.toString()
+        )
     }
 
 

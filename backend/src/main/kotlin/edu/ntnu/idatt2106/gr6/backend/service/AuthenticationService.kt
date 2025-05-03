@@ -5,6 +5,10 @@ import edu.ntnu.idatt2106.gr6.backend.repository.UserRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.crypto.password.PasswordEncoder
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.UserResponse
+import edu.ntnu.idatt2106.gr6.backend.exception.AuthenticationException
+import edu.ntnu.idatt2106.gr6.backend.exception.InvalidCredentialsException
+import edu.ntnu.idatt2106.gr6.backend.exception.UserAlreadyExistsException
+import edu.ntnu.idatt2106.gr6.backend.exception.UserNotFoundException
 import edu.ntnu.idatt2106.gr6.backend.model.User
 import edu.ntnu.idatt2106.gr6.backend.repository.RoleRepository
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -27,7 +31,7 @@ class AuthenticationService(
         password: String,
     ): UserResponse {
         if (userRepository.findByEmail(email) != null) {
-            throw IllegalArgumentException("User with email $email already exists")
+            throw UserAlreadyExistsException.forEmail(email)
         }
 
         val userToSave = User(
@@ -47,7 +51,7 @@ class AuthenticationService(
         val password = request.password
 
         if (email.isBlank() || password.isBlank()) {
-            throw IllegalArgumentException("Email and password cannot be blank")
+            throw InvalidCredentialsException.forEmail(email)
         }
 
         logger.info("Authenticating user with email: $email")
@@ -60,13 +64,13 @@ class AuthenticationService(
             )
         } catch (e: Exception) {
             logger.error("Authentication failed for user $email: ${e.message}")
-            throw IllegalArgumentException("Invalid email or password")
+            throw AuthenticationException.forEmail(email)
         }
 
         logger.info("User $email authenticated successfully.")
 
         return userRepository.findByEmail(email)?.toResponse()
-            ?: throw IllegalStateException("User $email not found in repository.")
+            ?: throw UserNotFoundException.forEmail(email)
     }
 
     fun User.toResponse(): UserResponse {
