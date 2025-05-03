@@ -6,23 +6,28 @@ import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 import javax.security.auth.kerberos.EncryptionKey
+import java.util.Base64
+import javax.crypto.spec.IvParameterSpec
 
 @Service
 class LocationEncryptionService(
     @Value("\${encryption.key}") private val encryptionKey: String,
 ) {
-    private val cipher: Cipher = Cipher.getInstance("AES")
+    private val logger = org.slf4j.LoggerFactory.getLogger(LocationEncryptionService::class.java)
     private val key: SecretKey = SecretKeySpec(encryptionKey.toByteArray(), "AES")
+    private val iv = IvParameterSpec(ByteArray(16)) // Replace with secure random in production
 
-    fun encryptLocation(location: String): String {
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        val encryptedBytes = cipher.doFinal(location.toByteArray())
-        return encryptedBytes.joinToString(",") { it.toString() }
+    fun encryptLocation(rawLocation: String): String {
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        cipher.init(Cipher.ENCRYPT_MODE, key, iv)
+        val encryptedBytes = cipher.doFinal(rawLocation.toByteArray())
+        return Base64.getEncoder().encodeToString(encryptedBytes)
     }
 
-    fun decryptLocation(location: String): String {
-        cipher.init(Cipher.DECRYPT_MODE, key)
-        val encryptedBytes = location.split(",").map { it.toByte() }.toByteArray()
+    fun decryptLocation(encryptedLocation: String): String {
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        cipher.init(Cipher.DECRYPT_MODE, key, iv)
+        val encryptedBytes = Base64.getDecoder().decode(encryptedLocation)
         val decryptedBytes = cipher.doFinal(encryptedBytes)
         return String(decryptedBytes)
     }
