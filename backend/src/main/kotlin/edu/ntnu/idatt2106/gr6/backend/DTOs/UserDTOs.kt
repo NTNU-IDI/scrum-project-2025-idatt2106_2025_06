@@ -58,4 +58,8 @@ class UserDTOs {
         val userId: String,
         val location: Location,
     )
+
+    data class ChangeUserTrackingPreferenceRequest(
+        val trackingEnabled: Boolean
+    )
 }
