@@ -13,14 +13,12 @@ class EnvConfig {
     @PostConstruct
     fun loadEnv() {
         try {
-            // Load the .env file
             val dotenv = Dotenv.configure()
-                .directory(System.getProperty("user.dir")) // Optional: specify the directory if needed
-                .filename(".env")                          // Default is .env
-                .ignoreIfMissing()                         // Don't throw an error if .env file is missing
+                .directory(System.getProperty("user.dir"))
+                .filename(".env")
+                .ignoreIfMissing()
                 .load()
 
-            // Set environment variables to system properties for Spring to pick them up
             dotenv.entries().forEach { (key, value) ->
                 if (System.getProperty(key) == null) {
                     System.setProperty(key, value)
