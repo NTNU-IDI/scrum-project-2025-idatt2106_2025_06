@@ -70,10 +70,8 @@ class MarkerService(
     }
 
     fun getMarkerById(id: String): CreateMarkerResponse? {
-        val marker = markerRepository.findMarkerById(id)
-        if (marker == null) {
+        val marker = markerRepository.findMarkerById(id) ?:
             throw MarkerNotFoundException.forMarkerId(id)
-        }
         return CreateMarkerResponse(
             id = marker.id,
             name = marker.name,
