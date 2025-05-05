@@ -5,4 +5,6 @@ INSERT INTO permissions (name, description) VALUES
 ('EDIT_POST', 'Allows user to edit a post'),
 ('DELETE_POST', 'Allows user to delete a post'),
 ('LOGIN_USER', 'Allows a user to login'),
-('CREATE_STORAGE', 'Allows a user to create storage');
+('CREATE_STORAGE', 'Allows a user to create storage'),
+('HANDLE_EVENTS', 'Allows a user to handle events'),
+('HANDLE_MARKERS', 'Allows a user to handle markers');

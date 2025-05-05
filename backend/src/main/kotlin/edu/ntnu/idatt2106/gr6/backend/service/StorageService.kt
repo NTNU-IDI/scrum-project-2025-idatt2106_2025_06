@@ -2,6 +2,7 @@ package edu.ntnu.idatt2106.gr6.backend.service
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageSummary
 import edu.ntnu.idatt2106.gr6.backend.model.toResponse
 import edu.ntnu.idatt2106.gr6.backend.repository.StorageRepository
 import org.slf4j.LoggerFactory
@@ -74,5 +75,11 @@ class StorageService(
     @Transactional
     fun removeUserFromStorage(userId: String, storageId: String): Boolean {
         return storageRepository.removeUserFromStorage(userId, storageId)
+    }
+
+    @Transactional
+    fun getStoragesByUserId(): List<StorageSummary> {
+        val userId = userContextService.getCurrentUserId()
+        return storageRepository.findStoragesByUserId(userId.toString())
     }
 }

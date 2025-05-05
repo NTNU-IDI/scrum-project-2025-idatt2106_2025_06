@@ -1,5 +1,4 @@
 <template>
-  <!-- Hele BentoCard er en router-link-->
   <router-link
     :to="href"
     :class="[
@@ -13,7 +12,6 @@
       {{ name }}
     </div>
 
-    <!-- Slot for custom content (som alerts eller annet innhold), plassert under tittelen -->
     <div class="relative mt-10 p-4 z-0">
       <slot></slot>
     </div>
