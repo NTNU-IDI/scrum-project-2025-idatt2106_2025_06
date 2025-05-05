@@ -48,30 +48,42 @@ jobs:
   # ─────────────── FRONTEND ───────────────
   frontend-install:
     runs-on: ubuntu-latest
-    outputs:
-      cache-key: ${{ steps.cache-node.outputs.cache-hit }}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Node.js & pnpm cache
+      # 1) Node.js (no package-manager flag)
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'pnpm'
-          cache-dependency-path: frontend/pnpm-lock.yaml
-          package-manager: 'pnpm'
 
-      - name: Install dependencies
-        working-directory: frontend
-        run: pnpm install
+      # 2) pnpm CLI
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false   # we only want the CLI; we'll install deps ourselves
 
-      - name: Persist pnpm store
+      # 3) Restore pnpm store cache
+      - name: Restore pnpm store
         uses: actions/cache@v3
-        id: cache-node
+        id: pnpm-cache
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-pnpm-store-
+
+      # 4) Install your dependencies
+      - name: Install frontend deps
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      # 5) Persist pnpm store for next runs
+      - name: Save pnpm store
+        if: steps.pnpm-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
 
   frontend-build:
     needs: frontend-install
@@ -79,15 +91,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Node.js & pnpm cache
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'pnpm'
-          cache-dependency-path: frontend/pnpm-lock.yaml
-          package-manager: 'pnpm'
 
-      - name: Build production bundle
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Restore pnpm store
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+
+      - name: Build
         working-directory: frontend
         run: pnpm run build
 
@@ -103,22 +123,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install pnpm CLI
-        run: npm install -g pnpm@latest
-
-      - name: Set up Node.js & pnpm cache
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'pnpm'
-          cache-dependency-path: frontend/pnpm-lock.yaml
-          package-manager: 'pnpm'
 
-      - name: Run Vitest unit tests
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Restore pnpm store
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+
+      - name: Run Vitest
         working-directory: frontend
         run: pnpm run test:unit
 
-      - name: Export and clean test output
+      - name: Clean test output
         if: always()
         working-directory: frontend
         run: |
@@ -132,22 +157,26 @@ jobs:
           path: frontend/clean_test_output.txt
 
   frontend-security:
+    name: OWASP Dependency-Check (Frontend)
     needs: frontend-install
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: OWASP Dependency Check
-        # run the official OWASP Dependency-Check docker image
+      - name: Create reports dir
+        run: mkdir -p owasp-reports
+
+      - name: Run OWASP Dependency-Check
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/frontend":/src \
             -v "${{ github.workspace }}/owasp-reports":/report \
             owasp/dependency-check:8.2.1 \
-              --project "SmartMat" \
+              --project "Frontend" \
               --scan /src \
-              --format "JSON" \
-              --out /report
+              --format JSON \
+              --out /report/dependency-check-report.json
 
       - name: Upload security report
         uses: actions/upload-artifact@v3
