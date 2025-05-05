@@ -25,6 +25,7 @@ class JwtService(private val roleRepository: RoleRepository) {
     @Value("\${security.jwt.expiration-time}")
     private var expiration: Long = 0
 
+    //generate
     fun generateToken(user: User): String {
         val now = System.currentTimeMillis()
         val expirationTime = now + expiration
