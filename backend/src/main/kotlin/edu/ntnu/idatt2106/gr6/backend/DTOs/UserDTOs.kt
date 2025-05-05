@@ -16,6 +16,11 @@ class UserDTOs {
         val expiresIn: Long,
     )
 
+    data class SimpleUserResponse (
+        val id: String,
+        val name: String
+    )
+
     data class CreateUserRequest(
         val name: String,
         val email: String,

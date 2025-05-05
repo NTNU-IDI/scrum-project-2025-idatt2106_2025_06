@@ -1,10 +1,11 @@
 package edu.ntnu.idatt2106.gr6.backend.controller
 
-import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateStorageRequest
-import edu.ntnu.idatt2106.gr6.backend.DTOs.JoinStorageRequest
-import edu.ntnu.idatt2106.gr6.backend.DTOs.RemoveUserFromStorageRequest
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageResponse
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.CreateStorageRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.JoinStorageRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.RemoveUserFromStorageRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.SimpleUserResponse
 import edu.ntnu.idatt2106.gr6.backend.service.StorageService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -143,16 +144,16 @@ class StorageController(
             ApiResponse(responseCode = "500", description = "Internal server error"),
         ],
     )
-    fun getMemberNamesOfStorage(
+    fun getStorageMembers(
         @PathVariable
         @Parameter(description = "ID of the storage", required = true)
         id: String
-    ): ResponseEntity<List<String>> {
-        logger.info("Fetching member names for storage with ID: $id")
+    ): ResponseEntity<List<SimpleUserResponse>> {
+        logger.info("Fetching member IDs and names for storage with ID: $id")
 
-        val memberNames = storageService.getMemberNamesOfStorage(id)
+        val members = storageService.getMemberDTOsOfStorage(id)
 
-        return ResponseEntity.ok(memberNames)
+        return ResponseEntity.ok(members)
     }
 
     @PostMapping("/remove-member")

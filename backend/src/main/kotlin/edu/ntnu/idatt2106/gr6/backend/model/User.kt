@@ -38,3 +38,8 @@ data class User(
 
     override fun isEnabled(): Boolean = true
 }
+
+data class SimpleUser (
+    val id: UUID?,
+    val name: String,
+)
