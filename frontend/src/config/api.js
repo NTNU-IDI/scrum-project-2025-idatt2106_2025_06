@@ -2,7 +2,7 @@
  * API configuration settings
  */
 
-import router from '@/router'
+import router from '@/router/router.js'
 import { useSessionStore } from '@/stores/session'
 import axios from 'axios'
 
