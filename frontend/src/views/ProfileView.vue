@@ -60,46 +60,21 @@ const passwordSuccess = ref('')
 
 async function createNewStorage() {
   const token = sessionStore.token
-
   const response = await storageStore.create(
     householdName.value, token)
-
   if (response) {
-    console.log("Husstand opprettet")
   }
 }
 
 async function joinStorage() {
   if (!joinToken.value) return
-
   const success = await storageStore.join(joinToken.value, sessionStore.token)
-
   if (success) {
-    console.log('Bli med i husstand: Vellykket')
     joinToken.value = ''
   } else {
-    console.error('Kunne ikke bli med i husstand')
+    console.error('Could not join storage')
   }
 }
-
-
-onMounted(async () => {
-  if (!sessionStore.isAuthenticated) {
-    router.push('/login')
-    console.log("Det er noe galt med innloggingen");
-  }
-
-  if (user.value) {
-    username.value = user.value.name
-    email.value = user.value.email
-  }
-
-  try {
-    await storageStore.fetchAll(sessionStore.token)
-  } catch (error) {
-    console.error("Klarte ikke hente husstander og medlemmer:", error)
-  }
-});
 
 function openEditProfile() {
   if (user.value) {
@@ -111,9 +86,7 @@ function openEditProfile() {
 async function submitProfileUpdate() {
   const success = await sessionStore.updateProfile(username.value, email.value)
   if (success) {
-    console.log("Profil oppdatert!")
 
-    // Refetch husstander og medlemmer med ny token
     await storageStore.fetchAll(sessionStore.token)
   }
 }
