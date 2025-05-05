@@ -4,6 +4,7 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateEventRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.EventResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UpdateEventRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.toEvent
+import edu.ntnu.idatt2106.gr6.backend.exception.EventDoesNotExistException
 import edu.ntnu.idatt2106.gr6.backend.model.Event
 import edu.ntnu.idatt2106.gr6.backend.model.EventType
 import edu.ntnu.idatt2106.gr6.backend.model.Severity
@@ -37,16 +38,20 @@ class EventService(
     }
 
     fun getEventById(id: String): EventResponse? {
-        return eventRepository.findEventById(id)?.toResponse()
+        val event = eventRepository.findEventById(id)
+            ?: throw EventDoesNotExistException.forEventId(id)
+        return event.toResponse()
     }
 
     fun deleteEventById(id: String): Boolean {
+        eventRepository.findEventById(id)
+            ?: throw EventDoesNotExistException.forEventId(id)
         return eventRepository.deleteEvent(id)
     }
 
     fun updateEvent(request: UpdateEventRequest): EventResponse? {
         val existingEvent = eventRepository.findEventById(request.id) ?:
-            throw IllegalArgumentException("Event with ID ${request.id} not found")
+            throw EventDoesNotExistException.forEventId(request.id)
 
         val updatedEvent = existingEvent.copy(
             id = request.id,
