@@ -4,6 +4,7 @@
       class="w-72 p-4 bg-white rounded-lg shadow space-y-4"
       style="position: relative; z-index: 10"
     >
+      lol
       <div class="flex flex-col gap-10">
         <div class="flex items-center justify-between">
           <div class="flex w-full flex-col">
