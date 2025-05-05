@@ -1,18 +1,29 @@
 import { defineStore } from 'pinia'
-import { fetchEvents, createEvent, updateEvent, deleteEvent } from '@/service/eventService.js'
+import { fetchEvents, fetchEventById, createEvent, updateEvent, deleteEvent, } from '@/service/eventService.js'
 import { ref } from 'vue'
 
 export const useEventStore = defineStore('eventStore', () => {
 
   const events = ref([])
 
-  const getEvents = async (token) => {
+  const getEvents = async () => {
     try {
-      events.value = await fetchEvents(token)
+      events.value = await fetchEvents()
     } catch (error) {
       console.error('Feil ved henting av hendelser:', error)
     }
   }
+
+  const getEventById = async (eventId, token) => {
+    try {
+      const event = await fetchEventById(eventId, token)
+      return event
+    } catch (error) {
+      console.error(`Feil ved henting av hendelse med ID ${eventId}:`, error)
+      throw error
+    }
+  }
+
 
   const createNewEvent = async (eventPayload, token) => {
     try {
@@ -47,6 +58,7 @@ export const useEventStore = defineStore('eventStore', () => {
   return {
     events,
     getEvents,
+    getEventById,
     createNewEvent,
     updateExistingEvent,
     deleteExistingEvent

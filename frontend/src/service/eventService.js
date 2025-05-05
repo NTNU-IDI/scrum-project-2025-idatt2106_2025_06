@@ -1,15 +1,25 @@
 import axios from 'axios';
 
-export async function fetchEvents(token) {
+export async function fetchEvents() {
   try {
-    const response = await axios.get('http://localhost:8080/api/events/all', {
+    const response = await axios.get('http://localhost:8080/api/events/all');
+    return response.data;
+  } catch (error) {
+    console.error('Feil ved henting av hendelser:', error);
+    throw error;
+  }
+}
+
+export async function fetchEventById(eventId, token) {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/events/${eventId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
     });
     return response.data;
   } catch (error) {
-    console.error('Feil ved henting av hendelser:', error);
+    console.error(`Feil ved henting av hendelse med ID ${eventId}:`, error);
     throw error;
   }
 }
