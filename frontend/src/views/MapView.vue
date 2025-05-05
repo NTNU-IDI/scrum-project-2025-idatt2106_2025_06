@@ -8,7 +8,7 @@
         <div class="flex items-center justify-between">
           <div class="flex w-full flex-col">
             <p class="block text-sm font-semibold mb-1">Din posisjon</p>
-            <p class="text-neutral-500">Aktivert</p>
+            <p class="text-neutral-500">{{ $refs.mapRef?.statusMessage }}</p>
           </div>
           <Button class="size-5 h-auto" variant="outline" @click="$refs.mapRef.flyToUser()">
             <Navigation />
