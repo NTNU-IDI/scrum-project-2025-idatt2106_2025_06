@@ -75,7 +75,7 @@ async function handleSubmit() {
     impact_area_radius_km: radius.value,
     type: eventType.value,
     severity: selectedSeverity.value,
-    start_date: date.value && time.value ? date.value + 'T' + time.value : null,
+    startDate: date.value && time.value ? date.value + 'T' + time.value : null,
   }
 
   try {
