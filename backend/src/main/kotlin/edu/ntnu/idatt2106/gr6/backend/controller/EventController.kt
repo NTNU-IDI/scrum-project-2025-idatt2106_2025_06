@@ -40,10 +40,6 @@ class EventController(
         @Parameter request: CreateEventRequest): ResponseEntity<EventResponse> {
         logger.info("Received event create request: $request")
         val response = eventService.createEvent(request)
-        if (response == null) {
-            logger.error("Failed to create event: ${request.name}")
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
-        }
         logger.info("Event created with ID: ${response.id}")
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
