@@ -67,12 +67,10 @@ defineExpose({
             <SelectValue placeholder="Velg beredskapsnivå" />
           </SelectTrigger>
           <SelectContent>
-            <SelectGroup>
-              <SelectItem value="info">Info</SelectItem>
-              <SelectItem value="green">Lav</SelectItem>
-              <SelectItem value="yellow">Middels</SelectItem>
-              <SelectItem value="red">Høy</SelectItem>
-            </SelectGroup>
+              <SelectItem value="info" severity="info">Info</SelectItem>
+              <SelectItem value="green" severity="low">Lav</SelectItem>
+              <SelectItem value="yellow" severity="medium">Middels</SelectItem>
+              <SelectItem value="red" severity="high">Høy</SelectItem>
           </SelectContent>
         </Select>
       </div>

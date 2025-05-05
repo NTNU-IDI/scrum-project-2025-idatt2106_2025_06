@@ -8,9 +8,9 @@ const sessionStore = useSessionStore()
 
 const severityColors = {
   info: 'bg-blue-200',
-  red: 'bg-red-500',
-  yellow: 'bg-yellow-400',
-  green: 'bg-green-400',
+  high: 'bg-red-500',
+  medium: 'bg-yellow-400',
+  low: 'bg-green-400',
 }
 
 const props = defineProps({
@@ -76,9 +76,9 @@ const formatDate = () => {
             >
               <!-- Velg ikon basert på severity -->
               <Info v-if="props.severity === 'info'" class="w-4 h-4 text-white" />
-              <OctagonAlert v-if="props.severity === 'red'" class="w-4 h-4 text-white" />
-              <TriangleAlert v-if="props.severity === 'yellow'" class="w-4 h-4 text-white" />
-              <Shield v-if="props.severity === 'green'" class="w-4 h-4 text-white" />
+              <OctagonAlert v-if="props.severity === 'high'" class="w-4 h-4 text-white" />
+              <TriangleAlert v-if="props.severity === 'medium'" class="w-4 h-4 text-white" />
+              <Shield v-if="props.severity === 'low'" class="w-4 h-4 text-white" />
             </div>
 
             <h1 :class="['font-bold', variant === 'admin' ? 'text-md' : 'text-2xl']">

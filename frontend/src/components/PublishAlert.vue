@@ -106,13 +106,13 @@ onMounted(() => {
           <div class="flex gap-2 items-center">
             <Select id="type" v-model="alertType">
               <SelectTrigger class="w-[180px]">
-                <SelectValue placeholder="Velg beredskapsnivå" />
+                <SelectValue placeholder="Velg beredskapsnivå"/>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="info" severity="info">Info</SelectItem>
-                <SelectItem value="green" severity="green">Lav</SelectItem>
-                <SelectItem value="yellow" severity="yellow">Middels</SelectItem>
-                <SelectItem value="red" severity="red">Høy</SelectItem>
+                <SelectItem value="green" severity="low">Lav</SelectItem>
+                <SelectItem value="yellow" severity="medium">Middels</SelectItem>
+                <SelectItem value="red" severity="high">Høy</SelectItem>
               </SelectContent>
             </Select>
           </div>
