@@ -21,8 +21,7 @@ const props = defineProps({
   eventId: [String, Number],
   name: String,
   description: String,
-  time: String,
-  date: String,
+  start_date: String,
   position: String,
   severity: { type: String, default: 'info' },
   variant: String,
@@ -37,8 +36,13 @@ const handleDelete = async () => {
 }
 
 const isToday = () => {
+  if (!props.start_date) {
+    console.error('props.start_date is undefined or null:', props.start_date)
+    return false
+  }
+
   const today = new Date()
-  const inputDate = new Date(props.date)
+  const inputDate = new Date(props.start_date.replace(' ', 'T')) // Convert to valid ISO string
   return (
     today.getFullYear() === inputDate.getFullYear() &&
     today.getMonth() === inputDate.getMonth() &&
@@ -47,7 +51,14 @@ const isToday = () => {
 }
 
 const formatDate = () => {
-  const dateObj = new Date(props.date)
+  console.log('Start Date:', props.start_date)
+
+  if (!props.start_date) {
+    console.error('props.start_date is undefined or null:', props.start_date)
+    return 'Invalid date' // Return something else if date is invalid
+  }
+
+  const dateObj = new Date(props.start_date.replace(' ', 'T')) // Convert to valid ISO string
   const today = new Date()
 
   // Skjul årstall hvis datoen er fra i år
@@ -127,4 +138,5 @@ const handleEdit = () => {
     </div>
   </div>
 </template>
+
 <style scoped></style>
