@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import HomeView from '@/views/Home.vue'
+import HomeView from '@/views/HomeView.vue'
 
 describe('HomeView.vue', () => {
   it('renders layout and child components', () => {
