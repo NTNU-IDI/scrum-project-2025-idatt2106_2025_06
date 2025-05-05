@@ -131,6 +131,7 @@ onMounted(async () => {
               :eventId="event.id"
               :name="event.name"
               :description="event.description"
+              :startDate="event.startDate"
               :position="event.location"
               :severity="event.severity"
             />

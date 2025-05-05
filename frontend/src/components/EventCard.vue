@@ -21,7 +21,7 @@ const props = defineProps({
   eventId: [String, Number],
   name: String,
   description: String,
-  start_date: String,
+  startDate: [String, Object],
   position: String,
   severity: { type: String, default: 'info' },
   variant: String,
@@ -35,39 +35,31 @@ const handleDelete = async () => {
   }
 }
 
-const isToday = () => {
-  if (!props.start_date) {
-    console.error('props.start_date is undefined or null:', props.start_date)
-    return false
-  }
+const formattedDate = () => {
+  if (!props.startDate) return 'Ukjent dato'
 
-  const today = new Date()
-  const inputDate = new Date(props.start_date.replace(' ', 'T')) // Convert to valid ISO string
-  return (
-    today.getFullYear() === inputDate.getFullYear() &&
-    today.getMonth() === inputDate.getMonth() &&
-    today.getDate() === inputDate.getDate()
-  )
-}
-
-const formatDate = () => {
-  console.log('Start Date:', props.start_date)
-
-  if (!props.start_date) {
-    console.error('props.start_date is undefined or null:', props.start_date)
-    return 'Invalid date' // Return something else if date is invalid
-  }
-
-  const dateObj = new Date(props.start_date.replace(' ', 'T')) // Convert to valid ISO string
+  const dateObj = new Date(props.startDate.replace(' ', 'T'))
   const today = new Date()
 
-  // Skjul årstall hvis datoen er fra i år
-  if (dateObj.getFullYear() === today.getFullYear()) {
-    return dateObj.toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })
+  const isSameDay =
+    today.getFullYear() === dateObj.getFullYear() &&
+    today.getMonth() === dateObj.getMonth() &&
+    today.getDate() === dateObj.getDate()
+
+  if (isSameDay) {
+    // Kun klokkeslett
+    return dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
+  } else if (today.getFullYear() === dateObj.getFullYear()) {
+    // Dato + klokkeslett uten år
+    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) +
+      ' ' +
+      dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
+  } else {
+    // Dato + årstall
+    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' })
   }
-  // Vis årstall hvis datoen er fra et annet år
-  return dateObj.toLocaleDateString('no-NO', { year: 'numeric', month: 'short', day: 'numeric' })
 }
+
 
 const handleEdit = () => {
   emit('editEvent', props.eventId)
@@ -105,8 +97,7 @@ const handleEdit = () => {
             </h1>
           </div>
 
-          <p v-if="isToday()" class="text-neutral-500 text-sm">{{ props.time }}</p>
-          <p v-if="!isToday()" class="text-neutral-500 text-sm">{{ formatDate() }}</p>
+          <p class="text-neutral-500 text-sm">{{ formattedDate() }}</p>
         </div>
 
         <p
