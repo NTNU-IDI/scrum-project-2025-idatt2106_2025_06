@@ -42,17 +42,23 @@ const props = defineProps({
   typeId: {type: Number, required: true}
 });
 
-const handleKeydown = (e) => {
-  if (e.key === '-' || e.key === 'e' || e.key === '+') {
-    e.preventDefault();
+function handleAmountInput(e) {
+  let value = e.target.value;
+  value = value.replace(/[^\d.,]/g, '');
+  value = value.replace(',', '.');
+  const parts = value.split('.');
+  if (parts.length > 2) {
+    value = parts[0] + '.' + parts.slice(1).join('');
   }
-};
+  value = value.replace(/^0+([1-9])/, '$1');
+  itemAmount.value = value;
+}
 
 onMounted(() => {
   currentItem.value = props.item;
   itemType.value = props.typeId;
   itemName.value = currentItem.value.name;
-  itemAmount.value = currentItem.value.amount;
+  itemAmount.value = String(currentItem.value.amount);
   itemUnit.value = currentItem.value.unit;
   expirationDate.value = parseDate(currentItem.value.expirationDate);
 })
@@ -77,9 +83,9 @@ onMounted(() => {
           <Label>Mengde</Label>
           <Input v-model="itemAmount"
                  placeholder="Mengde"
-                 type="number"
-                 :min="0"
-                 @keydown="handleKeydown"
+                 type="text"
+                 inputmode="decimal"
+                 @input="handleAmountInput"
           />
         </div>
         <div class="flex-1">
