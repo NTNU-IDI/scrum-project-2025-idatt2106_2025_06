@@ -24,18 +24,18 @@ export const useModeratorStore = defineStore('moderator', () => {
     }
   }
 
-  async function add(email, token) {
+  async function add(email, name, token) {
     try {
-      await createModerator(email, token)
+      await createModerator(email, name, token)
       await fetchAll(token)
     } catch (error) {
       console.error('Error adding moderator:', error)
     }
   }
 
-  async function remove(email, token) {
+  async function remove(email, id, name, token) {
     try {
-      await removeModerator(email, token)
+      await removeModerator(email, name, id, token)
       await fetchAll(token)
     } catch (error) {
       console.error('Error removing moderator:', error)

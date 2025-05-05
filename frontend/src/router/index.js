@@ -14,6 +14,7 @@ import DuringView from "@/views/DuringView.vue";
 import AfterView from "@/views/AfterView.vue";
 import AdminView from "@/views/AdminView.vue";
 import AdminMap from "@/views/AdminMapView.vue";
+import AddRemoveAdminView from "@/views/AddRemoveAdminView.vue";
 
 
 const routes = [
@@ -31,6 +32,8 @@ const routes = [
   {path: '/after', component: AfterView, name: 'after'},
   {path: '/admin', component: AdminView, name: 'admin'},
   {path: '/admin/map', component: AdminMap, name: 'map'},
+  {path: '/addremove', component: AddRemoveAdminView, name: 'addremove'},
+
 ]
 
 const index = createRouter({
