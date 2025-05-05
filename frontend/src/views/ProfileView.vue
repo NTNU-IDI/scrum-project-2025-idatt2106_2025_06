@@ -32,7 +32,7 @@ import {Input} from "@/components/ui/input/index.js";
 import {DialogClose} from "@/components/ui/dialog/index.js";
 import {Label} from "@/components/ui/label/index.js";
 import { computed, onMounted, ref } from 'vue'
-import router from '@/router/index.js'
+import router from '@/router/router.js'
 import { useSessionStore } from '@/stores/session'
 import { useStorageStore } from '@/stores/storage'
 import EditStorage from '@/components/EditStorage.vue'
@@ -186,7 +186,7 @@ function openEditProfile() {
                     <h4 class="mt-2 font-semibold">Medlemmer:</h4>
                     <ul v-if="membersByStorageId[s.id]">
                       <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
-                        {{ member }}
+                        {{ member.name }}
                       </li>
                     </ul>
                     <p v-else>Laster medlemmer...</p>
