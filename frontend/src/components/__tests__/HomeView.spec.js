@@ -1,28 +1,20 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import HomeView from '@/views/HomeView.vue'
-
-const stubs = {
-  BentoGrid: true,
-  BentoCard: true,
-  BentoCardCustom: true,
-  AlertCard: true,
-}
+import HomeView from '@/views/Home.vue'
 
 describe('HomeView.vue', () => {
   it('renders layout and child components', () => {
     const wrapper = mount(HomeView, {
-      global: { stubs },
+      global: {
+        stubs: ['BentoGrid', 'BentoCard', 'BentoCardCustom', 'AlertCard'],
+      },
     })
 
     expect(wrapper.exists()).toBe(true)
 
-    expect(wrapper.findComponent({ name: 'BentoGrid' }).exists()).toBe(true)
-
-    expect(wrapper.findAllComponents({ name: 'BentoCard' }).length).toBeGreaterThan(0)
-
-    expect(wrapper.findComponent({ name: 'BentoCardCustom' }).exists()).toBe(true)
-
-    expect(wrapper.findComponent({ name: 'AlertCard' }).exists()).toBe(true)
+    expect(wrapper.find('bento-grid-stub').exists()).toBe(true)
+    expect(wrapper.findAll('bento-card-stub').length).toBeGreaterThan(0)
+    expect(wrapper.find('bento-card-custom-stub').exists()).toBe(true)
+    expect(wrapper.find('alert-card-stub').exists()).toBe(true)
   })
 })
