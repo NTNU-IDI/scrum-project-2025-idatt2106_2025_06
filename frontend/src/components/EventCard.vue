@@ -1,6 +1,10 @@
 <script setup>
 import { Pencil, Trash, Info, OctagonAlert, TriangleAlert, Shield } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button/index.js'
+import { useEventStore } from '@/stores/event.js'
+const eventStore = useEventStore()
+import { useSessionStore } from '@/stores/session'
+const sessionStore = useSessionStore()
 
 const severityColors = {
   info: 'bg-blue-200',
@@ -10,6 +14,7 @@ const severityColors = {
 }
 
 const props = defineProps({
+  eventId: [String, Number],
   title: String,
   description: String,
   time: String,
@@ -18,6 +23,14 @@ const props = defineProps({
   severity: { type: String, default: 'info' },
   variant: String,
 })
+
+const handleDelete = async () => {
+  try {
+    await eventStore.deleteExistingEvent(props.eventId, sessionStore.token)
+  } catch (error) {
+    console.error('Kunne ikke slette event:', error)
+  }
+}
 
 const isToday = () => {
   const today = new Date()
@@ -96,11 +109,14 @@ const formatDate = () => {
       <Button class="p-2" variant="outline">
         <Pencil />
       </Button>
-      <Button class="p-2 bg-red-600 text-white hover:bg-red-700 hover:text-white" variant="outline">
-        <Trash />
+      <Button
+        class="p-2 bg-red-600 text-white hover:bg-red-700 hover:text-white"
+        variant="outline"
+        @click="handleDelete"
+      >
+      <Trash />
       </Button>
     </div>
   </div>
 </template>
-
 <style scoped></style>

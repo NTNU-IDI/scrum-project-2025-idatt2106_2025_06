@@ -3,24 +3,37 @@ import SearchAddressCoordinates from '@/components/SearchAddressCoordinates.vue'
 import { Button } from '@/components/ui/button/index.js';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs/index.js';
+import { useEventStore } from '@/stores/event.js'
+import { useSessionStore } from '@/stores/session'
 import EventCard from '@/components/EventCard.vue';
 import EventForm from '@/components/EventForm.vue'
-import { ref } from 'vue';
 import MarkerForm from '@/components/MarkerForm.vue'
+import { onMounted } from 'vue'
+import { computed } from 'vue';
+import { ref } from 'vue';
 
+const eventFormRef = ref(null);
+const formMode = ref('edit');
+
+
+const eventStore = useEventStore()
+const sessionStore = useSessionStore()
+
+const events = computed(() => eventStore.events);
+
+onMounted(async () => {
+  try {
+    await eventStore.getEvents(sessionStore.token)
+  } catch (error) {
+    console.error('Kunne ikke hente hendelser:', error)
+  }
+})
+
+function onNewEvent() {
+  formMode.value = 'new';
+  eventFormRef.value?.resetForm();
+}
 const activeTab = ref('event');
-
-const events = ref([
-  { id: 1, title: 'GODE NYHETER! lalal', description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.', date: '2025-05-02', time: '14:30', position: 'Sluppen, Trondheim', severity: 'info' },
-  { id: 2, title: 'Bolle', description: 'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.', date: '2025-05-02', time: '09:00', position: 'Element, Gløshaugen', severity: 'red' },
-  { id: 3, title: 'Gå vekk alerts', description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis', date: '2025-05-01', time: '11:42', position: 'Kalvskinnet, Trondheim', severity: 'yellow' },
-  { id: 4, title: 'Håp', description: 'Håper denne er borte.', date: '2023-05-01', time: '11:42', position: 'Solstien 4, Trondheim', severity: 'green' },
-  { id: 5, title: 'Bø', description: 'Borte... bø!', date: '2025-05-03', time: '16:15', position: 'Festningen, Trondheim', severity: 'info' },
-  { id: 6, title: 'GODE NYHETER!', description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.', date: '2025-05-01', time: '14:35', position: 'Sluppen, Trondheim', severity: 'red' },
-  { id: 7, title: 'Bolle', description: 'Gratis bolle på Element.', date: '2025-05-02', time: '10:00', position: 'Element, Gløshaugen', severity: 'green' },
-  { id: 8, title: 'Kanel', description: 'Gratis bolle på Element.', date: '2025-05-02', time: '10:15', position: 'Element, Gløshaugen', severity: 'yellow' },
-  { id: 9, title: 'Snurr', description: 'Gratis bolle på Element.', date: '2025-05-02', time: '10:30', position: 'Element, Gløshaugen', severity: 'info' },
-]);
 </script>
 
 <template>
@@ -41,7 +54,7 @@ const events = ref([
         </TabsList>
 
         <TabsContent value="event">
-          <EventForm/>
+          <EventForm ref="eventFormRef" :mode="formMode"/>
         </TabsContent>
 
         <TabsContent value="marker">
@@ -58,7 +71,7 @@ const events = ref([
       <Card v-if="activeTab === 'event'" class="h-[100%] absolute top-0 right-0 z-30">
         <CardHeader class="grid grid-cols-2 items-center w-full">
           <CardTitle class="text-2xl">Hendelser</CardTitle>
-          <Button class="justify-self-end">Ny hendelse</Button>
+          <Button class="justify-self-end" @click="onNewEvent">Ny hendelse</Button>
         </CardHeader>
         <CardContent class="max-w-[350px] max-h-[85%] overflow-y-auto flex flex-col gap-2">
           <template v-for="(event, index) in events" :key="index">
@@ -68,12 +81,10 @@ const events = ref([
                 :time="event.time"
                 :date="event.date"
                 :title="event.title"
-                variant="admin"
               />
           </template>
         </CardContent>
       </Card>
-
       <div class="w-full h-full rounded bg-blue-200"></div>
     </div>
   </div>
