@@ -1,6 +1,12 @@
 <script setup>
 import AlertCard from '@/components/AlertCard.vue'
-import EventCard from '@/components/EventCard.vue'
+import EventCard from '@/components/EventCard.vue';
+import { useEventStore } from '@/stores/event.js'
+const eventStore = useEventStore()
+
+import {computed, onMounted} from "vue";
+
+const events = computed(() => eventStore.events);
 
 const alerts = [
   {
@@ -89,52 +95,14 @@ const alerts = [
   },
 ]
 
-const events = [
-  {
-    id: 1,
-    title: 'GODE NYHETER! lalal',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-    time: 'Nå',
-    severity: 'info',
-  },
-  {
-    id: 2,
-    title: 'Bolle',
-    description:
-      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 3,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-    time: '11:42',
-    severity: 'yellow',
-  },
-  {
-    id: 4,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-    time: '11:42',
-    severity: 'green',
-  },
-  {
-    id: 5,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 6,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 7,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-]
+onMounted(async () => {
+  try {
+    await eventStore.getEvents()
+  } catch (error) {
+    console.error('Kunne ikke hente hendelser:', error)
+  }
+})
+
 </script>
 
 <template>
@@ -159,15 +127,13 @@ const events = [
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
           <template v-for="(event, index) in events" :key="index">
-            <RouterLink :to="'events/' + event.id" class="relative">
-              <EventCard
-                :description="event.description"
-                :severity="event.severity"
-                :time="event.time"
-                :title="event.title"
-                variant="default"
-              />
-            </RouterLink>
+            <EventCard
+              :eventId="event.id"
+              :name="event.name"
+              :description="event.description"
+              :position="event.location"
+              :severity="event.severity"
+            />
           </template>
         </div>
       </div>

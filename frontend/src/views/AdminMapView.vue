@@ -23,7 +23,7 @@ const events = computed(() => eventStore.events);
 
 onMounted(async () => {
   try {
-    await eventStore.getEvents(sessionStore.token)
+    await eventStore.getEvents()
   } catch (error) {
     console.error('Kunne ikke hente hendelser:', error)
   }
