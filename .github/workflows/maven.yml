@@ -114,7 +114,7 @@ jobs:
         run: pnpm run build
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
           path: frontend/dist
@@ -154,7 +154,7 @@ jobs:
           sed 's/\x1b\[[0-9;]*m//g' test_output.txt > clean_test_output.txt
 
       - name: Upload test report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
           path: frontend/clean_test_output.txt
@@ -182,7 +182,7 @@ jobs:
               --out /report/dependency-check-report.json
 
       - name: Upload security report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: owasp-dependency-report
           path: owasp-reports/dependency-check-report.json
