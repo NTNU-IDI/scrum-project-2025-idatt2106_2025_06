@@ -16,6 +16,14 @@ import {
 } from '@/components/ui/alert-dialog'
 import { onMounted, ref, watch } from 'vue'
 import axios from 'axios'
+import {
+  Select,
+  SelectContent,
+  SelectGroup, SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select/index.js'
+import { RefreshCw } from 'lucide-vue-next';
 
 const selectedBoxIds = ref([]);
 
@@ -160,23 +168,25 @@ const items4 = [
 
 const items5 = [];
 
-const storageId = ref();
+const typeId = ref();
+const isLoading = ref(false);
 
 const fetchItems = async () => {
+  isLoading.value = true;
   if (activeTab.value === 'matOgDrikke') {
-    storageId.value = 1;
+    typeId.value = 1;
     currentItems.value = groupItems(items1);
   } else if (activeTab.value === 'varmeOgLys') {
-    storageId.value = 2;
+    typeId.value = 2;
     currentItems.value = groupItems(items2);
   } else if (activeTab.value === 'informasjon') {
-    storageId.value = 3;
+    typeId.value = 3;
     currentItems.value = groupItems(items3);
   } else if (activeTab.value === 'legemidOgHygiene') {
-    storageId.value = 4;
+    typeId.value = 4;
     currentItems.value = groupItems(items4);
   } else if (activeTab.value === 'annet') {
-    storageId.value = 5;
+    typeId.value = 5;
     currentItems.value = groupItems(items5);
   }
 
@@ -186,13 +196,23 @@ const fetchItems = async () => {
         Authorization: `Bearer ${token.value}`
       },
       params: {
-        typeId: storageId.value
+        typeId: typeId.value
       }
     }
   );
   items.value = response.data;
 
    */
+
+  isLoading.value = false;
+}
+
+//midlertidig, for å se om loading funker
+const refreshItems = async () => {
+  isLoading.value = true;
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  await fetchItems();
+  isLoading.value = false;
 }
 
 const groupItems = (items) => {
@@ -231,22 +251,63 @@ const groupItems = (items) => {
   return result;
 }
 
+const storages = ref([
+  {
+    id: 1,
+    name: 'Hjemme'
+  },
+  {
+    id: 2,
+    name: 'Hytta'
+  }
+]);
+
+const activeStorageId = ref();
+const activeStorageName = ref();
+
 watch(() => activeTab.value, async () => {
+  selectedBoxIds.value = [];
+  await fetchItems();
+})
+
+watch(() => activeStorageId.value, async (newId) => {
+  const newSelection = storages.value.find(storage => storage.id === newId);
+  activeStorageName.value = newSelection.name;
+
   selectedBoxIds.value = [];
   await fetchItems();
 })
 
 onMounted(async () => {
   await fetchItems();
+  activeStorageId.value = storages.value[0].id;
+  activeStorageName.value = storages.value[0].name;
 })
 </script>
 
 <template>
-  <div class="m-auto">
-    <p>[Husstand-navn] sitt beredskapslager</p>
+  <div class="m-auto mt-10" v-if="activeStorageId">
+    <div class="flex justify-between pt-2 pb-2 items-center">
+      <p class="text-xl font-bold"> {{ activeStorageName }} sitt beredskapslager</p>
+      <Select v-if="activeStorageId" v-model="activeStorageId">
+        <SelectTrigger class="w-2/5">
+          <SelectValue placeholder="Velg sted" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem v-for="storage in storages" :key="storage.id" :value="storage.id">
+              {{ storage.name }}
+            </SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
 
     <div class="flex justify-end pt-2 pb-2">
-      <NewItem v-if="storageId" :storageId="storageId"/>
+      <Button variant="outline" class="mr-2" @click="refreshItems" :disabled="isLoading">
+        <RefreshCw :class="isLoading ? 'animate-spin' : '' "/>
+      </Button>
+      <NewItem v-if="typeId" :typeId="typeId"/>
       <AlertDialog>
         <AlertDialogTrigger :disabled="selectedBoxIds.length === 0" class="disabled:cursor-not-allowed">
           <Button
@@ -279,23 +340,23 @@ onMounted(async () => {
       </TabsList>
 
       <TabsContent value="matOgDrikke">
-        <InventoryTable :newItems="currentItems" :storageId="1" tab="matOgDrikke" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="1" tab="matOgDrikke" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
 
       <TabsContent value="varmeOgLys">
-        <InventoryTable :newItems="currentItems" :storageId="2" tab="varmeOgLys" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="2" tab="varmeOgLys" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
 
       <TabsContent value="informasjon">
-        <InventoryTable :newItems="currentItems" :storageId="3" tab="informasjon" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="3" tab="informasjon" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
 
       <TabsContent value="legemidOgHygiene">
-        <InventoryTable :newItems="currentItems" :storageId="4" tab="legemidOgHygiene" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="4" tab="legemidOgHygiene" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
 
       <TabsContent value="annet">
-        <InventoryTable :newItems="currentItems" :storageId="5" tab="annet" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="5" tab="annet" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
     </Tabs>
   </div>
