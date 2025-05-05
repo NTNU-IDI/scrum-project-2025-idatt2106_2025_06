@@ -5,6 +5,7 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.EditItemInstanceRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.ItemInstanceResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleGetItemInstancesResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.SimpleItemResponse
+import edu.ntnu.idatt2106.gr6.backend.exception.ItemNotFoundException
 import edu.ntnu.idatt2106.gr6.backend.model.ItemInstance
 import edu.ntnu.idatt2106.gr6.backend.repository.ItemRepository
 import org.springframework.http.HttpStatus
@@ -55,7 +56,7 @@ class ItemService(
 
         return itemInstances.map { instance ->
             val item = itemRepository.findItemById(instance.itemId)
-                ?: throw IllegalStateException("Item not found for id=${instance.itemId}")
+                ?: throw ItemNotFoundException.forItemId(instance.itemId)
 
             SimpleGetItemInstancesResponse.fromItemInstance(instance, item)
         }
@@ -63,9 +64,9 @@ class ItemService(
 
     fun editItemInstance(itemInstanceId: String, request: EditItemInstanceRequest): ItemInstance {
         val updated = itemRepository.updateItemInstance(itemInstanceId, request.amount, request.expiryDate)
-        if (!updated) throw ResponseStatusException(HttpStatus.NOT_FOUND, "ItemInstance is not found")
+        if (!updated) throw ItemNotFoundException.forItemId(itemInstanceId)
 
         return itemRepository.getItemInstanceById(itemInstanceId)
-            ?: throw IllegalStateException("Could not retrieve updated item instance")
+            ?: throw ItemNotFoundException.forItemId(itemInstanceId)
     }
 }

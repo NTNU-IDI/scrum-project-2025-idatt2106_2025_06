@@ -15,39 +15,34 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import axios from 'axios'
-import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
-import {ref} from 'vue'
-import {useRouter} from 'vue-router'
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useSessionStore } from '@/stores/session'
 
 const email = ref('')
 const password = ref('')
+
 const errorMessage = ref('')
 
 const router = useRouter()
 
+const session = useSessionStore()
+
 async function login() {
   errorMessage.value = ''
   try {
-    const response = await axios.post('http://localhost:8080/api/auth/login', {
-      email: email.value,
-      password: password.value,
-    });
-
-    const data = response.data;
-
-    if (data.token) {
-      localStorage.setItem('jwt', data.token)
-      if (data.role === "ROLE_ADMIN") {
-        router.push('/admin');
-      } else if (data.role === "ROLE_MODERATOR") {
-        router.push('/admin');
+    const success = await session.login(email.value, password.value)
+    if (success) {
+      if (['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role)) {
+        router.push('/admin')
       } else {
-        router.push('/');
+        router.push('/')
       }
+    } else {
+      errorMessage.value = 'Feil e-post eller passord.'
     }
-
   } catch (error) {
     if (error.response && error.response.status === 403) {
       errorMessage.value = 'Feil e-post eller passord.'
@@ -60,35 +55,43 @@ async function login() {
     return null;
   }
 }
-
 </script>
 
 <template>
   <Card class="mx-auto max-w-sm">
     <CardHeader>
       <CardTitle class="text-2xl"> Logg inn</CardTitle>
+
       <CardDescription>
         Skriv inn epost-adresse og passord for å logge inn
       </CardDescription>
+
     </CardHeader>
     <CardContent>
       <div class="grid gap-4">
         <form @submit.prevent="login">
+
           <div class="grid gap-2">
+
             <Label for="email">Epost</Label>
-            <Input id="email" v-model="email" placeholder="m@example.com" required type="email"/>
+            <Input id="email" v-model="email" placeholder="m@example.com" required type="email" />
+
             <div class="flex items-center">
               <Label for="password">Passord</Label>
               <a class="ml-auto inline-block text-sm underline" href="#">
                 Glemt passord?
               </a>
             </div>
-            <Input id="password" v-model="password" required type="password"/>
+
+            <Input id="password" v-model="password" required type="password" />
             <Button class="w-full" type="submit">Logg inn</Button>
             <p v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</p>
+
           </div>
+
         </form>
       </div>
+
       <div class="mt-4 text-center text-sm">
         Har du ikke bruker?
         <router-link class="underline" to="/signup"> Registrer her</router-link>

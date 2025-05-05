@@ -1,8 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.DTOs
 
-import org.aspectj.bridge.Message
 import java.time.Instant
-import java.util.UUID
 
 class UserDTOs {
     data class UserResponse(
@@ -51,5 +49,22 @@ class UserDTOs {
 
     data class ChangePasswordResponse(
         val message: String
+    )
+
+    data class UpdateUserLocationRequest(
+        val location: Location
+    )
+
+    data class GetUserLocationRequest(
+        val userId: String,
+    )
+
+    data class UserLocationResponse(
+        val userId: String,
+        val location: Location,
+    )
+
+    data class ChangeUserTrackingPreferenceRequest(
+        val trackingEnabled: Boolean
     )
 }
