@@ -94,9 +94,7 @@ const activeTab = ref('event');
               :eventId="event.id"
               :name="event.name"
               :description="event.description"
-              :date="event.start_date"
-              :time="event.start_date"
-              :position="`${event.location.lat}, ${event.location.lng}`"
+              :startDate="event.startDate"
               :severity="event.severity"
             />
           </template>
