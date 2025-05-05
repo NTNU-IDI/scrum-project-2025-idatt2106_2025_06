@@ -59,6 +59,7 @@ jobs:
           node-version: '16'
           cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
+          package-manager: 'pnpm'
 
       - name: Install dependencies
         working-directory: frontend
@@ -110,7 +111,8 @@ jobs:
         with:
           node-version: '16'
           cache: 'pnpm'
-          cache-dependency-path: ../frontend/pnpm-lock.yaml
+          cache-dependency-path: frontend/pnpm-lock.yaml
+          package-manager: 'pnpm'
 
       - name: Run Vitest unit tests
         working-directory: frontend
