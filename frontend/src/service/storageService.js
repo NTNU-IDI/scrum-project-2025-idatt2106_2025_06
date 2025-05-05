@@ -1,29 +1,31 @@
-import axios from 'axios';
+import api from '@/config/api.js'
 
-export async function createStorage(name, token){
+export async function createStorage(name) {
   try {
-    const response = await axios.post('http://localhost:8080/api/storages/create',
+    const response = await api.post(
+      '/storages/create',
       { name },
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       }
     )
-    return response.data;
+    return response.data
   } catch (error) {
-    console.error('Create storage error:', error);
-    throw error;
+    console.error('Create storage error:', error)
+    throw error
   }
 }
 
-export async function fetchStorages(token) {
+export async function fetchStorages() {
   try {
-    const response = await axios.get('http://localhost:8080/api/storages/my-storages', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    const response = await api.get('/storages/my-storages',
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
     return response.data
   } catch (error) {
     console.error('Fetch storages error:', error)
@@ -31,13 +33,9 @@ export async function fetchStorages(token) {
   }
 }
 
-export async function fetchStorageMembers(storageId, token) {
+export async function fetchStorageMembers(storageId) {
   try {
-    const response = await axios.get(`http://localhost:8080/api/storages/${storageId}/members`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    const response = await api.get(`/storages/${storageId}/members`)
     return response.data
   } catch (error) {
     console.error(`Failed to fetch members for storage ${storageId}:`, error)
@@ -45,15 +43,11 @@ export async function fetchStorageMembers(storageId, token) {
   }
 }
 
-export async function updateStorage(id, name, location, token) {
+export async function updateStorage(id, name, location) {
   try {
-    const response = await axios.put(`http://localhost:8080/api/storages/${id}`, {
+    const response = await api.put(`/storages/${id}`, {
       name,
       location,
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      }
     })
     return response.data
   } catch (error) {
@@ -64,14 +58,8 @@ export async function updateStorage(id, name, location, token) {
 
 export async function joinStorage(token, storageToken) {
   try {
-    const response = await axios.post('http://localhost:8080/api/storages/join',
-      { token: storageToken },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
+    const response = await api.post('/storages/join',
+      { token: storageToken })
     return response.data
   } catch (error) {
     console.error('Join storage error:', error)
@@ -81,15 +69,9 @@ export async function joinStorage(token, storageToken) {
 
 export async function removeStorageMember(token, userId, storageId) {
   try {
-    const response = await axios.post(
-      'http://localhost:8080/api/storages/remove-member',
-      { userId, storageId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
+    const response = await api.post(
+      '/storages/remove-member',
+      { userId, storageId })
     return response.data
   } catch (error) {
     console.error(`Feil ved fjerning av medlem ${userId} fra storage ${storageId}:`, error)

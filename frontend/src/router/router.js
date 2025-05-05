@@ -14,6 +14,8 @@ import DuringView from "@/views/DuringView.vue";
 import AfterView from "@/views/AfterView.vue";
 import AdminView from "@/views/AdminView.vue";
 import { useSessionStore } from '@/stores/session.js'
+import AdminView from "@/views/AdminView.vue";
+import AdminMap from "@/views/AdminMapView.vue";
 
 
 const routes = [
@@ -29,6 +31,7 @@ const routes = [
   {path: '/before', component: BeforeView, name: 'before'},
   {path: '/during', component: DuringView, name: 'during'},
   {path: '/after', component: AfterView, name: 'after'},
+  {path: '/admin/map', component: AdminMap, name: 'map'},
   {
     path: '/admin',
     component: () => import('@/views/AdminView.vue'),

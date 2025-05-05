@@ -25,8 +25,8 @@ export const useSessionStore = defineStore('session', () => {
 
     token.value = response.token
     sessionStorage.setItem('token', response.token)
-    console.log('Token setttt:', token.value)
-    console.log('User dataaaa:', response)
+    console.log('Token set:', token.value)
+    console.log('User data:', response)
     user.value = {
       id: response.userId,
       email: response.email,
@@ -42,6 +42,7 @@ export const useSessionStore = defineStore('session', () => {
   async function login(email, password) {
     try {
       const response = await loginUser(email, password)
+      console.log('Permission:', response.permission)
       setToken(response)
       return true
     } catch (error) {

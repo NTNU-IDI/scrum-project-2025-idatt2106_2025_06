@@ -25,3 +25,8 @@ fun ResultSet.getStatus(): Status {
     val status = getString("status")
     return Status.fromString(status)
 }
+
+fun ResultSet.getMarkerType(): MarkerType {
+    val type = getString("type")
+    return MarkerType.fromString(type)
+}

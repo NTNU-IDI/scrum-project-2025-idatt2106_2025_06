@@ -1,0 +1,2 @@
+ALTER TABLE marker
+    ADD COLUMN contact_info VARCHAR(255) NULL;

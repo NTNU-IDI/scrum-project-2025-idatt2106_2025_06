@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
+import edu.ntnu.idatt2106.gr6.backend.exception.InvalidUserDetailsException
 import edu.ntnu.idatt2106.gr6.backend.model.User
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -14,15 +15,20 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import java.util.*
 import javax.crypto.SecretKey
+import javax.crypto.spec.SecretKeySpec
+import io.jsonwebtoken.SignatureAlgorithm
 
 @Service
 class JwtService {
     private val logger = org.slf4j.LoggerFactory.getLogger(JwtService::class.java)
     @Value("\${security.jwt.secret-key}")
-    private val secret: String? = null
+    private lateinit var secret: String
+
 
     @Value("\${security.jwt.expiration-time}")
     private var expiration: Long = 0
+
+
 
     fun generateToken(userDetails: UserDetails): String {
         val now = System.currentTimeMillis()
@@ -32,14 +38,16 @@ class JwtService {
             if (userDetails is User) {
                 userDetails.id
             } else {
-                throw IllegalArgumentException(
-                    "UserDetails must be an instance of custom User class",
-                )
+                throw InvalidUserDetailsException.notCustomUserClass()
             }
         val emailClaim = userDetails.username
 
-        val roleClaim=  userDetails.authorities.map { it.authority }
-        val permissionsClaim = userDetails.authorities.map { it.authority }
+        val roleClaim = userDetails.authorities
+            .filter { it.authority.startsWith("ROLE_") }
+            .map { it.authority }
+        val permissionsClaim = userDetails.authorities
+            .filter { !it.authority.startsWith("ROLE_") }
+            .map { it.authority }
 
         return Jwts
             .builder()
@@ -49,7 +57,7 @@ class JwtService {
             .claim("permissions", permissionsClaim)
             .issuedAt(Date(now))
             .expiration(Date(expirationTime))
-            .signWith(getSignInKey())
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
             .compact()
     }
 
@@ -76,20 +84,6 @@ class JwtService {
         return extractedUserId != null && extractedUserId == userIdFromUserDetails && !isTokenExpired(token)
     }
 
-    fun getAuthoritiesFromToken(token: String): Collection<GrantedAuthority> {
-        val claims = getAllClaimsFromToken(token)
-        val roles = claims["role"] as? String
-        val permissions = claims["permissions"] as? List<String>
-
-        val authorities = mutableListOf<GrantedAuthority>()
-        authorities.addAll(
-            roles?.split(",")?.map { it.trim() }?.map { SimpleGrantedAuthority(it) } ?: emptyList()
-        )
-        authorities.addAll(
-            permissions?.map { SimpleGrantedAuthority(it) } ?: emptyList()
-        )
-        return authorities
-    }
 
     fun getExpirationTime(): Long {
         return expiration
