@@ -52,6 +52,12 @@ const storageStore = useStorageStore()
 const storages = computed(() => storageStore.storages)
 const membersByStorageId = computed(() => storageStore.membersByStorageId)
 
+const oldPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const passwordError = ref('')
+const passwordSuccess = ref('')
+
 async function createNewStorage() {
   const token = sessionStore.token
 
@@ -111,6 +117,48 @@ async function submitProfileUpdate() {
     await storageStore.fetchAll(sessionStore.token)
   }
 }
+
+async function submitChangePassword() {
+  passwordError.value = ''
+  passwordSuccess.value = ''
+
+  if (newPassword.value !== confirmPassword.value) {
+    passwordError.value = 'Passwords do not match.'
+    return
+  }
+
+  const success = await sessionStore.updatePassword(
+    oldPassword.value,
+    newPassword.value,
+    confirmPassword.value
+  )
+
+  if (success) {
+    passwordSuccess.value = 'Passord endret!'
+    oldPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+  } else {
+    passwordError.value = 'Kunne ikke endre passord.'
+  }
+}
+
+onMounted(async () => {
+  if (!sessionStore.isAuthenticated) {
+    router.push('/login')
+  }
+
+  if (user.value) {
+    username.value = user.value.name
+    email.value = user.value.email
+  }
+
+  try {
+    await storageStore.fetchAll(sessionStore.token)
+  } catch (error) {
+    console.error("Could not fetch storages and members:", error)
+  }
+});
 </script>
 
 <template>
@@ -164,22 +212,18 @@ async function submitProfileUpdate() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle class="text-2xl">Endre passord</DialogTitle>
-                <Input
-                  placeholder="Gammelt passord"
-                  type="password"
-                />
-                <Input
-                  placeholder="Nytt passord"
-                  type="password"
-                />
-                <Input
-                  placeholder="Gjenta nytt passord"
-                  type="password"
-                />
+                <Input v-model="oldPassword" placeholder="Gammelt passord" type="password" />
+                <Input v-model="newPassword" placeholder="Nytt passord" type="password" />
+                <Input v-model="confirmPassword" placeholder="Gjenta nytt passord" type="password" />
+                <p v-if="passwordError" class="text-red-600 font-bold">{{ passwordError }}</p>
+                <p v-if="passwordSuccess" class="text-green-600 font-bold">{{ passwordSuccess }}</p>
               </DialogHeader>
+              <div class="flex flex-col items-center">
+                <Button class="w-48" @click="submitChangePassword">Endre passord</Button>
+              </div>
               <DialogFooter class="flex flex-col items-center">
                 <DialogClose>
-                  <Button class="w-48">Lagre</Button>
+                  <Button class="w-48">Lukk</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>

@@ -29,3 +29,21 @@ export async function updateUser(name, email) {
     throw error
   }
 }
+
+export async function changePassword(oldPassword, newPassword) {
+  try {
+    const response = await api.put('/user/edit/password', {
+      oldPassword: oldPassword,
+      newPassword
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    console.log(response.data)
+    return response.data
+  } catch (error) {
+    console.error('Change password error:', error)
+    throw error
+  }
+}
