@@ -110,7 +110,7 @@ jobs:
         with:
           node-version: '16'
           cache: 'pnpm'
-          cache-dependency-path: /frontend/pnpm-lock.yaml
+          cache-dependency-path: ../frontend/pnpm-lock.yaml
 
       - name: Run Vitest unit tests
         working-directory: frontend
