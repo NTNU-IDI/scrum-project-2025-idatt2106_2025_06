@@ -84,6 +84,7 @@ jobs:
           node-version: '16'
           cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
+          package-manager: 'pnpm'
 
       - name: Build production bundle
         working-directory: frontend
