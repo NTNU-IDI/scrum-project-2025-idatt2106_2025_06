@@ -41,7 +41,6 @@ export const useStorageStore = defineStore('storage', () => {
   async function editStorage(id, name, location, token) {
     const updated = await updateStorage(id, name, location, token)
 
-    // Oppdater lokalt lagret storage
     const index = storages.value.findIndex(s => s.id === id)
     if (index !== -1) {
       storages.value[index].name = updated.name

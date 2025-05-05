@@ -186,7 +186,7 @@ function openEditProfile() {
                     <h4 class="mt-2 font-semibold">Medlemmer:</h4>
                     <ul v-if="membersByStorageId[s.id]">
                       <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
-                        {{ member }}
+                        {{ member.name }}
                       </li>
                     </ul>
                     <p v-else>Laster medlemmer...</p>

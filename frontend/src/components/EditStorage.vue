@@ -89,7 +89,7 @@ async function removeUser(userId) {
                 :key="index"
                 class="flex flex-row justify-between items-center w-full"
               >
-                <span class="text-left">{{ member }}</span>
+                <span class="text-left">{{ member.name }}</span>
 
                 <AlertDialog>
                   <AlertDialogTrigger as-child >
