@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import router from '@/router/router.js'
-import { loginUser, signupUser } from '@/service/authService.js'
+import { loginUser, signupUser, updateUser } from '@/service/authService.js'
 
 export const useSessionStore = defineStore('session', () => {
   const token = ref(sessionStorage.getItem('token'))
@@ -63,10 +63,23 @@ export const useSessionStore = defineStore('session', () => {
     }
   }
 
+  async function updateProfile(name, email) {
+    try {
+      const response = await updateUser(name, email)
+
+      setToken(response)
+
+      return true
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      return false
+    }
+  }
+
   function logout() {
     setToken(null)
     router.push('/login')
   }
 
-  return { token, user, isModerator, isAdmin, hasAccessToAdmin, isAuthenticated, login, signup, logout }
+  return { token, user, isModerator, isAdmin, hasAccessToAdmin, isAuthenticated, login, signup, logout, updateProfile }
 })

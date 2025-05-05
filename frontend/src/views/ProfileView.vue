@@ -101,6 +101,16 @@ function openEditProfile() {
     email.value = user.value.email;
   }
 }
+
+async function submitProfileUpdate() {
+  const success = await sessionStore.updateProfile(username.value, email.value)
+  if (success) {
+    console.log("Profil oppdatert!")
+
+    // Refetch husstander og medlemmer med ny token
+    await storageStore.fetchAll(sessionStore.token)
+  }
+}
 </script>
 
 <template>
@@ -141,7 +151,7 @@ function openEditProfile() {
               </DialogHeader>
               <DialogFooter class="flex flex-col items-center">
                 <DialogClose>
-                  <Button class="w-48">Lagre</Button>
+                  <Button class="w-48" @click="submitProfileUpdate">Lagre</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>

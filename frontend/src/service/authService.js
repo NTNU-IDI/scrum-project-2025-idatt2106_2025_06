@@ -19,3 +19,13 @@ export async function signupUser(email, name, password) {
     throw error;
   }
 }
+
+export async function updateUser(name, email) {
+  try {
+    const response = await api.put('/user/edit/name-email', { name, email })
+    return response.data
+  } catch (error) {
+    console.error('Update user error:', error)
+    throw error
+  }
+}
