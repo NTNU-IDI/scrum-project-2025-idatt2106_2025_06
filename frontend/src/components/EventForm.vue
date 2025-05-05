@@ -42,7 +42,7 @@ const title = ref('');
 const content = ref('');
 const position = ref('');
 const radius = ref(null);
-const eventType = ref('');
+const eventType = ref('other');
 const description = ref('');
 const selectedSeverity = ref('info');
 const date = ref(null);
@@ -150,6 +150,24 @@ watch(() => props.eventId, async (newId) => {
       </div>
     </div>
 
+    <div class="flex align-middle items-center">
+      <Label class="m-2" for="event">Hendelse</Label>
+      <div class="flex gap-2 items-center">
+        <Select v-model="eventType">
+          <SelectTrigger class="w-[180px]">
+            <SelectValue placeholder="Velg type hendelse" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="natural_disaster">Naturkatastrofe</SelectItem>
+            <SelectItem value="nuclear_attack">Atomangrep</SelectItem>
+            <SelectItem value="terror_attack">Terrorangrep</SelectItem>
+            <SelectItem value="pandemic">Pandemi</SelectItem>
+            <SelectItem value="other">Annet</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+
     <div class="flex items-center">
       <Label class="m-2" for="position">Posisjon</Label>
       <Input class="border w-full" id="position" placeholder="Adresse eller koordinater" v-model="position" />
@@ -161,10 +179,6 @@ watch(() => props.eventId, async (newId) => {
       <p class="ml-2">meter</p>
     </div>
 
-    <div class="flex items-center">
-      <Label class="m-2" for="event">Type</Label>
-      <Input class="border w-full" id="event" placeholder="Jordskjelv" v-model="eventType" />
-    </div>
 
     <div class="flex items-center">
       <Label class="m-2" for="summary">Sammendrag</Label>
