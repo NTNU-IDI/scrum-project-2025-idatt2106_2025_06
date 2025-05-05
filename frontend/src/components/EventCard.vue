@@ -18,18 +18,21 @@ const severityColors = {
 }
 
 const props = defineProps({
+  variant: String,
+
   eventId: [String, Number],
   name: String,
   description: String,
+  severity: { type: String, default: 'info' },
+  type: String,
+  status: String,
   startDate: [String, Object],
   position: String,
-  severity: { type: String, default: 'info' },
-  variant: String,
 })
 
 const handleDelete = async () => {
   try {
-    await eventStore.deleteExistingEvent(props.eventId, sessionStore.token)
+    await eventStore.deleteEventById(props.eventId, sessionStore.token)
   } catch (error) {
     console.error('Kunne ikke slette event:', error)
   }

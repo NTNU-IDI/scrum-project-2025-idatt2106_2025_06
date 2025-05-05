@@ -66,6 +66,6 @@ export const useEventStore = defineStore('eventStore', () => {
     getEventById,
     createNewEvent,
     updateExistingEvent,
-    deleteExistingEvent: deleteEventById
+    deleteEventById
   }
 })
