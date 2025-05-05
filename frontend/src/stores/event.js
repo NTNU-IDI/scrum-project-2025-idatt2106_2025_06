@@ -51,7 +51,7 @@ export const useEventStore = defineStore('eventStore', () => {
     }
   }
 
-  const deleteExistingEvent = async (eventId, token) => {
+  const deleteEventById = async (eventId, token) => {
     try {
       await deleteEvent(eventId, token)
       events.value = events.value.filter(event => event.id !== eventId)
@@ -66,6 +66,6 @@ export const useEventStore = defineStore('eventStore', () => {
     getEventById,
     createNewEvent,
     updateExistingEvent,
-    deleteExistingEvent
+    deleteExistingEvent: deleteEventById
   }
 })
