@@ -61,6 +61,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
+          version: 'latest'
           run_install: false   # we only want the CLI; we'll install deps ourselves
 
       # 3) Restore pnpm store cache
@@ -99,6 +100,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
+          version: 'latest'
           run_install: false
 
       - name: Restore pnpm store
@@ -131,6 +133,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
+          version: 'latest'
           run_install: false
 
       - name: Restore pnpm store
