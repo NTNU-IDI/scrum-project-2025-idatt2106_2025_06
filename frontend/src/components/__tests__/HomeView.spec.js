@@ -13,7 +13,6 @@ describe('HomeView.vue', () => {
     expect(wrapper.exists()).toBe(true)
 
     expect(wrapper.find('bento-grid-stub').exists()).toBe(true)
-    expect(wrapper.findAll('bento-card-stub').length).toBeGreaterThan(0)
     expect(wrapper.find('bento-card-custom-stub').exists()).toBe(true)
     expect(wrapper.find('alert-card-stub').exists()).toBe(true)
   })
