@@ -26,7 +26,7 @@ import EditItem from '@/components/EditItem.vue'
 
 const props = defineProps({
   newItems: { type: Array, required: true },
-  storageId: {type: Number, required: true},
+  typeId: {type: Number, required: true},
   tab: { type: String }
 });
 const emit = defineEmits(['selectionChanged']);
@@ -128,8 +128,16 @@ const getDaysLeft = (expDate) => {
     } else {
       return weeks + " uker";
     }
+  } else if (dayAmount === 0) {
+    return "I dag"
+  } else if (dayAmount < 0) {
+    return "Utgått"
   } else {
-    return dayAmount + " dager";
+    if (dayAmount === 1) {
+      return dayAmount + " dag";
+    } else {
+      return dayAmount + " dager";
+    }
   }
 }
 
@@ -195,7 +203,7 @@ onMounted(() => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <EditItem v-if="!item.items" :item="item" :storageId="storageId" />
+                  <EditItem v-if="!item.items" :item="item" :typeId="typeId" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Endre</p>
@@ -228,7 +236,7 @@ onMounted(() => {
               <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <EditItem :item="item" :storageId="storageId" />
+                  <EditItem :item="item" :typeId="typeId" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Endre</p>
