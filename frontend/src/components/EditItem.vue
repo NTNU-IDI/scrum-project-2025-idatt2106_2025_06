@@ -33,20 +33,29 @@ const dateFormat = new DateFormatter('nb-NO', {
 const expirationDate = ref();
 
 const currentItem = ref();
-const currentStorage = ref();
+const itemName = ref();
+const itemAmount = ref();
+const itemType = ref();
+const itemUnit = ref();
 const props = defineProps({
   item: { type: Object, required: true },
-  storageId: {type: Number, required: true}
+  typeId: {type: Number, required: true}
 });
+
+const handleKeydown = (e) => {
+  if (e.key === '-' || e.key === 'e' || e.key === '+') {
+    e.preventDefault();
+  }
+};
 
 onMounted(() => {
   currentItem.value = props.item;
-  currentStorage.value = props.storageId;
+  itemType.value = props.typeId;
+  itemName.value = currentItem.value.name;
+  itemAmount.value = currentItem.value.amount;
+  itemUnit.value = currentItem.value.unit;
   expirationDate.value = parseDate(currentItem.value.expirationDate);
-  console.log(currentItem.value)
 })
-
-
 </script>
 
 <template>
@@ -62,15 +71,20 @@ onMounted(() => {
         <DialogDescription/>
       </DialogHeader>
       <Label>Navn på vare</Label>
-      <Input :model-value="currentItem.name" :disabled="true" placeholder="Navn" type="text" />
+      <Input v-model="itemName" :disabled="true" placeholder="Navn" type="text" />
       <div class="flex gap-3">
         <div class="flex-1">
           <Label>Mengde</Label>
-          <Input :model-value="currentItem.amount" placeholder="Mengde" type="text" />
+          <Input v-model="itemAmount"
+                 placeholder="Mengde"
+                 type="number"
+                 :min="0"
+                 @keydown="handleKeydown"
+          />
         </div>
         <div class="flex-1">
           <Label>Enhet</Label>
-          <Select :model-value="currentItem.unit">
+          <Select v-model="itemUnit">
             <SelectTrigger :disabled="true">
               <SelectValue placeholder="Velg enhet" />
             </SelectTrigger>
@@ -85,7 +99,7 @@ onMounted(() => {
         </div>
       </div>
       <Label>Type</Label>
-      <Select :model-value="currentStorage">
+      <Select v-model="itemType">
         <SelectTrigger :disabled="true">
           <SelectValue placeholder="Velg type" />
         </SelectTrigger>
