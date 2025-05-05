@@ -1,4 +1,11 @@
-<script setup></script>
+<script setup>
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
+
+const sessionStore = useSessionStore()
+const user = computed(() => sessionStore.user)
+</script>
+
 
 <template>
   <nav class="sticky top-0 z-50 w-full py-2 shadow">
@@ -17,7 +24,8 @@
         to="/profile"
       >
         <img alt="avatar" src="" />
-        <p>Bob</p>
+        <p v-if="user">{{ user.name }}</p>
+        <p v-else>Log in</p>
       </router-link>
     </div>
   </nav>
