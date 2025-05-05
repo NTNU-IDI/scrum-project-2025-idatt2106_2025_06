@@ -51,6 +51,77 @@ class UserRepository (
         return null
     }
 
+    fun updateUser(userId: UUID, newName: String, newEmail: String): Boolean {
+        val sql = """
+        UPDATE users SET name = ?, email = ? WHERE id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, newName)
+                stmt.setString(2, newEmail)
+                stmt.setString(3, userId.toString())
+
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+    fun updatePassword(userId: UUID, hashedPassword: String): Boolean {
+        dataSource.connection.use { conn ->
+            val sql = "UPDATE users SET password = ? WHERE id = ?"
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, hashedPassword)
+                stmt.setString(2, userId.toString())
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+    fun findById(userId: UUID): User? {
+        val sql = """
+        SELECT u.*, r.role_name AS role_name 
+        FROM users u
+        JOIN roles r ON u.role_id = r.id
+        WHERE u.id = ?
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userId.toString())
+                stmt.executeQuery().use { rows ->
+                    if (rows.next()) {
+                        return mapRowToUser(rows)
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    fun updateUserTrackingPreferences(userId: UUID, trackingEnabled: Boolean): Boolean {
+        val sql = "UPDATE users SET tracking_enabled = ? WHERE id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setBoolean(1, trackingEnabled)
+                stmt.setString(2, userId.toString())
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+    fun deleteUserTrackingHistory(userId: UUID): Boolean {
+        val sql = "UPDATE users SET location = ? WHERE id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, null)
+                stmt.setString(2, userId.toString())
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+
     fun findByEmail(email: String): User? {
         dataSource.connection.use { conn ->
             val sql = """
@@ -71,7 +142,7 @@ class UserRepository (
         return null
     }
 
-    fun mapRowToUser(rs: ResultSet): User =
+     fun mapRowToUser(rs: ResultSet): User =
         User(
             id = UUID.fromString(rs.getString("id")),
             name = rs.getString("name"),
@@ -81,9 +152,37 @@ class UserRepository (
             role = Role(
                 id = rs.getInt("role_id"),
                 name = rs.getString("role_name"),
-                permissions = emptySet(),
+                permissions = fetchPermissions(rs.getInt("role_id")),
             ),
             passwordHashed = rs.getString("password"),
         )
+
+    fun fetchPermissions(roleId: Int): Set<Permission> {
+        val permissions = mutableSetOf<Permission>()
+
+        val sql = """
+        SELECT p.id, p.name, p.description
+        FROM role_permissions rp
+        JOIN permissions p ON rp.permission_id = p.id
+        WHERE rp.role_id = ?
+    """
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setInt(1, roleId)
+                stmt.executeQuery().use { rows ->
+                    while (rows.next()) {
+                        val permission = Permission(
+                            id = rows.getInt("id"),
+                            name = rows.getString("name"),
+                            description = rows.getString("description")
+                        )
+                        permissions.add(permission)
+                    }
+                }
+            }
+        }
+        return permissions
+    }
 }
 

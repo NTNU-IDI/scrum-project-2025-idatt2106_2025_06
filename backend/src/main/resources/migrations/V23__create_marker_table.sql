@@ -4,7 +4,7 @@ CREATE TABLE marker (
   event_id                         VARCHAR(36)                     NULL,
   name                             VARCHAR(255)                    NOT NULL,
   description                      TEXT                            NOT NULL,
-  location                         POINT SRID 4236                 NOT NULL,
+  location                         POINT SRID 4326                 NOT NULL,
   type                             VARCHAR(255)                    NOT NULL,
   created_at                       TIMESTAMP                       DEFAULT CURRENT_TIMESTAMP,
   updated_at                       TIMESTAMP                       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

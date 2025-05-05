@@ -19,9 +19,17 @@ export default {
     modelValue: { type: Object, required: true },
     settings: { type: Object, required: true },
   },
+  data() {
+    return {
+      selectedEl: null,
+      latitude: null,
+      longitude: null,
+      errorMessage: null,
+      isLoading: false,
+    }
+  },
   emits: ['update:modelValue'],
   mounted() {
-    // Initialize map
     const { lng, lat, zoom, bearing, pitch } = this.modelValue
     const map = new mapboxgl.Map({
       container: this.$refs.mapContainer,
@@ -33,9 +41,9 @@ export default {
     })
     this.map = map
 
-    // Track markers for filtering
     this.markerObjs = []
 
+    this.getGeolocation()
     map.on('load', () => {
       fetch('/data/tilfluktsrom-4326.json')
         .then((res) => res.json())
@@ -84,11 +92,9 @@ export default {
             this.markerObjs.push({ marker, el, props })
           })
 
-          // Apply initial filters
           this.applySettings(this.settings)
         })
 
-      // Deselect on map click
       map.on('click', () => {
         if (this.selectedEl) {
           this.selectedEl.querySelector('.icon').style.transform = 'scale(1)'
@@ -98,11 +104,9 @@ export default {
       })
     })
 
-    // Emit viewport changes back to parent
     const updateLocation = () => this.$emit('update:modelValue', this.getLocation())
     ;['moveend', 'zoomend', 'rotateend', 'pitchend'].forEach((evt) => map.on(evt, updateLocation))
 
-    // Watch for settings changes from parent
     this.$watch(
       () => this.settings,
       (newSettings) => this.applySettings(newSettings),
@@ -125,9 +129,45 @@ export default {
         zoom: this.map.getZoom(),
       }
     },
+    getGeolocation() {
+      if ('geolocation' in navigator) {
+        this.isLoading = true
 
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            this.latitude = position.coords.latitude
+            this.longitude = position.coords.longitude
+            this.isLoading = false
+            console.log(
+              'Client location: ' + position.coords.latitude + ', ' + position.coords.longitude,
+            )
+            this.userMarker = new mapboxgl.Marker({
+              color: '#007cbf',
+            })
+              .setLngLat([this.longitude, this.latitude])
+              .addTo(this.map)
+          },
+          (error) => {
+            this.isLoading = false
+            this.errorMessage = `Error: ${error.message}`
+          },
+        )
+      } else {
+        this.errorMessage = 'Geolocation is not supported by your browser.'
+      }
+    },
+    flyToUser() {
+      if (this.latitude != null && this.longitude != null && this.map) {
+        this.map.flyTo({
+          center: [this.longitude, this.latitude],
+          zoom: 14,
+          essential: true,
+        })
+      } else {
+        console.warn('User location not available yet.')
+      }
+    },
     applySettings(settings) {
-      // Show/hide markers based on searchQuery, showShelters, minCapacity
       this.markerObjs.forEach(({ el, props }) => {
         let visible = true
         if (!settings.showShelters) visible = false

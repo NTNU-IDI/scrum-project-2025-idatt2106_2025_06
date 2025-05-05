@@ -16,6 +16,7 @@ const props = defineProps({
   asChild: { type: Boolean, required: false },
   as: { type: null, required: false },
   class: { type: null, required: false },
+  severity: { type: String},
 });
 
 const delegatedProps = computed(() => {
@@ -23,6 +24,13 @@ const delegatedProps = computed(() => {
 
   return delegated;
 });
+
+const severityColors = {
+  info: 'bg-blue-500',
+  red: 'bg-red-500',
+  yellow: 'bg-yellow-400',
+  green: 'bg-green-500',
+};
 
 const forwardedProps = useForwardProps(delegatedProps);
 </script>
@@ -37,6 +45,16 @@ const forwardedProps = useForwardProps(delegatedProps);
       )
     "
   >
+
+    <div
+      v-if="props.severity"
+      :class="[
+    'absolute left-0 top-0 h-full w-1 rounded-tl-sm rounded-bl-sm',
+    severityColors[props.severity],
+  ]"
+    ></div>
+
+
     <span class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectItemIndicator>
         <CheckIcon class="h-4 w-4" />
