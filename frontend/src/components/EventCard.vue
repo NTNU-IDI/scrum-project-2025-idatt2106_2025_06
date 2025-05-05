@@ -2,9 +2,13 @@
 import { Pencil, Trash, Info, OctagonAlert, TriangleAlert, Shield } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button/index.js'
 import { useEventStore } from '@/stores/event.js'
-const eventStore = useEventStore()
 import { useSessionStore } from '@/stores/session'
+
+const eventStore = useEventStore()
 const sessionStore = useSessionStore()
+
+import { defineEmits } from 'vue'
+const emit = defineEmits(['editEvent'])
 
 const severityColors = {
   info: 'bg-blue-200',
@@ -15,7 +19,7 @@ const severityColors = {
 
 const props = defineProps({
   eventId: [String, Number],
-  title: String,
+  name: String,
   description: String,
   time: String,
   date: String,
@@ -53,6 +57,10 @@ const formatDate = () => {
   // Vis årstall hvis datoen er fra et annet år
   return dateObj.toLocaleDateString('no-NO', { year: 'numeric', month: 'short', day: 'numeric' })
 }
+
+const handleEdit = () => {
+  emit('editEvent', props.eventId)
+}
 </script>
 
 <template>
@@ -82,7 +90,7 @@ const formatDate = () => {
             </div>
 
             <h1 :class="['font-bold', variant === 'admin' ? 'text-md' : 'text-2xl']">
-              {{ props.title }}
+              {{ props.name }}
             </h1>
           </div>
 
@@ -98,15 +106,15 @@ const formatDate = () => {
         >
           {{ props.description }}
         </p>
-        <p class="text-sm text-neutral-400 mt-1">{{ props.position }}</p>
       </div>
       <div v-if="variant !== 'admin'" class="mt-4 flex-shrink-0">
+        <p class="text-sm text-neutral-400 mt-1">{{ props.position }}</p>
         <p>Les mer</p>
       </div>
     </div>
 
     <div v-if="props.variant === 'admin'" class="flex items-center gap-2">
-      <Button class="p-2" variant="outline">
+      <Button class="p-2" variant="outline" @click="handleEdit">
         <Pencil />
       </Button>
       <Button

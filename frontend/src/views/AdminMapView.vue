@@ -8,18 +8,26 @@ import { useSessionStore } from '@/stores/session'
 import EventCard from '@/components/EventCard.vue';
 import EventForm from '@/components/EventForm.vue'
 import MarkerForm from '@/components/MarkerForm.vue'
-import { onMounted } from 'vue'
 import { computed } from 'vue';
+import { onMounted } from 'vue'
 import { ref } from 'vue';
 
 const eventFormRef = ref(null);
-const formMode = ref('edit');
-
+const formMode = ref('new');
 
 const eventStore = useEventStore()
 const sessionStore = useSessionStore()
 
 const events = computed(() => eventStore.events);
+const selectedEventId = ref(null);
+
+function openEditForm(eventId) {
+  console.log('Åpner redigering for id:', eventId);
+  formMode.value = 'edit';
+  selectedEventId.value = eventId;
+
+
+}
 
 onMounted(async () => {
   try {
@@ -54,7 +62,12 @@ const activeTab = ref('event');
         </TabsList>
 
         <TabsContent value="event">
-          <EventForm ref="eventFormRef" :mode="formMode"/>
+          <EventForm
+            ref="eventFormRef"
+            :mode="formMode"
+            :token="sessionStore.token"
+            :event-id="selectedEventId"
+          />
         </TabsContent>
 
         <TabsContent value="marker">
@@ -75,13 +88,17 @@ const activeTab = ref('event');
         </CardHeader>
         <CardContent class="max-w-[350px] max-h-[85%] overflow-y-auto flex flex-col gap-2">
           <template v-for="(event, index) in events" :key="index">
-              <EventCard
-                :description="event.description"
-                :severity="event.severity"
-                :time="event.time"
-                :date="event.date"
-                :title="event.title"
-              />
+            <EventCard
+              @editEvent="openEditForm"
+              variant="admin"
+              :eventId="event.id"
+              :name="event.name"
+              :description="event.description"
+              :date="event.start_date"
+              :time="event.start_date"
+              :position="`${event.location.lat}, ${event.location.lng}`"
+              :severity="event.severity"
+            />
           </template>
         </CardContent>
       </Card>
