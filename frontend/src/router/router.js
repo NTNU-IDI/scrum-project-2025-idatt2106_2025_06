@@ -58,7 +58,7 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAdminAccess) {
     const role = session.user?.role
-    if (!['ADMIN', 'MODERATOR'].includes(role)) {
+    if (!['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(role)) {
       return next('/')
     }
   }

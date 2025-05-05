@@ -35,7 +35,7 @@ async function login() {
   try {
     const success = await session.login(email.value, password.value)
     if (success) {
-      if (['ADMIN', 'MODERATOR'].includes(session.user?.role)) {
+      if (['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role)) {
         router.push('/admin')
       } else {
         router.push('/')

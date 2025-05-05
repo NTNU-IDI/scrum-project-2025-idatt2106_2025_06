@@ -42,7 +42,8 @@ export const useSessionStore = defineStore('session', () => {
   async function login(email, password) {
     try {
       const response = await loginUser(email, password)
-      console.log('Permission:', response.permission)
+      console.log('Permission:', response.permissions)
+      console.log('Role:', response.role)
       setToken(response)
       return true
     } catch (error) {
