@@ -7,15 +7,15 @@ on:
     branches: [ main, master, develop ]
 
 jobs:
-  build-and-test:
+  # ─────────────── BACKEND ───────────────
+  build-and-test-backend:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Environment Variables
-      run: |
+      - name: Set up Environment Variables
+        run: |
           echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> $GITHUB_ENV
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
           echo "JWT_EXPIRATION_TIME=${{ secrets.JWT_EXPIRATION_TIME }}" >> $GITHUB_ENV
@@ -23,48 +23,149 @@ jobs:
           echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> $GITHUB_ENV
           echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
 
+      - name: Build with Maven
+        working-directory: backend
+        run: mvn -B clean package -DskipTests
 
-    
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
-    
-    - name: Build with Maven
-      run: mvn -B clean package -DskipTests
-      working-directory: backend
+      - name: Run tests
+        working-directory: backend
+        run: mvn test
 
-    - name: Run tests
-      run: mvn test
-      working-directory: backend
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-
-  code-quality:
+  code-quality-backend:
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    
-    - name: Analyze with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NTNU-IDI_scrum-project-2025-idatt2106_2025_06 -Dsonar.organization=ntnu-idi
-      if: env.SONAR_TOKEN != null
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Analyze with SonarCloud
+        if: secrets.SONAR_TOKEN != null
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=NTNU-IDI_scrum-project-2025-idatt2106_2025_06 \
+          -Dsonar.organization=ntnu-idi
+
+  # ─────────────── FRONTEND ───────────────
+  frontend-install:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-node.outputs.cache-hit }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js & pnpm cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install
+
+      - name: Persist pnpm store
+        uses: actions/cache@v3
+        id: cache-node
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-
+
+  frontend-build:
+    needs: frontend-install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js & pnpm cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Build production bundle
+        working-directory: frontend
+        run: pnpm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+  frontend-test:
+    needs: frontend-install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js & pnpm cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Run Vitest unit tests
+        working-directory: frontend
+        run: pnpm run test:unit
+
+      - name: Export and clean test output
+        if: always()
+        working-directory: frontend
+        run: |
+          pnpm run test:unit > test_output.txt || true
+          sed 's/\x1b\[[0-9;]*m//g' test_output.txt > clean_test_output.txt
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: frontend/clean_test_output.txt
+
+  frontend-security:
+    needs: frontend-install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: OWASP Dependency Check
+        # run the official OWASP Dependency-Check docker image
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/frontend":/src \
+            -v "${{ github.workspace }}/owasp-reports":/report \
+            owasp/dependency-check:8.2.1 \
+              --project "SmartMat" \
+              --scan /src \
+              --format "JSON" \
+              --out /report
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: owasp-dependency-report
+          path: owasp-reports/dependency-check-report.json
