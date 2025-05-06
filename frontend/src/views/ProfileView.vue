@@ -231,7 +231,9 @@ onMounted(async () => {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Er du sikker på at du ønsker å forlate husstanden? Dette kan ikke angres.
+                              <Label>
+                                Er du sikker på at du ønsker å forlate husstanden? Dette kan ikke angres.
+                              </Label>
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
