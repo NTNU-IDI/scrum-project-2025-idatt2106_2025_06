@@ -16,8 +16,8 @@ class NotificationController(
     private val messagingTemplate: SimpMessagingTemplate
 ) {
     private val logger = org.slf4j.LoggerFactory.getLogger(NotificationController::class.java)
-    @MessageMapping("/newsAlerts")
-    @SendTo("/topic/newsAlerts")
+    @MessageMapping("/public/newsAlerts")
+    @SendTo("/topic/public/newsAlerts")
     fun handleNotification(@Payload notification: String): List<Notification> {
         try {
             logger.info("Received notification: $notification")
