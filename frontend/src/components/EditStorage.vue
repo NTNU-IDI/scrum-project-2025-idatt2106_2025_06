@@ -95,7 +95,7 @@ async function removeUser(userId) {
                 <span class="text-left">{{ member.name }}</span>
                 <AlertDialog>
                   <AlertDialogTrigger as-child >
-                    <div v-if="user.id !== member.id">
+                    <div v-if="user && user.id !== member.id">
                       <Button size="icon" variant="outline">
                         <user-minus/>
                       </Button>
