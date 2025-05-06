@@ -7,8 +7,7 @@ data class Storage(
     val name: String,
     val storageOwner: String,
     val token: String,
-    val latitude: Double?,   // extracted from POINT (longitude, latitude)
-    val longitude: Double?,  // extracted from POINT (longitude, latitude)
+    val location: Location?,
     val createdAt: Instant,
     val updatedAt: Instant
 ) {
@@ -17,11 +16,9 @@ data class Storage(
         require(name.isNotBlank()) { "Storage name must not be blank." }
         require(storageOwner.isNotBlank()) { "Storage owner id must not be blank." }
         require(token.isNotBlank()) { "Token must not be blank" }
-        if (latitude != null) {
-            require(latitude in -90.0..90.0) { "Latitude must be between -90 and 90." }
-        }
-        if (longitude != null) {
-            require(longitude in -180.0..180.0) { "Longitude must be between -180 and 180." }
+        location?.let {
+            require(it.latitude in -90.0..90.0) { "Latitude must be between -90 and 90." }
+            require(it.longitude in -180.0..180.0) { "Longitude must be between -180 and 180." }
         }
     }
 }
