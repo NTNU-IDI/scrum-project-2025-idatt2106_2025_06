@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.model
 
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs
+    .StorageResponse
 
 fun Storage.toResponse(): StorageResponse {
     return StorageResponse(
