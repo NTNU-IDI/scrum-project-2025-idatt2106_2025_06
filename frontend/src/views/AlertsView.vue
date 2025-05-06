@@ -1,93 +1,46 @@
 <script setup>
 import AlertCard from '@/components/AlertCard.vue'
 import EventCard from '@/components/EventCard.vue'
+import { onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
+import { initializeWebSocket, sendMessage} from '@/lib/websocket.js'
+import { useSessionStore} from '@/stores/session'
+import { computed } from 'vue'
 
-const alerts = [
-  {
-    id: 1,
-    title: 'GODE NYHETER! lalal',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 2,
-    title: 'Bolle',
-    description:
-      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 3,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-    time: '11:42',
-    severity: 'yellow',
-  },
-  {
-    id: 4,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-    time: '11:42',
-    severity: 'green',
-  },
-  {
-    id: 5,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 6,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 7,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-  {
-    id: 8,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-  },
-  {
-    id: 9,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-  },
-  {
-    id: 10,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 11,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 12,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-  {
-    id: 13,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-  },
-  {
-    id: 14,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-  },
-  {
-    id: 15,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-]
+
+const alerts = ref([]);
+const sessionStore = useSessionStore();
+const jwtToken = computed(sessionStore.token)
+console.log({ jwtToken });
+
+
+const sendTestMessage = async () => {
+    await new Promise(resolve => setTimeout(resolve, 10000));
+  sendMessage('/app/newsAlerts', { message: 'Hello, world!' });
+  console.log('5 seconds passed')
+}
+
+onMounted(() => {
+  initializeWebSocket(jwtToken, (message) => {
+    console.log('Received message:', message);
+    const parsedMessages = JSON.parse(message.body);
+    const messages = Array.isArray(parsedMessages) ? parsedMessages : [parsedMessages];
+
+    messages.forEach((msg) => {
+      const alert = {
+        id: msg.id,
+        title: msg.title || 'No Title',
+        description: msg.description || 'No Description',
+        severity: msg.severity || 'info',
+        time: msg.time || 'Nå',
+      };
+      console.log('Parsed alert:', alert);
+    alerts.value.push(alert);
+    });
+  });
+  sendTestMessage()
+});
+
 
 const events = [
   {
