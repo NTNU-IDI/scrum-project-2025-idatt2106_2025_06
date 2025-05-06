@@ -132,9 +132,9 @@ class WebsocketConfig(
                 logger.info("Sent notifications after client subscribed to $destination")
             }
 
-            if (destination == "/topic/public/news") {
+            if (destination == "/topic/public/events") {
                 val latestNews = notificationService.getNews()
-                messagingTemplate.convertAndSend("/topic/public/news", latestNews)
+                messagingTemplate.convertAndSend("/topic/public/events", latestNews)
                 logger.info("Sent news after client subscribed to $destination")
             }
         }

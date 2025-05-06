@@ -42,7 +42,7 @@ class EventController(
         @Parameter request: CreateEventRequest): ResponseEntity<EventResponse> {
         logger.info("Received event create request: $request")
         val response = eventService.createEvent(request)
-        messagingTemplate.convertAndSend("/topic/public/news", response)
+        messagingTemplate.convertAndSend("/topic/public/events", response)
         logger.info("Event created with ID: ${response.id}")
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }

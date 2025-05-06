@@ -31,8 +31,8 @@ class NotificationController(
          }
     }
 
-    @MessageMapping("/public/news")
-    @SendTo("/topic/public/news")
+    @MessageMapping("/public/events")
+    @SendTo("/topic/public/events")
     fun handleNews(@Payload news: String): List<EventResponse> {
         try {
             logger.info("Received news: $news")
