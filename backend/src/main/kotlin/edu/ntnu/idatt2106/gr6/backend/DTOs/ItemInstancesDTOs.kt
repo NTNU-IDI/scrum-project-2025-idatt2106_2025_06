@@ -49,7 +49,7 @@ data class SimpleGetItemInstancesResponse(
 
 data class CreateItemInstanceRequest (
     val name: String,
-    val description: String?,
+    val description: String?, // Remove this!!
     val typeId: Int,
     val unitId: Int,
     val storageId: String,
