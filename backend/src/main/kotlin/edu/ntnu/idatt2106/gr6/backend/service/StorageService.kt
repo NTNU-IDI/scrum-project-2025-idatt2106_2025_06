@@ -1,8 +1,9 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
-import edu.ntnu.idatt2106.gr6.backend.DTOs.CreateStorageRequest
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageResponse
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.CreateStorageRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.SimpleUserResponse
 import edu.ntnu.idatt2106.gr6.backend.model.toResponse
 import edu.ntnu.idatt2106.gr6.backend.repository.StorageRepository
 import org.slf4j.LoggerFactory
@@ -67,10 +68,15 @@ class StorageService(
         storageRepository.addUserToStorage(userId, storage.id)
     }
 
-    @Transactional(readOnly = true)
-    fun getMemberNamesOfStorage(storageId: String): List<String> {
-        return storageRepository.findUserNamesInStorage(storageId)
+    fun getMemberDTOsOfStorage(storageId: String): List<SimpleUserResponse> {
+        return storageRepository.findSimpleUsersInStorage(storageId).map {
+            SimpleUserResponse(
+                id = it.id.toString(),
+                name = it.name
+            )
+        }
     }
+
 
     @Transactional
     fun removeUserFromStorage(userId: String, storageId: String): Boolean {

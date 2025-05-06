@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
+import edu.ntnu.idatt2106.gr6.backend.exception.InvalidUserDetailsException
 import edu.ntnu.idatt2106.gr6.backend.model.User
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -27,6 +28,8 @@ class JwtService {
     @Value("\${security.jwt.expiration-time}")
     private var expiration: Long = 0
 
+
+
     fun generateToken(userDetails: UserDetails): String {
         val now = System.currentTimeMillis()
         val expirationTime = now + expiration
@@ -35,9 +38,7 @@ class JwtService {
             if (userDetails is User) {
                 userDetails.id
             } else {
-                throw IllegalArgumentException(
-                    "UserDetails must be an instance of custom User class",
-                )
+                throw InvalidUserDetailsException.notCustomUserClass()
             }
         val emailClaim = userDetails.username
 
@@ -47,8 +48,6 @@ class JwtService {
         val permissionsClaim = userDetails.authorities
             .filter { !it.authority.startsWith("ROLE_") }
             .map { it.authority }
-
-        logger.info("Generating JWT token for user ID ${userDetails.authorities}")
 
         return Jwts
             .builder()
@@ -104,7 +103,6 @@ class JwtService {
             .payload
 
     private fun getSignInKey(): SecretKey {
-        logger.info("Secret key: $secret")
         val keyBytes = Decoders.BASE64.decode(secret)
         return Keys.hmacShaKeyFor(keyBytes)
     }

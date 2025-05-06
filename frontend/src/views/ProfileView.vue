@@ -31,13 +31,76 @@ import {Button} from "@/components/ui/button/index.js";
 import {Input} from "@/components/ui/input/index.js";
 import {DialogClose} from "@/components/ui/dialog/index.js";
 import {Label} from "@/components/ui/label/index.js";
-import {X, UserMinus} from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue'
+import router from '@/router/router.js'
+import { useSessionStore } from '@/stores/session'
+import { useStorageStore } from '@/stores/storage'
+import EditStorage from '@/components/EditStorage.vue'
 
-const username = 'username';
-const email = 'email';
-const householdName = 'householdname';
-const householdNumber = 'householdnumber';
-const location = null;
+const username = ref('');
+const email = ref('');
+
+const householdName = ref('');
+const location = ref('');
+
+const joinToken = ref('')
+
+const sessionStore = useSessionStore()
+const user = computed(() => sessionStore.user)
+
+const storageStore = useStorageStore()
+const storages = computed(() => storageStore.storages)
+const membersByStorageId = computed(() => storageStore.membersByStorageId)
+
+async function createNewStorage() {
+  const token = sessionStore.token
+
+  const response = await storageStore.create(
+    householdName.value, token)
+
+  if (response) {
+    console.log("Husstand opprettet")
+  }
+}
+
+async function joinStorage() {
+  if (!joinToken.value) return
+
+  const success = await storageStore.join(joinToken.value, sessionStore.token)
+
+  if (success) {
+    console.log('Bli med i husstand: Vellykket')
+    joinToken.value = ''
+  } else {
+    console.error('Kunne ikke bli med i husstand')
+  }
+}
+
+
+onMounted(async () => {
+  if (!sessionStore.isAuthenticated) {
+    router.push('/login')
+    console.log("Det er noe galt med innloggingen");
+  }
+
+  if (user.value) {
+    username.value = user.value.name
+    email.value = user.value.email
+  }
+
+  try {
+    await storageStore.fetchAll(sessionStore.token)
+  } catch (error) {
+    console.error("Klarte ikke hente husstander og medlemmer:", error)
+  }
+});
+
+function openEditProfile() {
+  if (user.value) {
+    username.value = user.value.name;
+    email.value = user.value.email;
+  }
+}
 </script>
 
 <template>
@@ -48,15 +111,15 @@ const location = null;
       </CardHeader>
       <CardContent>
         <div class="grid gap-2">
-          <Label>
+          <Label class="text-xl">
             Personalia:
           </Label>
           <CardDescription>
-            <p>Brukernavn: {{ username }}</p>
-            <p>Epostadresse: {{ email }}</p><br/>
+            <p v-if="user && user.name">Brukernavn: {{ user.name }}</p>
+            <p v-if="user && user.email">Epostadresse: {{ user.email }}</p><br/>
           </CardDescription>
           <Dialog>
-            <DialogTrigger>
+            <DialogTrigger @click="openEditProfile">
               <Button class="w-48">Rediger profil</Button>
             </DialogTrigger>
             <DialogContent>
@@ -74,10 +137,23 @@ const location = null;
                   v-model="email"
                   placeholder="Epostadresse"
                   type="email"
-                /><br/>
-                <Label>
-                  Endre passord?
-                </Label>
+                />
+              </DialogHeader>
+              <DialogFooter class="flex flex-col items-center">
+                <DialogClose>
+                  <Button class="w-48">Lagre</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog>
+            <DialogTrigger>
+              <Button class="w-48">Endre passord</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle class="text-2xl">Endre passord</DialogTitle>
                 <Input
                   placeholder="Gammelt passord"
                   type="password"
@@ -99,79 +175,62 @@ const location = null;
             </DialogContent>
           </Dialog>
           <br/>
-          <Label>
-            Husstand:
-          </Label>
-          <CardDescription>
-            <p>Husstandsnavn: {{ householdName }}</p>
-            <p>Lokasjon: {{ location === null ? 'Ikke spesifisert' : location }}</p>
-            <p>Husstandsnummer: {{ householdNumber }}</p>
+          <Label class="text-xl">Husstander:</Label>
+          <div class="flex flex-col items-center gap-2">
+              <CardDescription>
+                <div v-for="s in storages" :key="s.id" class="flex flex-col gap-4 w-full">
+                  <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
+                    <h3 class="text-xl font-bold">{{ s.name }}</h3>
+                    <p>Husstandsnummer: {{ s.token }}</p>
+                    <p>Lokasjon: {{ s.location != null ? s.location : 'Ikke angitt' }}</p>
+                    <h4 class="mt-2 font-semibold">Medlemmer:</h4>
+                    <ul v-if="membersByStorageId[s.id]">
+                      <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
+                        {{ member.name }}
+                      </li>
+                    </ul>
+                    <p v-else>Laster medlemmer...</p>
+                    <EditStorage :storage="s" />
+                  </div>
+                </div>
+              </CardDescription>
             <br/>
-            [Medlem 1]<br/>
-            [Medlem 2]<br/>
-          </CardDescription>
-          <div class="flex flex-col items-center">
             <Dialog>
               <DialogTrigger>
-                <Button class="w-48">Endre husstand</Button>
+                <Button class="w-48">Opprett ny husstand</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle class="text-2xl">Endre husstand</DialogTitle>
-                  <Label>
-                    Her kan du endre husstanden din. Trykk på "Lagre" når du er ferdig.
-                  </Label>
+                  <DialogTitle class="text-2xl">Opprett ny husstand</DialogTitle>
                   <Input
                     v-model="householdName"
                     placeholder="Husstandsnavn"
                     type="text"
                   />
+                  <!--
                   <Input
                     v-model="location"
                     placeholder="Lokasjon (valgfritt)"
                     type="text"
-                  /><br/>
-                  <Label>
-                    <p>Husstandsnummer: {{ householdNumber }}</p><br/>
-                  </Label>
-                  <DialogTitle>Medlemmer</DialogTitle>
-                  <div class="flex items-center gap-2 justify-between">
-                    <Label>[Medlem1]</Label>
-                    <AlertDialog>
-                      <AlertDialogTrigger as-child>
-                        <Button size="icon" variant="outline">
-                          <user-minus/>
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Er du sikker på at du ønsker å fjerne medlemmet fra husstanden?
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Nei</AlertDialogCancel>
-                          <AlertDialogAction>Ja</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </DialogHeader>
-
-                <DialogFooter class="flex flex-col items-center">
+                  />
+                  -->
                   <DialogClose>
-                    <Button class="w-48">Lagre</Button>
+                    <Button @click="createNewStorage()" class="w-48">Opprett</Button>
                   </DialogClose>
-                </DialogFooter>
+                </DialogHeader>
               </DialogContent>
             </Dialog>
+            <div class="flex flex-col items-center gap-4 mt-6">
+              <Label>Skriv inn husstandsnummer for å bli med i en annen husstand:</Label>
+              <Input v-model="joinToken" placeholder="Husstandsnummer" class="w-48" />
+              <Button class="w-48" @click="joinStorage">Bli med i husstand</Button>
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>
     <router-link to="/login">
-      <Button class="w-48" variant="destructive">Logg ut</Button>
+      <Button @click="sessionStore.logout" class="w-48" variant="destructive">Logg ut</Button>
     </router-link>
   </div>
 </template>

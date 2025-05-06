@@ -110,6 +110,21 @@ class UserRepository (
         }
     }
 
+    fun getUserTrackingPreferences(userId: UUID): Boolean {
+        val sql = "SELECT tracking_enabled FROM users WHERE id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userId.toString())
+                stmt.executeQuery().use { rows ->
+                    if (rows.next()) {
+                        return rows.getBoolean("tracking_enabled")
+                    }
+                }
+            }
+        }
+        return false
+    }
+
     fun deleteUserTrackingHistory(userId: UUID): Boolean {
         val sql = "UPDATE users SET location = ? WHERE id = ?"
         dataSource.connection.use { conn ->

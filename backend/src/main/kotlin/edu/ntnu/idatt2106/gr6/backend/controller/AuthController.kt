@@ -5,6 +5,9 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.UserResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.CreateUserRequest
 
 import edu.ntnu.idatt2106.gr6.backend.service.AuthenticationService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -21,6 +24,18 @@ class AuthController(
 
     @PostMapping("/signup")
     @PreAuthorize("permitAll()")
+    @Operation(
+        summary = "User signup",
+        description = "Creates a new user account with the provided details."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "201", description = "User created successfully"),
+            ApiResponse(responseCode = "400", description = "Invalid input or email already in use"),
+            ApiResponse(responseCode = "409", description = "Conflict: User Already Exists"),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
     fun signup(
         @RequestBody request: CreateUserRequest
     ): ResponseEntity<UserResponse> {
@@ -32,6 +47,18 @@ class AuthController(
 
     @PostMapping("/login")
     @PreAuthorize("permitAll()")
+    @Operation(
+        summary = "User login",
+        description = "Authenticates a user with the provided credentials."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "User logged in successfully"),
+            ApiResponse(responseCode = "400", description = "Invalid input"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
     fun login(
         @RequestBody request: LoginUserRequest
     ) : ResponseEntity<UserResponse> {
