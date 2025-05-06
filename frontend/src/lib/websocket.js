@@ -4,7 +4,6 @@ let client;
 
 let isConnected = false;
 
-// Define a function to set the connection state
 export const setConnected = (connected) => {
   isConnected = connected;
 };
@@ -16,7 +15,7 @@ export const initializeWebSocket = (jwtToken, onMessageCallback) => {
       Authorization: `Bearer ${jwtToken}`,
     },
     onConnect: () => {
-      setConnected(true); // Set the connection state to true
+      setConnected(true);
       console.log('WebSocket connected');
       client.subscribe('/topic/public/newsAlerts', (message) => {
         const parsedMessage = JSON.parse(message.body);
@@ -34,7 +33,7 @@ export const initializeWebSocket = (jwtToken, onMessageCallback) => {
 };
 
 export const sendMessage = (destination, body) => {
-  if (isConnected && client) { // Now checks the isConnected variable
+  if (isConnected && client) {
     client.publish({
       destination,
       body: JSON.stringify(body),
