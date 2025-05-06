@@ -27,6 +27,7 @@ const props = defineProps({
 })
 
 const sessionStore = useSessionStore()
+const user = computed(() => sessionStore.user)
 const storageStore = useStorageStore()
 
 const membersByStorageId = computed(() => storageStore.membersByStorageId)
@@ -87,15 +88,15 @@ async function removeUser(userId) {
               <li
                 v-for="(member, index) in membersByStorageId[props.storage.id]"
                 :key="index"
-                class="flex flex-row justify-between items-center w-full"
-              >
+                class="flex flex-row justify-between items-center w-full">
                 <span class="text-left">{{ member.name }}</span>
-
                 <AlertDialog>
                   <AlertDialogTrigger as-child >
-                    <Button size="icon" variant="outline">
-                      <user-minus/>
-                    </Button>
+                    <div v-if="user.id !== member.id">
+                      <Button size="icon" variant="outline">
+                        <user-minus/>
+                      </Button>
+                    </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -115,9 +116,28 @@ async function removeUser(userId) {
           </div>
         </DialogHeader>
         <DialogFooter class="flex flex-col items-center">
-          <DialogClose>
-            <Button class="w-48" @click="saveChanges">Lagre</Button>
-          </DialogClose>
+          <div class="flex flex-col items-center gap-2 w-full">
+            <DialogClose as-child>
+              <Button class="w-48" @click="saveChanges">Lagre</Button>
+            </DialogClose>
+            <AlertDialog>
+              <AlertDialogTrigger as-child>
+                <Button class="w-48" variant="destructive">Slett lager</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Er du sikker på at du ønsker å slette husstanden? Dette kan ikke angres.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Nei</AlertDialogCancel>
+                  <AlertDialogAction @click="">Ja</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

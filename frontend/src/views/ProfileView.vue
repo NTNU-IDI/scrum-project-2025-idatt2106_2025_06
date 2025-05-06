@@ -116,6 +116,19 @@ async function submitChangePassword() {
   }
 }
 
+async function removeUser(userId, storageId) {
+  try {
+    const success = await storageStore.removeMember(userId, storageId, sessionStore.token)
+    if (success) {
+      console.log('Medlem fjernet')
+    } else {
+      console.error('Klarte ikke fjerne medlem')
+    }
+  } catch (e) {
+    console.error('Feil ved fjerning:', e)
+  }
+}
+
 onMounted(async () => {
   if (!sessionStore.isAuthenticated) {
     router.push('/login')
@@ -156,19 +169,9 @@ onMounted(async () => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle class="text-2xl">Rediger profil</DialogTitle>
-                <Label>
-                  Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.
-                </Label>
-                <Input
-                  v-model="username"
-                  placeholder="Navn"
-                  type="text"
-                />
-                <Input
-                  v-model="email"
-                  placeholder="Epostadresse"
-                  type="email"
-                />
+                <Label>Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.</Label>
+                <Input v-model="username" placeholder="Navn" type="text" />
+                <Input v-model="email" placeholder="Epostadresse" type="email" />
               </DialogHeader>
               <DialogFooter class="flex flex-col items-center">
                 <DialogClose>
@@ -177,7 +180,6 @@ onMounted(async () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-
           <Dialog>
             <DialogTrigger>
               <Button class="w-48">Endre passord</Button>
@@ -217,7 +219,28 @@ onMounted(async () => {
                       </li>
                     </ul>
                     <p v-else>Laster medlemmer...</p>
-                    <EditStorage :storage="s" />
+                    <div v-if="user.id === s.storageOwner">
+                      <EditStorage :storage="s" />
+                    </div>
+                    <div v-else class="flex flex-col items-center gap-4">
+                      <AlertDialog>
+                        <AlertDialogTrigger as-child >
+                            <Button class="w-48">Forlat husstand</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Er du sikker på at du ønsker å forlate husstanden? Dette kan ikke angres.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Nei</AlertDialogCancel>
+                            <AlertDialogAction @click="removeUser(user.id, s.id)">Ja</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </div>
               </CardDescription>
