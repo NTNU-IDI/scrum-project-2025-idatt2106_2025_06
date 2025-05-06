@@ -18,7 +18,7 @@ export const initializeWebSocket = (jwtToken, onMessageCallback) => {
     onConnect: () => {
       setConnected(true); // Set the connection state to true
       console.log('WebSocket connected');
-      client.subscribe('/topic/newsAlerts', (message) => {
+      client.subscribe('/topic/public/newsAlerts', (message) => {
         const parsedMessage = JSON.parse(message.body);
         onMessageCallback(parsedMessage);
       });
