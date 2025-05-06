@@ -27,10 +27,8 @@ INSERT INTO marker (
  ST_PointFromText('POINT (8.0001 58.1467)', 4326), 'water_distribution',
  '2025-05-01 20:30:00', '2025-05-01 20:30:00', null,
  'Inger Vann, vann@krst.no,+47 116 78 912',
- '07:00-19:00,07:00-19:00,07:00-19:00,07:00-19:00,07:00-19:00,09:00-13:00,09:00-13:00');
-INSERT INTO marker (
-    id, storage_id, event_id, name, description, location, type, created_at, updated_at, image_id, contact_info, opening_hours
-) VALUES
+ '07:00-19:00,07:00-19:00,07:00-19:00,07:00-19:00,07:00-19:00,09:00-13:00,09:00-13:00'),
+
 -- Food Banks
 ('Xk9TqW7hF2', null, null, 'Matsentral', 'Bodø matsentral',
  ST_PointFromText('POINT (14.3976 67.2804)', 4326), 'food_bank',
