@@ -33,6 +33,8 @@ class SecurityConfig(
                 authorize.requestMatchers("/api/auth/**").permitAll()
                 authorize.requestMatchers("/api/**").permitAll()
                 authorize.requestMatchers("/ws/**").permitAll()
+                authorize.requestMatchers("/topic/newsAlerts").permitAll()
+                authorize.requestMatchers("/app/newsAlerts")
                 authorize.anyRequest().authenticated()
             }.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authenticationProvider(authenticationProvider)
