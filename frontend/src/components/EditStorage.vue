@@ -36,12 +36,15 @@ const name = ref(props.storage.name)
 const location = ref(props.storage.location ?? '')
 
 async function saveChanges() {
+  /*
   try {
     await storageStore.editStorage(props.storage.id, name.value, location.value, sessionStore.token)
     console.log('Husstand oppdatert')
   } catch (err) {
     console.error('Feil ved oppdatering av husstand:', err)
   }
+
+   */
 }
 
 async function removeUser(userId) {
