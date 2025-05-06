@@ -3,7 +3,8 @@ CREATE TABLE notification (
     event_id        VARCHAR(36)                                 NULL,
     marker_id       VARCHAR(36)                                 NULL,
     title           VARCHAR(255)                                NULL,
-    type            ENUM('event', 'storage')                    NOT NULL,
+    description     TEXT                                        NULL,
+    type            ENUM('event', 'storage','other')            NOT NULL,
     created_at      TIMESTAMP                                   DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP                                   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -12,4 +13,4 @@ CREATE TABLE notification (
 
     FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE,
     FOREIGN KEY (marker_id) REFERENCES marker(id) ON DELETE CASCADE
-)
+);
