@@ -9,6 +9,7 @@ fun Storage.toResponse(): StorageResponse {
         name = this.name,
         storageOwner = this.storageOwner,
         token = this.token,
+        location = this.location,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )
