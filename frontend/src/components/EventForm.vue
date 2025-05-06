@@ -43,6 +43,7 @@ const content = ref('');
 const position = ref('');
 const radius = ref(null);
 const eventType = ref('other');
+const eventStatus = ref('ongoing')
 const description = ref('');
 const selectedSeverity = ref('info');
 const date = ref(null);
@@ -54,7 +55,8 @@ const eventFormRefresh = () => {
   description.value = '';
   position.value = '';
   radius.value = null;
-  eventType.value = '';
+  eventType.value = 'other';
+  eventStatus.value = 'ongoing';
   selectedSeverity.value = 'info'
   date.value = null;
   time.value = null;
@@ -71,6 +73,7 @@ async function handleSubmit() {
     name: title.value,
     content: content.value,
     description: description.value,
+    status: eventStatus.value,
     position: position.value,
     impact_area_radius_km: radius.value,
     type: eventType.value,
@@ -154,6 +157,24 @@ watch(() => props.eventId, async (newId) => {
       <Label class="m-2" for="event">Hendelse</Label>
       <div class="flex gap-2 items-center">
         <Select v-model="eventType">
+          <SelectTrigger class="w-[180px]">
+            <SelectValue placeholder="Velg type hendelse" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="natural_disaster">Naturkatastrofe</SelectItem>
+            <SelectItem value="nuclear_attack">Atomangrep</SelectItem>
+            <SelectItem value="terror_attack">Terrorangrep</SelectItem>
+            <SelectItem value="pandemic">Pandemi</SelectItem>
+            <SelectItem value="other">Annet</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+
+    <div class="flex align-middle items-center">
+      <Label class="m-2" for="event">Hendelse</Label>
+      <div class="flex gap-2 items-center">
+        <Select v-model="eventStatus">
           <SelectTrigger class="w-[180px]">
             <SelectValue placeholder="Velg type hendelse" />
           </SelectTrigger>
