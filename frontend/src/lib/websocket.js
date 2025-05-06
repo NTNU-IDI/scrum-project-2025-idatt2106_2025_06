@@ -21,9 +21,9 @@ export const initializeWebSocket = (jwtToken, onMessageCallback) => {
         const parsedMessage = JSON.parse(message.body);
         onMessageCallback(parsedMessage, '/topic/public/newsAlerts');
       });
-      client.subscribe('/topic/public/news', (message) => {
+      client.subscribe('/topic/public/events', (message) => {
         const parsedMessage = JSON.parse(message.body);
-        onMessageCallback(parsedMessage, '/topic/public/news');
+        onMessageCallback(parsedMessage, '/topic/public/events');
       });
     },
     onStompError: (frame) => {

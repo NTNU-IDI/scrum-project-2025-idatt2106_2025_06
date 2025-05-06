@@ -3,7 +3,7 @@ import AlertCard from '@/components/AlertCard.vue'
 import EventCard from '@/components/EventCard.vue'
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { initializeWebSocket, sendMessage} from '@/lib/websocket.js'
+import { initializeWebSocket} from '@/lib/websocket.js'
 import { useSessionStore} from '@/stores/session'
 
 
@@ -13,12 +13,6 @@ const sessionStore = useSessionStore();
 const jwtToken = sessionStore.token
 console.log({ jwtToken });
 
-
-const sendTestMessage = async () => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  sendMessage('/app/public/newsAlerts', { message: 'Hello, world!' });
-  console.log('5 seconds passed')
-}
 
 onMounted(() => {
   initializeWebSocket(jwtToken, (message, source) => {
@@ -38,7 +32,7 @@ onMounted(() => {
         alerts.value.push(alert);
       }
 
-      if (source === '/topic/public/news') {
+      if (source === '/topic/public/events') {
         const news = {
           id: msg.id,
           title: msg.name || 'No Title',
