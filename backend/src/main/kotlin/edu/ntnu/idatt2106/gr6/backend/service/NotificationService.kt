@@ -27,6 +27,10 @@ class NotificationService(
         }
     }
 
+    fun getNews(): List<EventResponse> {
+        return eventService.getAllEvents()
+    }
+
     fun getRecentAlerts(): List<Notification> {
         return notificationRepository.getRecentMarkerEventNews()
     }

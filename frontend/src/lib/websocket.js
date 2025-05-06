@@ -19,7 +19,11 @@ export const initializeWebSocket = (jwtToken, onMessageCallback) => {
       console.log('WebSocket connected');
       client.subscribe('/topic/public/newsAlerts', (message) => {
         const parsedMessage = JSON.parse(message.body);
-        onMessageCallback(parsedMessage);
+        onMessageCallback(parsedMessage, '/topic/public/newsAlerts');
+      });
+      client.subscribe('/topic/public/events', (message) => {
+        const parsedMessage = JSON.parse(message.body);
+        onMessageCallback(parsedMessage, '/topic/public/events');
       });
     },
     onStompError: (frame) => {

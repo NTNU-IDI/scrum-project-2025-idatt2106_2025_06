@@ -1,7 +1,10 @@
 package edu.ntnu.idatt2106.gr6.backend.config
 
 import edu.ntnu.idatt2106.gr6.backend.service.JwtService
+import edu.ntnu.idatt2106.gr6.backend.service.NotificationService
 import edu.ntnu.idatt2106.gr6.backend.service.UserDetailsServiceImpl
+import org.springframework.context.ApplicationListener
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
@@ -18,7 +21,9 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer
 import org.springframework.messaging.Message
-
+import org.springframework.messaging.simp.SimpMessagingTemplate
+import org.springframework.web.socket.messaging.SessionConnectedEvent
+import org.springframework.web.socket.messaging.SessionSubscribeEvent
 
 
 @Configuration
@@ -112,5 +117,26 @@ class WebsocketConfig(
                 return message
             }
         })
+    }
+
+    @Bean
+    fun subscribeEventListener(messagingTemplate: SimpMessagingTemplate, notificationService: NotificationService): ApplicationListener<SessionSubscribeEvent> {
+        return ApplicationListener { event ->
+            val accessor = StompHeaderAccessor.wrap(event.message)
+            val destination = accessor.destination
+
+            // Only send notifications when client subscribes to the newsAlerts topic
+            if (destination == "/topic/public/newsAlerts") {
+                val latestNotifications = notificationService.getNewestNotifications()
+                messagingTemplate.convertAndSend("/topic/public/newsAlerts", latestNotifications)
+                logger.info("Sent notifications after client subscribed to $destination")
+            }
+
+            if (destination == "/topic/public/events") {
+                val latestNews = notificationService.getNews()
+                messagingTemplate.convertAndSend("/topic/public/events", latestNews)
+                logger.info("Sent news after client subscribed to $destination")
+            }
+        }
     }
 }
