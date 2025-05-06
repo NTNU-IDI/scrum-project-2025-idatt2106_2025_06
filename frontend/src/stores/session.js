@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import router from '@/router/router.js'
-import { loginUser, signupUser } from '@/service/authService.js'
+import { changePassword, loginUser, signupUser, updateUser } from '@/service/authService.js'
 
 export const useSessionStore = defineStore('session', () => {
   const token = ref(sessionStorage.getItem('token'))
@@ -25,8 +25,6 @@ export const useSessionStore = defineStore('session', () => {
 
     token.value = response.token
     sessionStorage.setItem('token', response.token)
-    console.log('Token set:', token.value)
-    console.log('User data:', response)
     user.value = {
       id: response.userId,
       email: response.email,
@@ -42,8 +40,6 @@ export const useSessionStore = defineStore('session', () => {
   async function login(email, password) {
     try {
       const response = await loginUser(email, password)
-      console.log('Permission:', response.permissions)
-      console.log('Role:', response.role)
       setToken(response)
       return true
     } catch (error) {
@@ -63,10 +59,36 @@ export const useSessionStore = defineStore('session', () => {
     }
   }
 
+  async function updateProfile(name, email) {
+    try {
+      const response = await updateUser(name, email)
+      setToken(response)
+      return true
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      return false
+    }
+  }
+
+  async function updatePassword(oldPassword, newPassword, confirmPassword) {
+    if (newPassword !== confirmPassword) {
+      console.error('New password and confirmation do not match')
+      return false
+    } else {
+      try {
+        await changePassword(oldPassword, newPassword)
+        return true
+      } catch (error) {
+        console.error('Error changing password:', error)
+        return false
+      }
+    }
+  }
+
   function logout() {
     setToken(null)
     router.push('/login')
   }
 
-  return { token, user, isModerator, isAdmin, hasAccessToAdmin, isAuthenticated, login, signup, logout }
+  return { token, user, isModerator, isAdmin, hasAccessToAdmin, isAuthenticated, login, signup, logout, updateProfile, updatePassword }
 })
