@@ -32,11 +32,19 @@ class SecurityConfig(
             .authorizeHttpRequests { authorize ->
                 authorize.requestMatchers("/api/auth/**").permitAll()
                 authorize.requestMatchers("/api/**").permitAll()
+                authorize.requestMatchers("/ws/**").permitAll()
                 authorize.anyRequest().authenticated()
             }.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-
+            .exceptionHandling { exception ->
+                exception.authenticationEntryPoint { request, response, authException ->
+                    response.sendError(401, "Unauthorized")
+                }
+                exception.accessDeniedHandler { request, response, accessDeniedException ->
+                    response.sendError(403, "Forbidden")
+                }
+            }
         return http.build()
     }
 
