@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.repository
 
-import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.model.SimpleUser
 import edu.ntnu.idatt2106.gr6.backend.model.Storage
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -133,29 +134,36 @@ class StorageRepository(private val dataSource: DataSource) {
     }
 
 
-    fun findUserNamesInStorage(storageId: String): List<String> {
+    fun findSimpleUsersInStorage(storageId: String): List<SimpleUser> {
         val sql = """
-        SELECT u.name
+        SELECT u.id, u.name
         FROM user_storages us
         JOIN users u ON us.user_id = u.id
         WHERE us.storage_id = ?
     """.trimIndent()
 
-        val names = mutableListOf<String>()
+        val users = mutableListOf<SimpleUser>()
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, storageId)
                 stmt.executeQuery().use { rs ->
                     while (rs.next()) {
-                        names.add(rs.getString("name"))
+                        users.add(
+                            SimpleUser(
+                                id = UUID.fromString(rs.getString("id")),
+                                name = rs.getString("name")
+                            )
+                        )
                     }
                 }
             }
         }
 
-        return names
+        return users
     }
+
+
 
     fun findStoragesByUserId(userId: String): List<StorageSummary> {
         val sql = """

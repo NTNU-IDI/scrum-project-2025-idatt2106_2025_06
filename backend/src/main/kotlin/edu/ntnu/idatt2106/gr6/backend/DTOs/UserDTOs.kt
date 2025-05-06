@@ -14,6 +14,11 @@ class UserDTOs {
         val expiresIn: Long,
     )
 
+    data class SimpleUserResponse (
+        val id: String,
+        val name: String
+    )
+
     data class CreateUserRequest(
         val name: String,
         val email: String,
@@ -23,5 +28,43 @@ class UserDTOs {
     data class LoginUserRequest(
         val email: String,
         val password: String,
+    )
+
+    data class EditUserNameEmailRequest(
+        val name: String,
+        val email: String
+    )
+
+    data class EditUserNameEmailResponse(
+        val id: String,
+        val name: String,
+        val email: String,
+        val token: String
+    )
+
+    data class ChangePasswordRequest(
+        val oldPassword: String,
+        val newPassword: String
+    )
+
+    data class ChangePasswordResponse(
+        val message: String
+    )
+
+    data class UpdateUserLocationRequest(
+        val location: Location
+    )
+
+    data class GetUserLocationRequest(
+        val userId: String,
+    )
+
+    data class UserLocationResponse(
+        val userId: String,
+        val location: Location,
+    )
+
+    data class ChangeUserTrackingPreferenceRequest(
+        val trackingEnabled: Boolean
     )
 }

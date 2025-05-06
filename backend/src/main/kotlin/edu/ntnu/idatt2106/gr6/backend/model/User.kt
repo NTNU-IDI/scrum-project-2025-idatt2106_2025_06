@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.model
 
+import edu.ntnu.idatt2106.gr6.backend.model.Location
 import jakarta.persistence.ManyToOne
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -14,8 +15,10 @@ data class User(
     private val passwordHashed: String,
     val createdAt: Instant = Instant.now(),
     val verified: Boolean,
+    val location: Location? = null,
+    val trackingEnabled: Boolean = false,
     @ManyToOne
-    val role: Role
+    val role: Role,
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         val authorities = mutableListOf<GrantedAuthority>()
@@ -38,3 +41,8 @@ data class User(
 
     override fun isEnabled(): Boolean = true
 }
+
+data class SimpleUser (
+    val id: UUID?,
+    val name: String,
+)
