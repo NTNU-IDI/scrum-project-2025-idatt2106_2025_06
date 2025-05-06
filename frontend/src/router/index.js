@@ -32,7 +32,7 @@ const routes = [
   {path: '/after', component: AfterView, name: 'after'},
   {path: '/admin', component: AdminView, name: 'admin'},
   {path: '/admin/map', component: AdminMap, name: 'map'},
-  {path: '/addremove', component: AddRemoveAdminView, name: 'addremove'},
+  {path: '/admin/addremove', component: AddRemoveAdminView, name: 'admin-addremove'},
 
 ]
 
