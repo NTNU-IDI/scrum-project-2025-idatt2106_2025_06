@@ -75,6 +75,7 @@ class AuthenticationService(
 
     fun User.toResponse(): UserResponse {
         val token = jwtService.generateToken(this)
+        logger.info("Authentication token: $token")
         return UserResponse(
             id = id.toString(),
             name = name,
