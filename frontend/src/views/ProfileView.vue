@@ -120,7 +120,7 @@ function openEditProfile() {
           </CardDescription>
           <Dialog>
             <DialogTrigger @click="openEditProfile">
-              <Button class="w-48">Rediger profil</Button>
+              <Button class="w-48">Rediger personalia</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -226,6 +226,35 @@ function openEditProfile() {
               <Button class="w-48" @click="joinStorage">Bli med i husstand</Button>
             </div>
           </div>
+          <br/>
+          <Label class="text-xl">Personvern:</Label>
+          <CardDescription>
+            <div class="flex flex-col items-center text-center gap-4">
+              <span>
+                <p>Ønsker du å slette din lokasjonshistorikk?</p>
+              <p>Trykk på knappen under for å slette all lokasjonshistorikk.</p>
+              </span>
+
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Button class="w-48">Slett lokasjonshistorikk</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle class="text-2xl">Slett lokasjonshistorikk</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Er du sikker på at du vil slette all lokasjonshistorikk? Dette kan ikke angres.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                    <AlertDialogAction class="bg-red-500 text-white">Slett</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </CardDescription>
+
         </div>
       </CardContent>
     </Card>
