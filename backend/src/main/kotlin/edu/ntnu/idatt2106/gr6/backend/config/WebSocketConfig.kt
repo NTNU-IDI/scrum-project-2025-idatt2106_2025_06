@@ -57,23 +57,57 @@ class WebsocketConfig(
                     MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor::class.java) ?: return message
                 logger.info("Headers: {}", accessor)
 
-                logger.info("Message command: ${accessor?.command}")
-
-
                 if (StompCommand.CONNECT == accessor?.getCommand()) {
-                    val authorizationHeader: String? = accessor.getFirstNativeHeader("Authorization")
-                    val token = authorizationHeader!!.substring(7)
-
-                    logger.info("Extracted token websock: $token")
-
-                    val username: String = jwtService.extractEmailFromToken(token).toString()
-                    val userDetails = userDetailsService!!.loadUserByUsername(username)
-                    val usernamePasswordAuthenticationToken =
-                        UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken)
-
-                    accessor.setUser(usernamePasswordAuthenticationToken)
+                    return message
                 }
+
+                if (StompCommand.SUBSCRIBE == accessor?.getCommand()) {
+                    logger.info("User subscribed to topic: ${accessor?.destination}")
+                }
+
+                if (StompCommand.DISCONNECT == accessor?.getCommand()) {
+                    logger.info("Disconnecting user")
+                    SecurityContextHolder.clearContext()
+                    return message
+                }
+
+                if (StompCommand.UNSUBSCRIBE == accessor?.getCommand()) {
+                    logger.info("User unsubscribed from topic: ${accessor?.destination}")
+                }
+
+                if (StompCommand.SEND == accessor.command) {
+                    val destination = accessor.destination
+                    if (destination != null && destination.startsWith("/app/public")) {
+                        logger.info("Allowing unauthenticated access to public destination: $destination")
+                        return message
+                    }
+                }
+
+
+
+                val destination = accessor.destination ?: ""
+                logger.info("Destination: $destination")
+                if (destination.startsWith("/topic/public")) {
+                    logger.info("Allowing unauthenticated access to public destination: $destination")
+                    return message
+                }
+
+                val authorizationHeader: String? = accessor.getFirstNativeHeader("Authorization")
+                if (authorizationHeader.isNullOrBlank() || !authorizationHeader.startsWith("Bearer ")) {
+                    logger.info("Authorization header: $authorizationHeader")
+                    throw IllegalArgumentException("Missing or invalid Authorization header")
+                }
+
+                val token = authorizationHeader.substring(7)
+                logger.info("Extracted token from websocket: $token")
+
+                val username = jwtService.extractEmailFromToken(token)
+                    ?: throw IllegalArgumentException("Invalid token")
+                val userDetails = userDetailsService!!.loadUserByUsername(username)
+
+                val authToken = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+                SecurityContextHolder.getContext().authentication = authToken
+                accessor.user = authToken
 
                 return message
             }
