@@ -10,20 +10,20 @@ import { computed } from 'vue'
 
 const alerts = ref([]);
 const sessionStore = useSessionStore();
-const jwtToken = computed(sessionStore.token)
+const jwtToken = sessionStore.token
 console.log({ jwtToken });
 
 
 const sendTestMessage = async () => {
-    await new Promise(resolve => setTimeout(resolve, 10000));
-  sendMessage('/app/newsAlerts', { message: 'Hello, world!' });
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  sendMessage('/app/public/newsAlerts', { message: 'Hello, world!' });
   console.log('5 seconds passed')
 }
 
 onMounted(() => {
   initializeWebSocket(jwtToken, (message) => {
     console.log('Received message:', message);
-    const parsedMessages = JSON.parse(message.body);
+    const parsedMessages = typeof message === 'string' ? JSON.parse(message) : message;
     const messages = Array.isArray(parsedMessages) ? parsedMessages : [parsedMessages];
 
     messages.forEach((msg) => {
