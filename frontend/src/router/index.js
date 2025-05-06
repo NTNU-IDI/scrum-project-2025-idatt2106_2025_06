@@ -14,6 +14,7 @@ import DuringView from "@/views/DuringView.vue";
 import AfterView from "@/views/AfterView.vue";
 import AdminView from "@/views/AdminView.vue";
 import AdminMap from "@/views/AdminMapView.vue";
+import Websocketswebtest from '@/views/websocketswebtest.vue'
 
 
 const routes = [
@@ -31,6 +32,7 @@ const routes = [
   {path: '/after', component: AfterView, name: 'after'},
   {path: '/admin', component: AdminView, name: 'admin'},
   {path: '/admin/map', component: AdminMap, name: 'map'},
+  {path: '/websockets-test', component: Websocketswebtest, name: 'websockets-test'},
 ]
 
 const index = createRouter({
