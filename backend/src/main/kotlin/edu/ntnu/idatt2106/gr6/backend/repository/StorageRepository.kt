@@ -167,7 +167,7 @@ class StorageRepository(private val dataSource: DataSource) {
 
     fun findStoragesByUserId(userId: String): List<StorageSummary> {
         val sql = """
-        SELECT s.id, s.name, s.token
+        SELECT s.id, s.name, s.token, s.storage_owner
         FROM storages s
         JOIN user_storages us ON s.id = us.storage_id
         WHERE us.user_id = ?
@@ -184,7 +184,8 @@ class StorageRepository(private val dataSource: DataSource) {
                             StorageSummary(
                                 id = rs.getString("id"),
                                 name = rs.getString("name"),
-                                token = rs.getString("token")
+                                token = rs.getString("token"),
+                                storageOwner = rs.getString("storage_owner")
                             )
                         )
                     }

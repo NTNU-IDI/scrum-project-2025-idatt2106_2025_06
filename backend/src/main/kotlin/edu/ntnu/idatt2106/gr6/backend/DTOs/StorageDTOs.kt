@@ -30,6 +30,7 @@ class StorageDTOs {
     data class StorageSummary(
         val id: String,
         val name: String,
-        val token: String
+        val token: String,
+        val storageOwner: String
     )
 }
