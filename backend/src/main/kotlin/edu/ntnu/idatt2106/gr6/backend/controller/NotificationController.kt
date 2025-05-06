@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.controller
 
 import com.fasterxml.jackson.databind.util.JSONPObject
+import edu.ntnu.idatt2106.gr6.backend.DTOs.EventResponse
 import edu.ntnu.idatt2106.gr6.backend.model.Notification
 import edu.ntnu.idatt2106.gr6.backend.service.NotificationService
 import kotlinx.serialization.json.Json
@@ -28,5 +29,19 @@ class NotificationController(
             logger.error("Error while sending notification: ${ex.message}")
             return emptyList()
          }
+    }
+
+    @MessageMapping("/public/news")
+    @SendTo("/topic/public/news")
+    fun handleNews(@Payload news: String): List<EventResponse> {
+        try {
+            logger.info("Received news: $news")
+            val event = notificationService.getNews()
+            logger.info("Sending news: $event")
+            return event
+        } catch (ex: Exception) {
+            logger.error("Error while sending news: ${ex.message}")
+            return emptyList()
+        }
     }
 }
