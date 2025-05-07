@@ -32,12 +32,20 @@ export const useEventStore = defineStore('eventStore', () => {
 
   const createNewEvent = async (eventPayload, token) => {
     try {
-      const createdEvent = await createEvent(eventPayload, token)
-      events.value.push(createdEvent)
+      console.log('PRØVER Å LAGE NY HENDELSE');
+      const createdEvent = await createEvent(eventPayload, token);
+
+      if (createdEvent) {
+        console.log('Ny hendelse opprettet med ID:', createdEvent.id);
+        events.value.push(createdEvent);
+      } else {
+        console.error('Event ble ikke opprettet, tom respons mottatt.');
+      }
     } catch (error) {
-      console.error('Feil ved opprettelse av hendelse:', error)
+      console.error('Feil ved opprettelse av hendelse:', error);
     }
   }
+
 
   const updateExistingEvent = async (eventId, eventPayload, token) => {
     try {

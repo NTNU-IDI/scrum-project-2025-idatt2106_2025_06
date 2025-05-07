@@ -6,6 +6,7 @@ export async function fetchEvents() {
     return response.data;
   } catch (error) {
     console.error('Feil ved henting av hendelser:', error);
+
     throw error;
   }
 }
@@ -26,21 +27,26 @@ export async function fetchEventById(eventId, token) {
 
 export async function createEvent(eventPayload, token) {
   try {
+    console.log('Sender eventPayload:', eventPayload); // Logg eventPayload før du sender
     const response = await axios.post('http://localhost:8080/api/events/create', eventPayload, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
     });
+    console.log('Backend response:', response);
     return response.data;
   } catch (error) {
-    console.error('Feil ved opprettelse av hendelse:', error);
+    console.error('Feil ved opprettelse av hendelse:', error.response || error);
     throw error;
   }
 }
 
+
 export async function updateEvent(eventId, eventPayload, token) {
   try {
-    const response = await axios.put(`http://localhost:8080/api/events/update`, eventPayload, {
+    const payloadWithId = { id: eventId, ...eventPayload };
+    console.log('Payload being sent to the backend:', payloadWithId);
+    const response = await axios.post('http://localhost:8080/api/events/update', payloadWithId, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
