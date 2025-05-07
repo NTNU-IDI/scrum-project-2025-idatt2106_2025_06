@@ -32,6 +32,7 @@ class StorageDTOs {
         val id: String,
         val name: String,
         val token: String,
-        val location: Location?
+        val location: Location?,
+        val storageOwner: String
     )
 }
