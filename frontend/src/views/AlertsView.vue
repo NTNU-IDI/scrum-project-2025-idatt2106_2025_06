@@ -1,52 +1,15 @@
 <script setup>
 import AlertCard from '@/components/AlertCard.vue'
 import EventCard from '@/components/EventCard.vue'
-import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { initializeWebSocket} from '@/lib/websocket.js'
-import { useSessionStore} from '@/stores/session'
 
+import { useWebSocketStore } from '@/stores/websocket.js';
+import { useSessionStore} from '@/stores/session.js'
 
-const alerts = ref([]);
-const allNews = ref([]);
-const sessionStore = useSessionStore();
-const jwtToken = sessionStore.token
-console.log({ jwtToken });
-
-
-onMounted(() => {
-  initializeWebSocket(jwtToken, (message, source) => {
-    console.log('Received message from ',source, ': ', message);
-    const parsedMessages = typeof message === 'string' ? JSON.parse(message) : message;
-    const messages = Array.isArray(parsedMessages) ? parsedMessages : [parsedMessages];
-
-    messages.forEach((msg) => {
-      if (source === '/topic/public/newsAlerts') {
-        const alert = {
-          id: msg.id,
-          title: msg.title || 'No Title',
-          description: msg.description || 'No Description',
-          severity: msg.severity || 'info',
-          time: msg.time || 'Nå',
-        };
-        alerts.value.push(alert);
-      }
-
-      if (source === '/topic/public/events') {
-        const news = {
-          id: msg.id,
-          title: msg.name || 'No Title',
-          description: msg.description || 'No Description',
-          content: msg.content || 'No Content',
-          severity: msg.severity || 'info',
-          time: msg.startDate || 'Nå',
-        };
-        allNews.value.push(news);
-      }
-    });
-  });
-  //sendTestMessage()
-});
+const jwtToken = useSessionStore().token;
+const webSocketStore = useWebSocketStore();
+const alerts = webSocketStore.alerts;
+const events = webSocketStore.events;
 </script>
 
 <template>
@@ -70,13 +33,13 @@ onMounted(() => {
     <div class="mt-16">
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
-          <template v-for="(news, index) in allNews" :key="index">
-            <RouterLink :to="'events/' + news.id" class="relative">
+          <template v-for="(event, index) in events" :key="index">
+            <RouterLink :to="'events/' + event.id" class="relative">
               <EventCard
-                :description="news.description"
-                :severity="news.severity"
-                :time="news.startDate"
-                :title="news.title"
+                :description="event.description"
+                :severity="event.severity"
+                :time="event.startDate ? new Date(event.startDate).toISOString() : ''"
+                :title="event.title"
                 variant="default"
               />
             </RouterLink>

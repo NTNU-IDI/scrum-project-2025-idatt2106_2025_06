@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button/index.js'
 
 const severityColors = {
   info: 'bg-blue-200',
-  red: 'bg-red-500',
-  yellow: 'bg-yellow-400',
-  green: 'bg-green-400',
+  high: 'bg-red-500',
+  medium: 'bg-yellow-400',
+  low: 'bg-green-400',
 }
 
 const props = defineProps({
