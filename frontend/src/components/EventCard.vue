@@ -27,7 +27,7 @@ const props = defineProps({
   type: { type: String, required: true },
   severity: { type: String, default: 'low' },
   status: { type: String, required: true },
-  updatedDate: { type: [String, Object]},
+  updatedAt: { type: [String, Object] },
 
   // Ikke obligatoriske props
   content: { type: String, default: '' },
@@ -46,10 +46,13 @@ const handleDelete = async () => {
 }
 
 const formattedDate = () => {
-  console.log('FRA FORMATTED DATE', props.updatedDate)
-  if (!props.updatedDate) return 'Ukjent dato';
+  console.log('FRA FORMATTED DATE', props.updatedAt)
+  if (!props.updatedAt) {
+    console.warn(`updatedDate mangler for eventId: ${props.eventId}`);
+    return 'Ukjent dato';
+  }
 
-  const dateObj = new Date(props.updatedDate);
+  const dateObj = new Date(props.updatedAt);
   const today = new Date();
 
   const isSameDay =
@@ -82,7 +85,6 @@ const handleEdit = () => {
     endTime: props.endTime,
   })
 }
-
 </script>
 
 <template>

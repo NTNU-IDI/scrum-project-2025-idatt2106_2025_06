@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, watch } from 'vue'
+import { ref, defineProps, watch, onMounted } from 'vue'
 import { useEventStore } from '@/stores/event.js'
 import { Card} from '@/components/ui/card/index.js';
 import {Button} from '@/components/ui/button';
@@ -64,7 +64,6 @@ async function handleSubmit() {
     alert('Fyll ut alle obligatoriske felter: Tittel, Beskrivelse, Beredskapsnivå og Hendelse.');
     return;
   }
-
 
   const eventPayload = {
     name: title.value,
@@ -188,9 +187,9 @@ watch(() => props.eventData, async (newData) => {
     </div>
 
     <div class="flex items-center">
-      <Label class="m-2" for="latitude">Breddegrad</Label>
+      <Label class="m-2" for="latitude">Posisjon</Label>
       <div class="flex flex-col ">
-        <Label class="m-2" for="latitude">Latitude</Label>
+        <Label class="m-2" for="latitude">Breddegrad</Label>
         <Input class="border w-full" id="latitude" placeholder="eks: 64.232321" v-model="latitude" />
       </div>
 

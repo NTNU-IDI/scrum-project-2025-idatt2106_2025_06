@@ -99,7 +99,7 @@ const activeTab = ref('event');
               :location="event.location"
               :startTime="event.startTime"
               :endTime="event.endTime"
-              :updatedDate="event.updatedDate"
+              :updatedAt="event.updatedAt"
               @edit="handleEditEvent"
             />
           </template>

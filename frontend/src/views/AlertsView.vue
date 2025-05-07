@@ -128,12 +128,15 @@ onMounted(async () => {
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
           <template v-for="(event, index) in events" :key="index">
             <EventCard
-              :eventId="event.id"
+              :event-id="event.id"
               :name="event.name"
               :description="event.description"
-              :startDate="event.startDate"
-              :position="event.location"
+              :content="event.content"
               :severity="event.severity"
+              :type="event.type"
+              :status="event.status"
+              :location="event.location"
+              :updatedAt="event.updatedAt"
             />
           </template>
         </div>
