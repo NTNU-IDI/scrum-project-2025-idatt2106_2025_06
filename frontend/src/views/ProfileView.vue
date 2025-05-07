@@ -36,12 +36,14 @@ import router from '@/router/router.js'
 import { useSessionStore } from '@/stores/session'
 import { useStorageStore } from '@/stores/storage'
 import EditStorage from '@/components/EditStorage.vue'
+import axios from 'axios'
 
 const username = ref('');
 const email = ref('');
 
 const householdName = ref('');
-const location = ref('');
+const address = ref('');
+const resolvedAddresses = ref({})
 
 const joinToken = ref('')
 
@@ -60,11 +62,51 @@ const passwordSuccess = ref('')
 
 async function createNewStorage() {
   const token = sessionStore.token
-  const response = await storageStore.create(
-    householdName.value, token)
-  if (response) {
+
+  let location = null;
+
+  if (address.value.trim()) {
+    try {
+      const response = await axios.get(
+        'https://nominatim.openstreetmap.org/search',
+        {
+          params: {
+            q: address.value,
+            countrycodes: 'no',
+            format: 'json',
+            limit: 1,
+          },
+          headers: {
+            'Accept-Language': 'no',
+          },
+        }
+      );
+
+      const result = response.data[0];
+      if (result) {
+        location = {
+          latitude: parseFloat(result.lat),
+          longitude: parseFloat(result.lon),
+        };
+      } else {
+        console.warn('Fant ingen lokasjon for adressen');
+      }
+    } catch (error) {
+      console.error('Feil ved henting av koordinater:', error);
+    }
   }
+
+  const response = await storageStore.create(householdName.value, token, location);
+
+  if (response) {
+    householdName.value = '';
+    address.value = '';
+  }
+
+  await storageStore.fetchAll(token)
+  await loadAddresses()
 }
+
 
 async function joinStorage() {
   if (!joinToken.value) return
@@ -129,6 +171,31 @@ async function removeUser(userId, storageId) {
   }
 }
 
+async function resolveAddressFromLocation(location) {
+  const latitude = location.latitude
+  const longitude = location.longitude
+
+    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`, {
+  });
+
+  if (response.data.error) throw new Error(response.data.error)
+
+  return response.data.display_name;
+}
+
+async function loadAddresses() {
+  for (const s of storageStore.storages) {
+    if (s.location?.latitude && s.location?.longitude) {
+      try {
+        const address = await resolveAddressFromLocation(s.location)
+        resolvedAddresses.value[s.id] = address
+      } catch (err) {
+        console.error(`Kunne ikke resolve adresse for storage ${s.id}:`, err)
+      }
+    }
+  }
+}
+
 onMounted(async () => {
   if (!sessionStore.isAuthenticated) {
     router.push('/login')
@@ -141,6 +208,8 @@ onMounted(async () => {
 
   try {
     await storageStore.fetchAll(sessionStore.token)
+    await loadAddresses()
+
   } catch (error) {
     console.error("Could not fetch storages and members:", error)
   }
@@ -211,7 +280,7 @@ onMounted(async () => {
                   <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
                     <h3 class="text-xl font-bold">{{ s.name }}</h3>
                     <p>Husstandsnummer: {{ s.token }}</p>
-                    <p>Lokasjon: {{ s.location != null ? s.location : 'Ikke angitt' }}</p>
+                    <p>Lokasjon: {{ resolvedAddresses[s.id] || 'Laster...' }}</p>
                     <h4 class="mt-2 font-semibold">Medlemmer:</h4>
                     <ul v-if="membersByStorageId[s.id]">
                       <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
@@ -259,13 +328,13 @@ onMounted(async () => {
                     placeholder="Husstandsnavn"
                     type="text"
                   />
-                  <!--
+
                   <Input
-                    v-model="location"
-                    placeholder="Lokasjon (valgfritt)"
+                    v-model="address"
+                    placeholder="Adresse (valgfritt)"
                     type="text"
                   />
-                  -->
+
                   <DialogClose>
                     <Button @click="createNewStorage()" class="w-48">Opprett</Button>
                   </DialogClose>

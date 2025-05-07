@@ -1,20 +1,22 @@
 import api from '@/config/api.js'
+import axios from 'axios'
 
-export async function createStorage(name) {
+export async function createStorage(name, token, location) {
   try {
     const response = await api.post(
       '/storages/create',
-      { name },
+      { name, location },
       {
         headers: {
           'Content-Type': 'application/json'
         }
       }
-    )
-    return response.data
+    );
+    console.log("Response fra createStorage:", response.data)
+    return response.data;
   } catch (error) {
-    console.error('Create storage error:', error)
-    throw error
+    console.error('Create storage error:', error);
+    throw error;
   }
 }
 
