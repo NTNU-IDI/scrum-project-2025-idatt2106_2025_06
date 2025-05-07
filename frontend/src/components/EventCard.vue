@@ -27,10 +27,12 @@ const props = defineProps({
   type: { type: String, required: true },
   severity: { type: String, default: 'low' },
   status: { type: String, required: true },
+  updatedDate: { type: [String, Object]},
 
   // Ikke obligatoriske props
   content: { type: String, default: '' },
-  startDate: { type: [String, Object], default: null },
+  startTime: { type: [String, Object], default: null },
+  endTime: { type: [String, Object], default: null },
   location: { type: Object, default: null },
 })
 
@@ -44,27 +46,25 @@ const handleDelete = async () => {
 }
 
 const formattedDate = () => {
-  if (!props.startDate) return 'Ukjent dato'
+  console.log('FRA FORMATTED DATE', props.updatedDate)
+  if (!props.updatedDate) return 'Ukjent dato';
 
-  const dateObj = new Date(props.startDate.replace(' ', 'T'))
-  const today = new Date()
+  const dateObj = new Date(props.updatedDate);
+  const today = new Date();
 
   const isSameDay =
     today.getFullYear() === dateObj.getFullYear() &&
     today.getMonth() === dateObj.getMonth() &&
-    today.getDate() === dateObj.getDate()
+    today.getDate() === dateObj.getDate();
 
   if (isSameDay) {
-    // Kun klokkeslett
-    return dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
+    return dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
   } else if (today.getFullYear() === dateObj.getFullYear()) {
-    // Dato + klokkeslett uten år
     return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) +
       ' ' +
-      dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
+      dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
   } else {
-    // Dato + årstall
-    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' })
+    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 }
 
@@ -77,8 +77,9 @@ const handleEdit = () => {
     severity: props.severity,
     type: props.type,
     status: props.status,
-    startDate: props.startDate,
     location: props.location,
+    startTime: props.startTime,
+    endTime: props.endTime,
   })
 }
 

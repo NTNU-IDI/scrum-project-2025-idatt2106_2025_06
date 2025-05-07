@@ -34,12 +34,10 @@ const description = ref('')
 const content = ref('')
 const latitude = ref('')
 const longitude = ref('')
-const radius = ref(null)
+const radius = ref(1)
 const eventType = ref('other')
 const eventStatus = ref('ongoing')
 const selectedSeverity = ref('low')
-const date = ref()
-const time = ref()
 
 const eventFormRefresh = () => {
   id.value = ''
@@ -48,12 +46,10 @@ const eventFormRefresh = () => {
   description.value = ''
   latitude.value = ''
   longitude.value = ''
-  radius.value = null
+  radius.value = 1
   eventType.value = 'other'
   eventStatus.value = 'ongoing'
   selectedSeverity.value = 'low'
-  time.value = ''
-  date.value = ''
 };
 
 defineExpose({
@@ -62,14 +58,13 @@ defineExpose({
 
 async function handleSubmit() {
   console.log('Handling submit for mode:', props.mode)
+  const now = new Date().toISOString();
 
   if (!title.value || !description.value || !selectedSeverity.value || !eventType.value) {
     alert('Fyll ut alle obligatoriske felter: Tittel, Beskrivelse, Beredskapsnivå og Hendelse.');
     return;
   }
 
-  let datetime = date.value && time.value ? `${date.value}T${time.value}` : null
-  console.log('sjekk', datetime)
 
   const eventPayload = {
     name: title.value,
@@ -84,7 +79,8 @@ async function handleSubmit() {
     impact_area_radius_km: radius.value,
     type: eventType.value,
     severity: selectedSeverity.value,
-    startDate: datetime ? new Date(datetime).toISOString() : null,
+    startTime: now,
+    endTime: now,
   }
   console.log("Event Payload:", eventPayload);
 
@@ -95,7 +91,6 @@ async function handleSubmit() {
       await eventStore.createNewEvent(eventPayload, token)
     } else if (props.mode === 'edit') {
       const eventId = id.value
-
       console.log('Updating event id:', id.value)
       await eventStore.updateExistingEvent(eventId, eventPayload, token)
     }
@@ -112,20 +107,13 @@ watch(() => props.eventData, async (newData) => {
 
     id.value = newData.eventId
     title.value = newData.name
-    description.value = newData.description
     content.value = newData.content
+    latitude.value = newData.location.latitude
     eventType.value = newData.type
+    longitude.value = newData.location.longitude
+    description.value = newData.description
     eventStatus.value = newData.status
     selectedSeverity.value = newData.severity
-    latitude.value = newData.location.latitude
-    longitude.value = newData.location.longitude
-
-    if (newData.startDate) {
-      console.log('ny data dato', newData.startDate)
-      const [datePart, timePart] = newData.startDate.split('T')
-      date.value = datePart
-      time.value = timePart?.slice(0,5) ?? '00:00'
-    }
   }
 });
 </script>
@@ -221,14 +209,6 @@ watch(() => props.eventData, async (newData) => {
     <div class="flex items-center">
       <Label class="m-2" for="content">Mer info</Label>
       <Input class="border w-full" id="content" placeholder="Lengre beskrivelse av hendelsen" v-model="content" />
-    </div>
-
-    <div class="flex align-middle items-center">
-      <Label class="m-2" for="start-date">Tidspunkt</Label>
-      <div class="flex gap-2 items-center">
-        <input type="date" id="start-date" v-model="date" class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
-        <input type="time" id="start-time" v-model="time" class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
-      </div>
     </div>
 
     <Button class="flex-1" @click="handleSubmit">

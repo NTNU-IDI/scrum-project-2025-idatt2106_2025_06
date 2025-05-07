@@ -96,12 +96,13 @@ const activeTab = ref('event');
               :severity="event.severity"
               :type="event.type"
               :status="event.status"
-              :startDate="event.startDate"
               :location="event.location"
+              :startTime="event.startTime"
+              :endTime="event.endTime"
+              :updatedDate="event.updatedDate"
               @edit="handleEditEvent"
             />
           </template>
-
         </CardContent>
       </Card>
       <div class="w-full h-full rounded bg-blue-200"></div>
