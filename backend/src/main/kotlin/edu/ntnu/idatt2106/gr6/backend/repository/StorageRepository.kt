@@ -166,7 +166,7 @@ class StorageRepository(private val dataSource: DataSource) {
 
     fun findStoragesByUserId(userId: String): List<StorageSummary> {
         val sql = """
-        SELECT s.id, s.name, s.token, 
+        SELECT s.id, s.name, s.token, s.storage_owner,
                 ST_Y(s.location) AS latitude,
                 ST_X(s.location) AS longitude
         FROM storages s
@@ -190,7 +190,8 @@ class StorageRepository(private val dataSource: DataSource) {
                                 id = rs.getString("id"),
                                 name = rs.getString("name"),
                                 token = rs.getString("token"),
-                                location = location
+                                location = location,
+                                storageOwner = rs.getString("storage_owner")
                             )
                         )
                     }

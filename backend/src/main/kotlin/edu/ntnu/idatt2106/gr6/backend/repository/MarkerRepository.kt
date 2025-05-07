@@ -20,26 +20,25 @@ class MarkerRepository(
     fun createMarker(marker: Marker): Marker {
         val sql = """
         INSERT INTO marker (
-            id, storage_id, event_id, name, ST_, description, 
+            id, event_id, name, ST_, description, 
             contact_info, opening_hours, image_id, type
-        ) VALUES (?, ?, ?, ?, ST_PointFromText(?, 4326), ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ST_PointFromText(?, 4326), ?, ?, ?, ?, ?)
     """.trimIndent()
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, marker.id)
-                stmt.setString(2, marker.storageId)
-                stmt.setString(3, marker.eventId)
-                stmt.setString(4, marker.name)
-                stmt.setString(5, "POINT(${marker.location.longitude} ${marker.location.latitude})") // 🛠 Fixed
-                stmt.setString(6, marker.description)
-                stmt.setObject(7, marker.contactInfo.let {
+                stmt.setString(2, marker.eventId)
+                stmt.setString(3, marker.name)
+                stmt.setString(4, "POINT(${marker.location.longitude} ${marker.location.latitude})") // 🛠 Fixed
+                stmt.setString(5, marker.description)
+                stmt.setObject(6, marker.contactInfo.let {
                     it?.name + "," + it?.email + "," + it?.phone })
-                stmt.setObject(8, marker.openingHours.let {
+                stmt.setObject(7, marker.openingHours.let {
                     it?.monday + "," + it?.tuesday + "," + it?.wednesday + "," +
                             it?.thursday + "," + it?.friday + "," + it?.saturday + "," + it?.sunday })
-                stmt.setString(9, marker.imageId)
-                stmt.setString(10, marker.type.toString())
+                stmt.setString(8, marker.imageId)
+                stmt.setString(9, marker.type.toString())
 
                 logger.info("raw location: ${marker.location}")
                 logger.info("location: ${marker.location.latitude}, ${marker.location.longitude}")
@@ -56,7 +55,7 @@ class MarkerRepository(
     }
 
     fun findMarkerById(id: String): Marker? {
-        val sql = """SELECT id, storage_id, event_id, name, ST_AsText(location) AS location,
+        val sql = """SELECT id, event_id, name, ST_AsText(location) AS location,
             description, contact_info, opening_hours, image_id, type FROM marker WHERE id = ?
         """
         dataSource.connection.use { conn ->
@@ -74,7 +73,7 @@ class MarkerRepository(
 
 
     fun findAllMarkers(): List<Marker> {
-        val sql = """SELECT id, storage_id, event_id, name, ST_AsText(location) AS location,
+        val sql = """SELECT id, event_id, name, ST_AsText(location) AS location,
             description, contact_info, opening_hours, image_id, type FROM marker
         """
         val markers = mutableListOf<Marker>()
@@ -93,27 +92,25 @@ class MarkerRepository(
 
     fun updateMarker(marker: Marker): Marker {
         val sql = """
-            UPDATE marker SET 
-                storage_id = ?, event_id = ?, name = ?, location = ST_PointFromText(?, 4326), 
+            UPDATE marker SET event_id = ?, name = ?, location = ST_PointFromText(?, 4326), 
                 description = ?, contact_info = ?, opening_hours = ?, image_id = ?, type = ?
             WHERE id = ?
         """.trimIndent()
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, marker.storageId)
-                stmt.setString(2, marker.eventId)
-                stmt.setString(3, marker.name)
-                stmt.setString(4, "POINT(${marker.location.longitude} ${marker.location.latitude})")
-                stmt.setString(5, marker.description)
-                stmt.setObject(6, marker.contactInfo.let {
+                stmt.setString(1, marker.eventId)
+                stmt.setString(2, marker.name)
+                stmt.setString(3, "POINT(${marker.location.longitude} ${marker.location.latitude})")
+                stmt.setString(4, marker.description)
+                stmt.setObject(5, marker.contactInfo.let {
                     it?.name + "," + it?.email + "," + it?.phone })
-                stmt.setObject(7, marker.openingHours.let {
+                stmt.setObject(6, marker.openingHours.let {
                     it?.monday + "," + it?.tuesday + "," + it?.wednesday + "," +
                             it?.thursday + "," + it?.friday + "," + it?.saturday + "," + it?.sunday })
-                stmt.setString(8, marker.imageId)
-                stmt.setString(9, marker.type.toString())
-                stmt.setString(10, marker.id)
+                stmt.setString(7, marker.imageId)
+                stmt.setString(8, marker.type.toString())
+                stmt.setString(9, marker.id)
 
                 val rowsAffected = stmt.executeUpdate()
 
@@ -219,7 +216,6 @@ class MarkerRepository(
         }
         return Marker(
             id = rs.getString("id"),
-            storageId = rs.getString("storage_id"),
             eventId = rs.getString("event_id"),
             name = rs.getString("name"),
             location = location,
