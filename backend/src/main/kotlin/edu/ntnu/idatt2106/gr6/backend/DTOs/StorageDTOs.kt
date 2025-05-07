@@ -1,12 +1,12 @@
 package edu.ntnu.idatt2106.gr6.backend.DTOs
 
+import edu.ntnu.idatt2106.gr6.backend.model.Location
 import java.time.Instant
 
 class StorageDTOs {
     data class CreateStorageRequest(
         val name: String,
-        val latitude: Double?,  // optional
-        val longitude: Double?  // optional
+        val location: Location?,
     )
 
     data class StorageResponse(
@@ -14,6 +14,7 @@ class StorageDTOs {
         val name: String,
         val storageOwner: String,
         val token: String,
+        val location: Location?,
         val createdAt: Instant,
         val updatedAt: Instant
     )
@@ -31,6 +32,6 @@ class StorageDTOs {
         val id: String,
         val name: String,
         val token: String,
-        val storageOwner: String
+        val location: Location?
     )
 }

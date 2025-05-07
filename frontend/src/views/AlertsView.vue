@@ -1,140 +1,52 @@
 <script setup>
 import AlertCard from '@/components/AlertCard.vue'
 import EventCard from '@/components/EventCard.vue'
+import { onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
+import { initializeWebSocket} from '@/lib/websocket.js'
+import { useSessionStore} from '@/stores/session'
 
-const alerts = [
-  {
-    id: 1,
-    title: 'GODE NYHETER! lalal',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 2,
-    title: 'Bolle',
-    description:
-      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 3,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-    time: '11:42',
-    severity: 'yellow',
-  },
-  {
-    id: 4,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-    time: '11:42',
-    severity: 'green',
-  },
-  {
-    id: 5,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 6,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 7,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-  {
-    id: 8,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-  },
-  {
-    id: 9,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-  },
-  {
-    id: 10,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 11,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 12,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-  {
-    id: 13,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-  },
-  {
-    id: 14,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-  },
-  {
-    id: 15,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-]
 
-const events = [
-  {
-    id: 1,
-    title: 'GODE NYHETER! lalal',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-    time: 'Nå',
-    severity: 'info',
-  },
-  {
-    id: 2,
-    title: 'Bolle',
-    description:
-      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 3,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-    time: '11:42',
-    severity: 'yellow',
-  },
-  {
-    id: 4,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-    time: '11:42',
-    severity: 'green',
-  },
-  {
-    id: 5,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 6,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 7,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-]
+const alerts = ref([]);
+const allNews = ref([]);
+const sessionStore = useSessionStore();
+const jwtToken = sessionStore.token
+console.log({ jwtToken });
+
+
+onMounted(() => {
+  initializeWebSocket(jwtToken, (message, source) => {
+    console.log('Received message from ',source, ': ', message);
+    const parsedMessages = typeof message === 'string' ? JSON.parse(message) : message;
+    const messages = Array.isArray(parsedMessages) ? parsedMessages : [parsedMessages];
+
+    messages.forEach((msg) => {
+      if (source === '/topic/public/newsAlerts') {
+        const alert = {
+          id: msg.id,
+          title: msg.title || 'No Title',
+          description: msg.description || 'No Description',
+          severity: msg.severity || 'info',
+          time: msg.time || 'Nå',
+        };
+        alerts.value.push(alert);
+      }
+
+      if (source === '/topic/public/events') {
+        const news = {
+          id: msg.id,
+          title: msg.name || 'No Title',
+          description: msg.description || 'No Description',
+          content: msg.content || 'No Content',
+          severity: msg.severity || 'info',
+          time: msg.startDate || 'Nå',
+        };
+        allNews.value.push(news);
+      }
+    });
+  });
+  //sendTestMessage()
+});
 </script>
 
 <template>
@@ -158,13 +70,13 @@ const events = [
     <div class="mt-16">
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
-          <template v-for="(event, index) in events" :key="index">
-            <RouterLink :to="'events/' + event.id" class="relative">
+          <template v-for="(news, index) in allNews" :key="index">
+            <RouterLink :to="'events/' + news.id" class="relative">
               <EventCard
-                :description="event.description"
-                :severity="event.severity"
-                :time="event.time"
-                :title="event.title"
+                :description="news.description"
+                :severity="news.severity"
+                :time="news.startDate"
+                :title="news.title"
                 variant="default"
               />
             </RouterLink>
