@@ -179,6 +179,53 @@ class MarkerRepository(
         return markers
     }
 
+    fun findClosestMarkerIdByType(
+        location: Location,
+        type: String
+    ): String? {
+        val sql = """
+            SELECT id
+            FROM marker
+            WHERE type = ?
+            ORDER BY ST_Distance_Sphere(location, ST_PointFromText(?, 4326))
+            LIMIT 1
+        """.trimIndent()
+
+        val point = "POINT(${location.longitude} ${location.latitude})"
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, type)
+                stmt.setString(2, point)
+                stmt.executeQuery().use { rs ->
+                    return if (rs.next()) rs.getString("id") else null
+                }
+            }
+        }
+    }
+
+    fun findClosestPersonalMarker(
+        location: Location,
+    ): String? {
+        val sql = """
+            SELECT id
+            FROM personal_marker
+            ORDER BY ST_Distance_Sphere(location, ST_PointFromText(?, 4326))
+            LIMIT 1
+        """.trimIndent()
+
+        val point = "POINT(${location.longitude} ${location.latitude})"
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, point)
+                stmt.executeQuery().use { rs ->
+                    return if (rs.next()) rs.getString("id") else null
+                }
+            }
+        }
+    }
+
     fun mapRowToMarker(rs: ResultSet): Marker {
         val location = rs.getLocation() ?: throw Exception("Location cannot be null")
 
