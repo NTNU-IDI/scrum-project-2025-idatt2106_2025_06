@@ -18,6 +18,7 @@ import AddRemoveAdminView from "@/views/AddRemoveAdminView.vue";
 
 import { useSessionStore } from '@/stores/session.js'
 
+
 const routes = [
   {path: '/', component: HomeView, name: 'home'},
   {path: '/alerts', component: AlertsView, name: 'alerts'},

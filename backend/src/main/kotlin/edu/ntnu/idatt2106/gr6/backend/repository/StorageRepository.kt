@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.repository
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.model.Location
 import edu.ntnu.idatt2106.gr6.backend.model.SimpleUser
 import edu.ntnu.idatt2106.gr6.backend.model.Storage
 import org.springframework.stereotype.Repository
@@ -15,8 +16,7 @@ class StorageRepository(private val dataSource: DataSource) {
     fun saveStorage(
         name: String,
         storageOwner: String,
-        latitude: Double?,
-        longitude: Double?
+        location: Location?,
     ): Storage {
         val id = UUID.randomUUID()
         val token = generateRandomKey()
@@ -34,8 +34,8 @@ class StorageRepository(private val dataSource: DataSource) {
                 stmt.setString(2, name)
                 stmt.setString(3, storageOwner)
                 stmt.setString(4, token)
-                stmt.setObject(5, latitude)
-                stmt.setObject(6, longitude)
+                stmt.setObject(5, location?.latitude)
+                stmt.setObject(6, location?.longitude)
                 stmt.setTimestamp(7, createdAt)
                 stmt.setTimestamp(8, updatedAt)
                 stmt.executeUpdate()
@@ -49,8 +49,7 @@ class StorageRepository(private val dataSource: DataSource) {
             name = name,
             storageOwner = storageOwner,
             token = token.toString(),
-            latitude = latitude,
-            longitude = longitude,
+            location = location,
             createdAt = createdAt.toInstant(),
             updatedAt = updatedAt.toInstant()
         )
@@ -167,7 +166,9 @@ class StorageRepository(private val dataSource: DataSource) {
 
     fun findStoragesByUserId(userId: String): List<StorageSummary> {
         val sql = """
-        SELECT s.id, s.name, s.token
+        SELECT s.id, s.name, s.token, s.storage_owner,
+                ST_Y(s.location) AS latitude,
+                ST_X(s.location) AS longitude
         FROM storages s
         JOIN user_storages us ON s.id = us.storage_id
         WHERE us.user_id = ?
@@ -180,30 +181,36 @@ class StorageRepository(private val dataSource: DataSource) {
                 stmt.setString(1, userId)
                 stmt.executeQuery().use { rs ->
                     while (rs.next()) {
+                        val lat = rs.getObject("latitude") as? Double
+                        val lon = rs.getObject("longitude") as? Double
+                        val location = if (lat != null && lon != null) Location(lat, lon) else null
+
                         storages.add(
                             StorageSummary(
                                 id = rs.getString("id"),
                                 name = rs.getString("name"),
-                                token = rs.getString("token")
+                                token = rs.getString("token"),
+                                location = location,
+                                storageOwner = rs.getString("storage_owner")
                             )
                         )
                     }
                 }
             }
         }
-
         return storages
     }
 
 
     private fun mapRowToStorage(rs: ResultSet): Storage {
+        val lat = rs.getObject("latitude") as? Double
+        val lon = rs.getObject("longitude") as? Double
         return Storage(
             id = rs.getString("id"),
             name = rs.getString("name"),
             storageOwner = rs.getString("storage_owner"),
             token = rs.getString("token"),
-            latitude = rs.getObject("latitude") as? Double,
-            longitude = rs.getObject("longitude") as? Double,
+            location = if (lat != null && lon != null) Location(lat, lon) else null,
             createdAt = rs.getTimestamp("created_at").toInstant(),
             updatedAt = rs.getTimestamp("updated_at").toInstant()
         )

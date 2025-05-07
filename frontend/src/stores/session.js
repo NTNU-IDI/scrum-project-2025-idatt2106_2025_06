@@ -26,7 +26,7 @@ export const useSessionStore = defineStore('session', () => {
     token.value = response.token
     sessionStorage.setItem('token', response.token)
     user.value = {
-      id: response.userId,
+      id: response.id,
       email: response.email,
       name: response.name,
       joinedAt: response.joinedAt,

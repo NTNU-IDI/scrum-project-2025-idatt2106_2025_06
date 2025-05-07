@@ -2,319 +2,347 @@
   <div class="relative w-full h-full flex">
     <div ref="mapContainer" class="map-container flex-1 w-full rounded-xl shadow"></div>
     <div
-      ref="props"
-      class="w-full h-64 bg-white hidden p-4 absolute bottom-4 left-4 mr-40 overflow-hidden rounded-md"
-    ></div>
+      v-if="popup.visible"
+      class="map-overlay-inner bg-white p-4 absolute bottom-4 left-4 mr-40 overflow-auto rounded-md"
+    >
+      <h3 class="font-semibold mb-2">{{ popup.item.name }}</h3>
+      <p class="mb-2">{{ popup.item.description }}</p>
+      <Button
+        class="mt-2"
+        @click="
+          () => {
+            lastDest = popup.coords
+            fetchAndAnimateRoute(routeStart, popup.coords)
+          }
+        "
+      >
+        Vis rute hit
+      </Button>
+    </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import 'mapbox-gl/dist/mapbox-gl.css'
 import mapboxgl from 'mapbox-gl'
+import {
+  createVNode,
+  defineEmits,
+  defineExpose,
+  defineProps,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  render,
+  watch,
+} from 'vue'
+import {
+  HeartPulse,
+  Hospital,
+  MapPin,
+  Package,
+  Plus,
+  Shield,
+  Vault,
+  Warehouse,
+} from 'lucide-vue-next'
+import { Button } from '@/components/ui/button/index.js'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
-export default {
-  props: {
-    modelValue: { type: Object, required: true },
-    settings: { type: Object, required: true },
-  },
+const popup = reactive({
+  visible: false,
+  item: null,
+  coords: [0, 0],
+})
 
-  emits: ['update:modelValue'],
+const props = defineProps({
+  modelValue: Object,
+  settings: Object,
+  markers: Array,
+  storages: Array,
+  startSelection: [String, Number],
+})
+const emit = defineEmits(['update:modelValue'])
 
-  data() {
-    return {
-      selectedEl: null,
-      latitude: null,
-      longitude: null,
-      errorMessage: null,
-      isLoading: false,
-      statusMessage: 'Ikke aktivert',
-      geoDenied: false,
+const statusMessage = ref('Ikke aktivert')
+let userMarker = null
 
-      // for path animation - https://docs.mapbox.com/mapbox-gl-js/example/animate-ant-path/
-      dashSequence: [
-        [0, 4, 3],
-        [0.5, 4, 2.5],
-        [1, 4, 2],
-        [1.5, 4, 1.5],
-        [2, 4, 1],
-        [2.5, 4, 0.5],
-        [3, 4, 0],
-        [0, 0.5, 3, 3.5],
-        [0, 1, 3, 3],
-        [0, 1.5, 3, 2.5],
-        [0, 2, 3, 2],
-        [0, 2.5, 3, 1.5],
-        [0, 3, 3, 1],
-        [0, 3.5, 3, 0.5],
-      ],
-      dashStep: 0,
-      animationId: null,
-    }
-  },
+function flyToUser() {
+  if (!userMarker) {
+    getGeolocation()
+    return
+  }
+  const { lng, lat } = userMarker.getLngLat()
+  map.flyTo({ center: [lng, lat], zoom: 14, essential: true })
+}
 
-  mounted() {
-    const { lng, lat, zoom, bearing, pitch } = this.modelValue
-    this.map = new mapboxgl.Map({
-      container: this.$refs.mapContainer,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [lng, lat],
-      zoom,
-      bearing,
-      pitch,
-    })
+defineExpose({ statusMessage, flyToUser })
 
-    this.markerObjs = []
-    this.getGeolocation()
+const mapContainer = ref(null)
+const propsOverlay = ref(null)
+let map,
+  animationId,
+  dashStep = 0,
+  routeStart = null,
+  lastDest = null,
+  markerObjs = []
 
-    this.map.on('load', () => {
-      fetch('/data/tilfluktsrom-4326.json')
-        .then((res) => res.json())
-        .then((data) => {
-          data.features.forEach((feature) => {
-            const props = feature.properties
-            const coords = feature.geometry.coordinates
+const dashSequence = [
+  [0, 4, 3],
+  [0.5, 4, 2.5],
+  [1, 4, 2],
+  [1.5, 4, 1.5],
+  [2, 4, 1],
+  [2.5, 4, 0.5],
+  [3, 4, 0],
+  [0, 0.5, 3, 3.5],
+  [0, 1, 3, 3],
+  [0, 1.5, 3, 2.5],
+  [0, 2, 3, 2],
+  [0, 2.5, 3, 1.5],
+  [0, 3, 3, 1],
+  [0, 3.5, 3, 0.5],
+]
 
-            const el = document.createElement('div')
-            el.className = 'marker'
+const typeConfig = {
+  Shelter: { icon: Vault, bg: '#4e95f3' },
+  Defibrillator: { icon: HeartPulse, bg: '#f34e4e' },
+  EmergencyClinic: { icon: Hospital, bg: '#e36414' },
+  DistributionPoint: { icon: Package, bg: '#14e3d3' },
+  PoliceStation: { icon: Shield, bg: '#e314a1' },
+  Pharmacy: { icon: Plus, bg: '#14a114' },
+  General: { icon: MapPin, bg: '#a1a114' },
+  storage: { icon: Warehouse, bg: '#8e4ef3' },
+}
 
-            const icon = document.createElement('div')
-            icon.className = 'icon'
-            Object.assign(icon.style, {
-              backgroundImage: 'url(/VaultDoor.svg)',
-              width: '52px',
-              height: '72px',
-              scale: '0.6',
-              cursor: 'pointer',
-              transition: 'transform 0.1s ease',
-            })
+onMounted(() => {
+  const { lng, lat, zoom, bearing, pitch } = props.modelValue
+  map = new mapboxgl.Map({
+    container: mapContainer.value,
+    style: 'mapbox://styles/mapbox/streets-v12',
+    center: [lng, lat],
+    zoom,
+    bearing,
+    pitch,
+  })
 
-            icon.addEventListener('mouseenter', () => (icon.style.transform = 'scale(1.1)'))
-            icon.addEventListener('mouseleave', () => {
-              if (el !== this.selectedEl) icon.style.transform = 'scale(1)'
-            })
+  getGeolocation()
+  map.on('load', () => {
+    updateRouteStart()
+    redrawAll()
+  })
+  map.on('click', clearSelection)
+  const updateLoc = () => emit('update:modelValue', getLocation())
+  ;['moveend', 'zoomend', 'rotateend', 'pitchend'].forEach((e) => map.on(e, updateLoc))
 
-            icon.addEventListener('click', (e) => {
-              e.stopPropagation()
-              if (this.selectedEl && this.selectedEl !== el) {
-                this.selectedEl.querySelector('.icon').style.transform = 'scale(1)'
-              }
-              this.map.flyTo({
-                center: coords,
-                zoom: 14,
-                essential: true,
-              })
-              this.selectedEl = el
-              icon.style.transform = 'scale(1.2)'
-              this.showCard(props)
-              this.fetchAndAnimateRoute(coords)
-            })
-
-            el.appendChild(icon)
-
-            const marker = new mapboxgl.Marker(el).setLngLat(coords).addTo(this.map)
-
-            this.markerObjs.push({ marker, el, props })
-          })
-
-          this.applySettings(this.settings)
-        })
-
-      this.map.on('click', () => {
-        if (this.selectedEl) {
-          this.selectedEl.querySelector('.icon').style.transform = 'scale(1)'
-          this.selectedEl = null
-        }
-        this.clearRoute()
-        this.hideCard()
-      })
-    })
-
-    const updateLocation = () => this.$emit('update:modelValue', this.getLocation())
-    ;['moveend', 'zoomend', 'rotateend', 'pitchend'].forEach((evt) =>
-      this.map.on(evt, updateLocation),
-    )
-
-    this.$watch(
-      () => this.settings,
-      (newSettings) => this.applySettings(newSettings),
-      { deep: true },
-    )
-  },
-
-  unmounted() {
-    if (this.map) this.map.remove()
-  },
-
-  methods: {
-    getLocation() {
-      const [lng, lat] = this.map.getCenter().toArray()
-      return {
-        lng,
-        lat,
-        bearing: this.map.getBearing(),
-        pitch: this.map.getPitch(),
-        zoom: this.map.getZoom(),
-      }
+  watch(() => [props.markers, props.storages, props.settings], redrawAll, { deep: true })
+  watch(
+    () => props.startSelection,
+    () => {
+      updateRouteStart()
+      if (lastDest) fetchAndAnimateRoute(routeStart, lastDest)
     },
+  )
+})
 
-    getGeolocation() {
-      if ('geolocation' in navigator) {
-        this.isLoading = true
-        this.statusMessage = 'Henter posisjon...'
+onBeforeUnmount(() => {
+  if (animationId) cancelAnimationFrame(animationId)
+  map?.remove()
+})
 
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            this.latitude = position.coords.latitude
-            this.longitude = position.coords.longitude
-            this.statusMessage = 'Posisjon funnet'
-            this.geoDenied = false
-            this.isLoading = false
+function getLocation() {
+  const [lng, lat] = map.getCenter().toArray()
+  return { lng, lat, bearing: map.getBearing(), pitch: map.getPitch(), zoom: map.getZoom() }
+}
 
-            // Add marker if not already present
-            if (!this.userMarker) {
-              this.userMarker = new mapboxgl.Marker({ color: '#007cbf' })
-                .setLngLat([this.longitude, this.latitude])
-                .addTo(this.map)
-            } else {
-              this.userMarker.setLngLat([this.longitude, this.latitude])
-            }
-          },
-          (error) => {
-            this.isLoading = false
-            if (error.code === error.PERMISSION_DENIED) {
-              this.statusMessage = 'Tilgang nektet'
-              this.geoDenied = true
-            } else {
-              this.statusMessage = `Feil: ${error.message}`
-            }
-          },
-        )
+function getGeolocation() {
+  if (!navigator.geolocation) {
+    statusMessage.value = 'Geolokasjon støttes ikke'
+    return
+  }
+  statusMessage.value = 'Henter posisjon...'
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords
+      statusMessage.value = 'Posisjon funnet'
+      if (!userMarker) {
+        userMarker = new mapboxgl.Marker({ color: '#007cbf' })
+          .setLngLat([longitude, latitude])
+          .addTo(map)
       } else {
-        this.statusMessage = 'Geolokasjon støttes ikke'
+        userMarker.setLngLat([longitude, latitude])
       }
+      if (props.startSelection === 'current') routeStart = { lng: longitude, lat: latitude }
     },
-
-    flyToUser() {
-      if (this.geoDenied || this.latitude == null || this.longitude == null) {
-        this.getGeolocation()
-        return
-      }
-
-      this.map.flyTo({
-        center: [this.longitude, this.latitude],
-        zoom: 14,
-        essential: true,
-      })
+    (err) => {
+      statusMessage.value =
+        err.code === err.PERMISSION_DENIED ? 'Tilgang nektet' : `Feil: ${err.message}`
     },
+  )
+}
 
-    applySettings(settings) {
-      this.markerObjs.forEach(({ el, props }) => {
-        let visible = true
-        if (!settings.showShelters) visible = false
-        if (props.capacity < settings.minCapacity) visible = false
-        if (settings.searchQuery) {
-          const q = settings.searchQuery.toLowerCase()
-          const text = ((props.adresse || props.name) + '').toLowerCase()
-          if (!text.includes(q)) visible = false
-        }
-        el.style.display = visible ? 'block' : 'none'
-      })
-    },
+function updateRouteStart() {
+  if (props.startSelection === 'current') {
+    if (userMarker) {
+      const { lng, lat } = userMarker.getLngLat()
+      routeStart = { lng, lat }
+    } else getGeolocation()
+  } else {
+    const st = props.storages.find((s) => String(s.id) === String(props.startSelection))
+    if (st?.location?.longitude != null) {
+      routeStart = { lng: st.location.longitude, lat: st.location.latitude }
+    }
+  }
+}
 
-    showCard(props) {
-      const c = this.$refs.props
-      c.innerHTML = `
-        <div class="map-overlay-inner">
-          <code>${props.adresse || props.name}</code><hr>
-          ${Object.entries(props)
-            .map(([k, v]) => `<li><b>${k}</b>: ${v}</li>`)
-            .join('')}
-        </div>`
-      c.style.display = 'block'
-    },
-    hideCard() {
-      this.$refs.props.style.display = 'none'
-    },
+function redrawAll() {
+  if (!map?.isStyleLoaded()) return
+  markerObjs.forEach((o) => o.marker.remove())
+  markerObjs = []
 
-    async fetchAndAnimateRoute(coords) {
-      if (!this.latitude || !this.longitude) return
+  const s = props.settings,
+    q = s.searchQuery?.toLowerCase() || ''
 
-      const coordsParam = `${this.longitude},${this.latitude};${coords[0]},${coords[1]}`
-      const url =
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${coordsParam}` +
-        `?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`
+  // backend markers
+  for (const m of props.markers) {
+    const { type, location, name, description, capacity } = m
+    if (
+      (type === 'Shelter' && !s.showShelters) ||
+      (type === 'Defibrillator' && !s.showDefibrillators) ||
+      (type === 'EmergencyClinic' && !s.showEmergencyClinics) ||
+      (type === 'DistributionPoint' && !s.showDistributionPoints) ||
+      (type === 'PoliceStation' && !s.showPoliceStations) ||
+      (type === 'Pharmacy' && !s.showPharmacies) ||
+      (type === 'General' && !s.showGeneral)
+    )
+      continue
+    if (capacity != null && capacity < s.minCapacity) continue
+    if (q && !`${name} ${description}`.toLowerCase().includes(q)) continue
 
-      const res = await fetch(url)
-      const json = await res.json()
-      if (!json.routes?.length) return
+    addOne(m, type, [location.longitude, location.latitude])
+  }
 
-      const routeGeoJSON = { type: 'Feature', geometry: json.routes[0].geometry }
+  // storages
+  if (s.showStorages) {
+    for (const st of props.storages) {
+      const { location, name, description } = st
+      if (q && !`${name} ${description}`.toLowerCase().includes(q)) continue
+      addOne(st, 'storage', [location.longitude, location.latitude])
+    }
+  }
+}
 
-      if (this.map.getSource('route')) {
-        ;['route-dashed', 'route-bg'].forEach((id) => {
-          if (this.map.getLayer(id)) this.map.removeLayer(id)
-        })
-        this.map.removeSource('route')
-      }
+const selectedEl = ref(null)
 
-      this.map.addSource('route', { type: 'geojson', data: routeGeoJSON })
-      this.map.addLayer({
-        id: 'route-bg',
-        type: 'line',
-        source: 'route',
-        paint: {
-          'line-color': 'yellow',
-          'line-width': 6,
-          'line-opacity': 0.4,
-        },
-      })
-      this.map.addLayer({
-        id: 'route-dashed',
-        type: 'line',
-        source: 'route',
-        paint: {
-          'line-color': 'orange',
-          'line-width': 6,
-          'line-dasharray': this.dashSequence[0],
-        },
-      })
+function addOne(item, type, coords) {
+  const cfg = typeConfig[type] || typeConfig.general
+  const el = document.createElement('div')
+  el.className = 'marker'
+  const wrap = document.createElement('div')
+  Object.assign(wrap.style, {
+    width: '32px',
+    height: '32px',
+    borderRadius: '50%',
+    backgroundColor: cfg.bg,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    transition: 'transform .1s',
+  })
+  const vnode = createVNode(cfg.icon, { size: 20, color: '#fff' })
+  render(vnode, wrap)
 
-      this.animateDash()
-    },
+  wrap.addEventListener('mouseenter', () => (wrap.style.transform = 'scale(1.1)'))
+  wrap.addEventListener('mouseleave', () => {
+    if (el !== selectedEl.value) wrap.style.transform = 'scale(1)'
+  })
+  wrap.addEventListener('click', (e) => {
+    e.stopPropagation()
+    if (selectedEl.value && selectedEl.value !== el) {
+      selectedEl.value.querySelector('div').style.transform = 'scale(1)'
+    }
+    wrap.style.transform = 'scale(1.2)'
+    selectedEl.value = el
+    showCard(item, coords)
+  })
 
-    animateDash(timestamp = 0) {
-      const seq = this.dashSequence
-      const next = parseInt((timestamp / 50) % seq.length)
+  el.appendChild(wrap)
+  const marker = new mapboxgl.Marker(el).setLngLat(coords).addTo(map)
+  markerObjs.push({ marker: marker, el })
+}
 
-      if (next !== this.dashStep) {
-        this.map.setPaintProperty('route-dashed', 'line-dasharray', seq[next])
-        this.dashStep = next
-      }
-      this.animationId = requestAnimationFrame(this.animateDash.bind(this))
-    },
+function clearSelection() {
+  if (selectedEl.value) {
+    selectedEl.value.querySelector('div').style.transform = 'scale(1)'
+    selectedEl.value = null
+  }
+  hideCard()
+  clearRoute()
+}
 
-    clearRoute() {
-      if (this.animationId) {
-        cancelAnimationFrame(this.animationId)
-        this.animationId = null
-      }
-      if (this.map.getSource('route')) {
-        ;['route-dashed', 'route-bg'].forEach((id) => {
-          if (this.map.getLayer(id)) this.map.removeLayer(id)
-        })
-        this.map.removeSource('route')
-      }
-      this.dashStep = 0
-    },
-  },
+function showCard(item, coords) {
+  popup.item = item
+  popup.coords = coords
+  popup.visible = true
+}
+
+function hideCard() {
+  popup.visible = false
+}
+
+async function fetchAndAnimateRoute(start, end) {
+  if (!start || !end) return
+  const p = `${start.lng},${start.lat};${end[0]},${end[1]}`
+  const url =
+    `https://api.mapbox.com/directions/v5/mapbox/driving/${p}` +
+    `?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`
+  const res = await fetch(url),
+    js = await res.json()
+  if (!js.routes?.length) return
+  const geo = { type: 'Feature', geometry: js.routes[0].geometry }
+  if (map.getSource('route')) {
+    ;['route-bg', 'route-dashed'].forEach((id) => map.getLayer(id) && map.removeLayer(id))
+    map.removeSource('route')
+  }
+  map.addSource('route', { type: 'geojson', data: geo })
+  map.addLayer({
+    id: 'route-bg',
+    type: 'line',
+    source: 'route',
+    paint: { 'line-color': 'yellow', 'line-width': 6, 'line-opacity': 0.4 },
+  })
+  map.addLayer({
+    id: 'route-dashed',
+    type: 'line',
+    source: 'route',
+    paint: { 'line-color': 'orange', 'line-width': 6, 'line-dasharray': dashSequence[0] },
+  })
+  animateDash()
+}
+
+function animateDash(t = 0) {
+  const next = parseInt((t / 50) % dashSequence.length)
+  if (next !== dashStep) {
+    map.setPaintProperty('route-dashed', 'line-dasharray', dashSequence[next])
+    dashStep = next
+  }
+  animationId = requestAnimationFrame(animateDash)
+}
+
+function clearRoute() {
+  if (animationId) cancelAnimationFrame(animationId)
+  if (map.getSource('route')) {
+    ;['route-bg', 'route-dashed'].forEach((id) => map.getLayer(id) && map.removeLayer(id))
+    map.removeSource('route')
+  }
+  dashStep = 0
 }
 </script>
 
 <style scoped>
-.icon {
-  background-size: contain;
-  background-repeat: no-repeat;
+.marker {
 }
 </style>
