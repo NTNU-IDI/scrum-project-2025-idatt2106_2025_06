@@ -131,9 +131,10 @@ const handleEdit = () => {
           {{ props.description || props.content }}
         </p>
       </div>
+      <!-- TODO Fjern når les mer-funksjonalitet er på plass
       <div v-if="variant !== 'admin'" class="mt-4 flex-shrink-0">
         <p>Les mer</p>
-      </div>
+      </div>-->
     </div>
 
     <div v-if="props.variant === 'admin'" class="flex items-center gap-2">
