@@ -5,6 +5,7 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.EditUserNameEmailResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.ChangePasswordRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.ChangeUserTrackingPreferenceRequest
 import edu.ntnu.idatt2106.gr6.backend.service.UserService
+import edu.ntnu.idatt2106.gr6.backend.service.EmailService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.DeleteMapping
 
 @RestController
 @RequestMapping("/api/user")
 class UserController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val emailService: EmailService
 ) {
     private val logger = org.slf4j.LoggerFactory.getLogger(UserController::class.java)
 
@@ -85,5 +88,16 @@ class UserController(
         userService.deleteUserTrackingHistory()
         logger.info("Location history deleted successfully")
         return ResponseEntity.ok().build()
+    }
+
+    @GetMapping("/send-email")
+    fun testEmail(): ResponseEntity<String> {
+        try {
+            logger.info("Received request to send verification email")
+            val response = emailService.sendVerificationEmail()
+            return ResponseEntity.ok("Email sent successfully: $response")
+        } catch (e: Exception) {
+            return ResponseEntity.internalServerError().body("Failed to send email: ${e.message}")
+        }
     }
 }
