@@ -46,13 +46,14 @@ const handleDelete = async () => {
 }
 
 const formattedDate = () => {
-  console.log('FRA FORMATTED DATE', props.updatedAt)
   if (!props.updatedAt) {
     console.warn(`updatedDate mangler for eventId: ${props.eventId}`);
     return 'Ukjent dato';
   }
 
   const dateObj = new Date(props.updatedAt);
+  dateObj.setHours(dateObj.getHours() + 2); //Added because date somehow saves as CEST
+
   const today = new Date();
 
   const isSameDay =
