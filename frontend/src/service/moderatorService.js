@@ -2,10 +2,10 @@ import axios from 'axios';
 
 
 
-export async function createModerator(name, email, token) {
+export async function createModerator(name, email, username, token) {
   try {
     const response = await axios.post('http://localhost:8080/api/moderator/create',
-      { name, email },
+      { name, email, username },
       {
         headers: {
           Authorization: `Bearer ${token}`,

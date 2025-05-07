@@ -1,27 +1,37 @@
 <script setup>
-import DeleteModerator from '@/components/DeleteModerator.vue'
 import ResetPasswordLink from '@/components/ResetPasswordLink.vue'
-import AddModerator from '@/components/AddModerator.vue'
 import { Button } from '@/components/ui/button/index.js'
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
+import { useRouter} from 'vue-router'
 
-const isAdmin = ref(true)
+const router = useRouter()
+const session = useSessionStore()
+
+function handleLogout() {
+  session.logout()
+  router.push('/login')
+}
+
+const isAdmin = computed(() => session.user?.role === 'ADMIN')
 </script>
 
 <template>
-  <nav class="sticky top-0 z-50 w-full py-2 shadow">
-    <div class="flex items-center justify-between max-w-7xl m-auto">
-      <router-link class="flex min-w-40 h-10 gap-4 items-center hover:scale-110 transition" to="/admin">
-        <img alt="logo" src="">
-        <p>Krisefikser</p>
+  <nav class="sticky top-0 z-50 w-full py-2 shadow backdrop:white">
+    <div class="flex items-center justify-between max-w-6xl m-auto">
+      <router-link class="flex min-w-40 h-10 gap-2 items-center hover:scale-110 transition" to="/admin">
+        <img alt="logo" height="32" src="/krisefikserLogo.svg" width="32">
+        <p class="font-bold">KRISEFIKSER</p>
       </router-link>
       <div
-        class="gap-10 hidden sm:flex h-10 items-center">
-        <AddModerator v-if="isAdmin"/>
-        <DeleteModerator v-if="isAdmin"/>
+        class="gap-10 hidden sm:flex items-center">
+        <router-link to="/admin/addremove" v-if="isAdmin">
+          <Button>Administrer moderatorer</Button>
+        </router-link>
         <ResetPasswordLink v-if="isAdmin"/>
       </div>
-      <Button variant="destructive">Logg ut</Button>
+        <Button @click="handleLogout" class="bg-white text-black hover:bg-gray-100" >Logg ut</Button>
+
     </div>
 
   </nav>
