@@ -1,7 +1,7 @@
 <template>
-  <div class="m-auto flex relative flex-1 w-full py-10 gap-6">
+  <div class="m-auto flex relative flex-1 w-full h-full py-10 gap-6 items-stretch min-h-0">
     <aside
-      class="w-72 p-4 bg-white rounded-lg shadow space-y-4"
+      class="w-72 h-full p-4 bg-white rounded-lg shadow space-y-4 overflow-auto"
       style="position: relative; z-index: 10"
     >
       <div class="flex items-center justify-between">
@@ -35,11 +35,11 @@
           <div class="flex justify-between items-center mb-2">
             <label class="flex items-center gap-2 text-sm font-semibold">
               <MapPin class="size-5" />
-              Dine markører
+              Generelle markører
             </label>
-            <Checkbox v-model="settings.showMarkers" />
+            <Checkbox v-model="settings.showGeneral" />
           </div>
-          <div v-if="settings.showMarkers" class="flex flex-col gap-2">
+          <div v-if="settings.showGeneral" class="flex flex-col gap-2">
             <input
               v-model="settings.searchQuery"
               class="w-full border rounded px-2 py-1"
@@ -51,6 +51,7 @@
             </Button>
           </div>
         </div>
+
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="flex items-center gap-2 text-sm font-semibold">
@@ -67,10 +68,11 @@
             />
             <Button variant="outline">
               <Milestone />
-              Vis rute til nærmeste tilfluktsrom
+              Vis nærmeste tilfluktsrom
             </Button>
           </div>
         </div>
+
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="flex items-center gap-2 text-sm font-semibold">
@@ -87,19 +89,20 @@
             />
             <Button variant="outline">
               <Milestone />
-              Vis rute til nærmeste hjertestarter
+              Vis nærmeste hjertestarter
             </Button>
           </div>
         </div>
+
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="flex items-center gap-2 text-sm font-semibold">
-              <CookingPot class="size-5" />
-              Matstasjoner
+              <Hospital class="size-5" />
+              Akuttmottak
             </label>
-            <Checkbox v-model="settings.showFoodStations" />
+            <Checkbox v-model="settings.showEmergencyClinics" />
           </div>
-          <div v-if="settings.showFoodStations" class="flex flex-col gap-2">
+          <div v-if="settings.showEmergencyClinics" class="flex flex-col gap-2">
             <input
               v-model="settings.searchQuery"
               class="w-full border rounded px-2 py-1"
@@ -107,15 +110,79 @@
             />
             <Button variant="outline">
               <Milestone />
-              Vis rute til nærmeste matstasjon
+              Vis nærmeste akuttmottak
             </Button>
           </div>
         </div>
+
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="flex items-center gap-2 text-sm font-semibold">
-              <MapPin class="size-5" />
-              Lagre lokasjoner
+              <Package class="size-5" />
+              Distribusjonspunkt
+            </label>
+            <Checkbox v-model="settings.showDistributionPoints" />
+          </div>
+          <div v-if="settings.showDistributionPoints" class="flex flex-col gap-2">
+            <input
+              v-model="settings.searchQuery"
+              class="w-full border rounded px-2 py-1"
+              placeholder="Søk..."
+            />
+            <Button variant="outline">
+              <Milestone />
+              Vis nærmeste distribusjonspunkt
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="flex items-center gap-2 text-sm font-semibold">
+              <Shield class="size-5" />
+              Politistasjoner
+            </label>
+            <Checkbox v-model="settings.showPoliceStations" />
+          </div>
+          <div v-if="settings.showPoliceStations" class="flex flex-col gap-2">
+            <input
+              v-model="settings.searchQuery"
+              class="w-full border rounded px-2 py-1"
+              placeholder="Søk..."
+            />
+            <Button variant="outline">
+              <Milestone />
+              Vis nærmeste politistasjon
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="flex items-center gap-2 text-sm font-semibold">
+              <Plus class="size-5" />
+              Apotek
+            </label>
+            <Checkbox v-model="settings.showPharmacies" />
+          </div>
+          <div v-if="settings.showPharmacies" class="flex flex-col gap-2">
+            <input
+              v-model="settings.searchQuery"
+              class="w-full border rounded px-2 py-1"
+              placeholder="Søk..."
+            />
+            <Button variant="outline">
+              <Milestone />
+              Vis nærmeste apotek
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="flex items-center gap-2 text-sm font-semibold">
+              <Warehouse class="size-5" />
+              Dine lagre
             </label>
             <Checkbox v-model="settings.showStorages" />
           </div>
@@ -150,13 +217,17 @@ import Map from '@/components/Map.vue'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import {
-  CookingPot,
   HeartPulse,
+  Hospital,
   MapPin,
   MapPinPlus,
   Milestone,
   Navigation,
+  Package,
+  Plus,
+  Shield,
   Vault,
+  Warehouse,
 } from 'lucide-vue-next'
 import {
   Select,
@@ -165,7 +236,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select/index.js'
+} from '@/components/ui/select'
 
 const location = reactive({
   lng: 10.40574,
@@ -176,19 +247,20 @@ const location = reactive({
 })
 
 const settings = reactive({
-  searchQuery: '',
-  showMarkers: true,
+  showGeneral: true,
   showShelters: true,
   showDefibrillators: true,
-  showFoodStations: true,
+  showEmergencyClinics: true,
+  showDistributionPoints: true,
+  showPoliceStations: true,
+  showPharmacies: true,
   showStorages: true,
+  searchQuery: '',
   minCapacity: 0,
-  geoLocationEnabled: true,
 })
 
 const markers = ref([])
 const storages = ref([])
-
 const startSelection = ref('current')
 
 const startOptions = computed(() => {
