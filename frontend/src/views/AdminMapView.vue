@@ -12,21 +12,18 @@ import { computed } from 'vue';
 import { onMounted } from 'vue'
 import { ref } from 'vue';
 
-const eventFormRef = ref(null);
 const formMode = ref('new');
 
 const eventStore = useEventStore()
 const sessionStore = useSessionStore()
 
 const events = computed(() => eventStore.events);
-const selectedEventId = ref(null);
 
-function openEditForm(eventId) {
-  console.log('Åpner redigering for id:', eventId);
+const selectedEvent = ref(null)
+
+const handleEditEvent = (eventData) => {
   formMode.value = 'edit';
-  selectedEventId.value = eventId;
-
-
+  selectedEvent.value = eventData
 }
 
 onMounted(async () => {
@@ -37,9 +34,11 @@ onMounted(async () => {
   }
 })
 
+const eventFormRef = ref(null);
+
 function onNewEvent() {
   formMode.value = 'new';
-  eventFormRef.value?.resetForm();
+  eventFormRef.value?.eventFormRefresh();
 }
 const activeTab = ref('event');
 </script>
@@ -66,7 +65,7 @@ const activeTab = ref('event');
             ref="eventFormRef"
             :mode="formMode"
             :token="sessionStore.token"
-            :event-id="selectedEventId"
+            :event-data="selectedEvent"
           />
         </TabsContent>
 
@@ -87,17 +86,22 @@ const activeTab = ref('event');
           <Button class="justify-self-end" @click="onNewEvent">Ny hendelse</Button>
         </CardHeader>
         <CardContent class="max-w-[350px] max-h-[85%] overflow-y-auto flex flex-col gap-2">
-          <template v-for="(event, index) in events" :key="index">
+          <template v-for="event in events" :key="event.id">
             <EventCard
-              @editEvent="openEditForm"
               variant="admin"
-              :eventId="event.id"
+              :event-id="event.id"
               :name="event.name"
               :description="event.description"
-              :startDate="event.startDate"
+              :content="event.content"
               :severity="event.severity"
+              :type="event.type"
+              :status="event.status"
+              :startDate="event.startDate"
+              :location="event.location"
+              @edit="handleEditEvent"
             />
           </template>
+
         </CardContent>
       </Card>
       <div class="w-full h-full rounded bg-blue-200"></div>
