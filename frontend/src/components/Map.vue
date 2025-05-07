@@ -2,9 +2,23 @@
   <div class="relative w-full h-full flex">
     <div ref="mapContainer" class="map-container flex-1 w-full rounded-xl shadow"></div>
     <div
-      ref="propsOverlay"
-      class="w-full h-64 bg-white hidden p-4 absolute bottom-4 left-4 mr-40 overflow-auto rounded-md"
-    ></div>
+      v-if="popup.visible"
+      class="map-overlay-inner bg-white p-4 absolute bottom-4 left-4 mr-40 overflow-auto rounded-md"
+    >
+      <h3 class="font-semibold mb-2">{{ popup.item.name }}</h3>
+      <p class="mb-2">{{ popup.item.description }}</p>
+      <Button
+        class="mt-2"
+        @click="
+          () => {
+            lastDest = popup.coords
+            fetchAndAnimateRoute(routeStart, popup.coords)
+          }
+        "
+      >
+        Vis rute hit
+      </Button>
+    </div>
   </div>
 </template>
 
@@ -18,6 +32,7 @@ import {
   defineProps,
   onBeforeUnmount,
   onMounted,
+  reactive,
   ref,
   render,
   watch,
@@ -32,8 +47,15 @@ import {
   Shield,
   Vault,
 } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button/index.js'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
+
+const popup = reactive({
+  visible: false,
+  item: null,
+  coords: [0, 0],
+})
 
 const props = defineProps({
   modelValue: Object,
@@ -262,26 +284,13 @@ function clearSelection() {
 }
 
 function showCard(item, coords) {
-  const c = propsOverlay.value
-  c.innerHTML = `
-    <div class="map-overlay-inner">
-      <h3 class="font-semibold mb-2">${item.name}</h3>
-      <p class="mb-2">${item.description || ''}</p>
-      <div class="mt-2">
-        <button id="btn-end" class="px-2 py-1 bg-green-500 text-white rounded">
-          Vis rute hit
-        </button>
-      </div>
-    </div>`
-  c.style.display = 'block'
-  c.querySelector('#btn-end').addEventListener('click', () => {
-    lastDest = coords
-    fetchAndAnimateRoute(routeStart, coords)
-  })
+  popup.item = item
+  popup.coords = coords
+  popup.visible = true
 }
 
 function hideCard() {
-  propsOverlay.value.style.display = 'none'
+  popup.visible = false
 }
 
 async function fetchAndAnimateRoute(start, end) {
