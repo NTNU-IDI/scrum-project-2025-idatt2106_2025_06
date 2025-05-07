@@ -180,7 +180,14 @@ async function resolveAddressFromLocation(location) {
 
   if (response.data.error) throw new Error(response.data.error)
 
-  return response.data.display_name;
+  const address = response.data.address;
+
+  const road = address.road || 'Ukjent gate';
+  const houseNumber = address.house_number || 'ukjent nummer';
+  const postcode = address.postcode || 'ukjent postnummer';
+  const city = address.city || address.town || address.village || 'ukjent sted';
+
+  return `${road} ${houseNumber}, ${postcode} ${city}`;
 }
 
 async function loadAddresses() {
