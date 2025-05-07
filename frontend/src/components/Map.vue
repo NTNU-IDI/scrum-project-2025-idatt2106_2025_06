@@ -48,6 +48,7 @@ import {
   Warehouse,
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button/index.js'
+import { getClosestMarkerId } from '@/service/markerService.js'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -78,7 +79,23 @@ function flyToUser() {
   map.flyTo({ center: [lng, lat], zoom: 14, essential: true })
 }
 
-defineExpose({ statusMessage, flyToUser })
+async function flyToNearest(type) {
+  const closestMarkerId = await getClosestMarkerId(routeStart, type)
+
+  if (closestMarkerId != null) {
+    const closestMarker = props.markers.find((m) => m.id === closestMarkerId)
+    if (!closestMarker) {
+      return
+    }
+    const coords = [closestMarker.location.longitude, closestMarker.location.latitude]
+    map.flyTo({ center: coords, zoom: 14, essential: true })
+    fetchAndAnimateRoute(routeStart, coords).catch((err) => {
+      console.error('Rutevisning feilet:', err)
+    })
+  }
+}
+
+defineExpose({ statusMessage, flyToUser, flyToNearest })
 
 const mapContainer = ref(null)
 const propsOverlay = ref(null)
