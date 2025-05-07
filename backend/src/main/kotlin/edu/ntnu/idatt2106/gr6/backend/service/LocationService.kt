@@ -9,6 +9,8 @@ import edu.ntnu.idatt2106.gr6.backend.exception.UserMismatchException
 import edu.ntnu.idatt2106.gr6.backend.model.Location
 import edu.ntnu.idatt2106.gr6.backend.repository.UserRepository
 import edu.ntnu.idatt2106.gr6.backend.util.LocationParser
+import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.stereotype.Service
 import java.sql.ResultSet
 import java.util.UUID
@@ -22,6 +24,8 @@ class LocationService(
     private val userRepository: UserRepository
 ) {
     private val logger = org.slf4j.LoggerFactory.getLogger(LocationService::class.java)
+    @MessageMapping("/private/location")
+    @SendTo("/topic/private/update")
     fun updateUserLocation(updateUserLocationRequest: UpdateUserLocationRequest) {
         val userId: String = userContextService.getCurrentUserId().toString()
         val trackingEnabled = userRepository.getUserTrackingPreferences(UUID.fromString(userId))
