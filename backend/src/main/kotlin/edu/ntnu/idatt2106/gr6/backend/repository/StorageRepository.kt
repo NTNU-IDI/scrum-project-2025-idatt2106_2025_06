@@ -167,8 +167,8 @@ class StorageRepository(private val dataSource: DataSource) {
     fun findStoragesByUserId(userId: String): List<StorageSummary> {
         val sql = """
         SELECT s.id, s.name, s.token, s.storage_owner,
-                ST_X(s.location) AS latitude,
-                ST_Y(s.location) AS longitude
+                ST_Y(s.location) AS latitude,
+                ST_X(s.location) AS longitude
         FROM storages s
         JOIN user_storages us ON s.id = us.storage_id
         WHERE us.user_id = ?
