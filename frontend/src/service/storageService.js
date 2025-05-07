@@ -1,5 +1,4 @@
 import api from '@/config/api.js'
-import axios from 'axios'
 
 export async function createStorage(name, token, location) {
   try {
@@ -12,7 +11,6 @@ export async function createStorage(name, token, location) {
         }
       }
     );
-    console.log("Response fra createStorage:", response.data)
     return response.data;
   } catch (error) {
     console.error('Create storage error:', error);
