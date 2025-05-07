@@ -8,7 +8,7 @@ const eventStore = useEventStore()
 const sessionStore = useSessionStore()
 
 import { defineEmits } from 'vue'
-const emit = defineEmits(['editEvent'])
+const emit = defineEmits(['edit'])
 
 const severityColors = {
   info: 'bg-blue-200',
@@ -18,17 +18,22 @@ const severityColors = {
 }
 
 const props = defineProps({
-  variant: String,
+  variant: { type: String, default: 'user' },
 
-  eventId: [String, Number],
-  name: String,
-  description: String,
-  severity: { type: String, default: 'info' },
-  type: String,
-  status: String,
-  startDate: [String, Object],
-  position: String,
+  // Obligatoriske props
+  eventId: { type: [String, Number], required: true },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  type: { type: String, required: true },
+  severity: { type: String, default: 'low' },
+  status: { type: String, required: true },
+
+  // Ikke obligatoriske props
+  content: { type: String, default: '' },
+  startDate: { type: [String, Object], default: null },
+  location: { type: Object, default: null },
 })
+
 
 const handleDelete = async () => {
   try {
@@ -63,10 +68,20 @@ const formattedDate = () => {
   }
 }
 
-
 const handleEdit = () => {
-  emit('editEvent', props.eventId)
+  emit('edit', {
+    eventId: props.eventId,
+    name: props.name,
+    description: props.description,
+    content: props.content,
+    severity: props.severity,
+    type: props.type,
+    status: props.status,
+    startDate: props.startDate,
+    location: props.location,
+  })
 }
+
 </script>
 
 <template>
@@ -85,7 +100,7 @@ const handleEdit = () => {
             <div
               :class="[
                 'shrink-0 flex items-center justify-center rounded-full w-6 h-6',
-                severityColors[props.severity] || severityColors['info'],
+                severityColors[props.severity] || severityColors['low'],
               ]"
             >
               <!-- Velg ikon basert på severity -->
@@ -109,11 +124,10 @@ const handleEdit = () => {
             variant === 'admin' ? 'truncate' : '',
           ]"
         >
-          {{ props.description }}
+          {{ props.description || props.content }}
         </p>
       </div>
       <div v-if="variant !== 'admin'" class="mt-4 flex-shrink-0">
-        <p class="text-sm text-neutral-400 mt-1">{{ props.position }}</p>
         <p>Les mer</p>
       </div>
     </div>
