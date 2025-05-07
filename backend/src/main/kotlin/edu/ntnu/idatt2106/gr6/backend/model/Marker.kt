@@ -1,5 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.model
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 import edu.ntnu.idatt2106.gr6.backend.DTOs.Location
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.MapsId
@@ -14,6 +16,7 @@ sealed class MarkerType {
     object Pharmacy: MarkerType()
     object General: MarkerType()
 
+    @JsonValue
     override fun toString(): String {
         return when (this) {
             is Shelter -> "Shelter"
@@ -27,6 +30,10 @@ sealed class MarkerType {
     }
 
     companion object {
+        @JvmStatic
+        @JsonCreator
+        fun fromJson(value: String): MarkerType = fromString(value)
+
         fun fromString(type: String): MarkerType {
             return when (type) {
                 "Shelter" -> Shelter

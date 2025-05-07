@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.DTOs
 import edu.ntnu.idatt2106.gr6.backend.model.ContactInfo
+import edu.ntnu.idatt2106.gr6.backend.model.MarkerType
 import edu.ntnu.idatt2106.gr6.backend.model.OpeningHours
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
@@ -74,5 +75,14 @@ class MarkerDTOs {
     data class MarkerTypeDTO(
         val id: Int,
         val name: String
+    )
+
+    data class ClosestMarkerRequest(
+        val startLocation: Location,
+        val type: MarkerType
+    )
+
+    data class ClosestMarkerResponse(
+        val markerId: String
     )
 }
