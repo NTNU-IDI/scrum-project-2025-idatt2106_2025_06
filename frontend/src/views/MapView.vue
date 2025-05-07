@@ -30,6 +30,15 @@
         </Select>
       </div>
 
+      <div class="mb-6">
+        <input
+          v-model="settings.searchQuery"
+          class="w-full border rounded px-2 py-1"
+          placeholder="Søk etter markør..."
+          type="text"
+        />
+      </div>
+
       <div class="flex flex-col">
         <Tabs v-model="activeTab" class="w-full">
           <TabsList class="grid w-full grid-cols-2">
@@ -41,22 +50,23 @@
 
           <TabsContent value="marker">
             <div class="flex flex-col gap-4">
-              <div>
-                <label class="block text-sm font-semibold mb-1">Filtrer på navn</label>
-                <input
-                  v-model="settings.searchQuery"
-                  class="w-full border rounded px-2 py-1"
-                  placeholder="Søk etter markør..."
-                  type="text"
-                />
-              </div>
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showStorages,
+                  }"
+                >
                   <Warehouse class="size-5" />
                   Dine lagre ({{ counts.storages }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('storage')">
+                  <Button
+                    :disabled="!settings.showStorages"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('storage')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -71,12 +81,22 @@
               </div>
 
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showPersonal,
+                  }"
+                >
                   <MapPin class="size-5" />
                   Dine markører ({{ counts.personal }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('personal')">
+                  <Button
+                    :disabled="!settings.showPersonal"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('personal')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -91,12 +111,22 @@
               </div>
 
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showShelters,
+                  }"
+                >
                   <Vault class="size-5" />
                   Tilfluktsrom ({{ counts.shelter }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('shelter')">
+                  <Button
+                    :disabled="!settings.showShelters"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('shelter')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -111,12 +141,22 @@
               </div>
 
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showDefibrillators,
+                  }"
+                >
                   <HeartPulse class="size-5" />
                   Hjertestartere ({{ counts.defibrillator }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('defibrillator')">
+                  <Button
+                    :disabled="!settings.showDefibrillators"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('defibrillator')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -131,12 +171,22 @@
               </div>
 
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showEmergencyClinics,
+                  }"
+                >
                   <Hospital class="size-5" />
                   Akuttmottak ({{ counts.emergencyClinic }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('emergencyClinic')">
+                  <Button
+                    :disabled="!settings.showEmergencyClinics"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('emergencyClinic')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -151,12 +201,22 @@
               </div>
 
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showDistributionPoints,
+                  }"
+                >
                   <Package class="size-5" />
                   Distribusjonspunkt ({{ counts.distributionPoint }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('distributionPoint')">
+                  <Button
+                    :disabled="!settings.showDistributionPoints"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('distributionPoint')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -171,12 +231,22 @@
               </div>
 
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showPoliceStations,
+                  }"
+                >
                   <Shield class="size-5" />
                   Politistasjoner ({{ counts.policeStation }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('policeStation')">
+                  <Button
+                    :disabled="!settings.showPoliceStations"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('policeStation')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -191,12 +261,22 @@
               </div>
 
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showPharmacies,
+                  }"
+                >
                   <Plus class="size-5" />
                   Apotek ({{ counts.pharmacy }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('pharmacy')">
+                  <Button
+                    :disabled="!settings.showPharmacies"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('pharmacy')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -211,12 +291,22 @@
               </div>
 
               <div class="flex justify-between items-center mb-2">
-                <label class="flex items-center gap-2 text-sm font-semibold">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showGeneral,
+                  }"
+                >
                   <MapPin class="size-5" />
                   Andre markører ({{ counts.general }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button size="icon" variant="outline" @click="goToNearest('general')">
+                  <Button
+                    :disabled="!settings.showGeneral"
+                    size="icon"
+                    variant="outline"
+                    @click="goToNearest('general')"
+                  >
                     <Navigation class="size-5" />
                   </Button>
                   <Button
@@ -266,6 +356,7 @@ import {
   Vault,
   Warehouse,
 } from 'lucide-vue-next'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Select,
   SelectContent,
@@ -274,7 +365,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const activeTab = ref('event')
 const mapRef = ref(null)
@@ -319,7 +409,6 @@ const counts = computed(() => ({
 }))
 
 function goToNearest(type) {
-  // assumes Map.vue exposes flyToNearest(type)
   mapRef.value?.flyToNearest(type)
 }
 
