@@ -1,108 +1,15 @@
 <script setup>
 import AlertCard from '@/components/AlertCard.vue'
-import EventCard from '@/components/EventCard.vue';
-import { useEventStore } from '@/stores/event.js'
-const eventStore = useEventStore()
+import EventCard from '@/components/EventCard.vue'
+import { RouterLink } from 'vue-router'
 
-import {computed, onMounted} from "vue";
+import { useWebSocketStore } from '@/stores/websocket.js';
+import { useSessionStore} from '@/stores/session.js'
 
-const events = computed(() => eventStore.events);
-
-const alerts = [
-  {
-    id: 1,
-    title: 'GODE NYHETER! lalal',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 2,
-    title: 'Bolle',
-    description:
-      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 3,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-    time: '11:42',
-    severity: 'yellow',
-  },
-  {
-    id: 4,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-    time: '11:42',
-    severity: 'green',
-  },
-  {
-    id: 5,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 6,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 7,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-  {
-    id: 8,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-  },
-  {
-    id: 9,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-  },
-  {
-    id: 10,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 11,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 12,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-  {
-    id: 13,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-  },
-  {
-    id: 14,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-  },
-  {
-    id: 15,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-]
-
-onMounted(async () => {
-  try {
-    await eventStore.getEvents()
-  } catch (error) {
-    console.error('Kunne ikke hente hendelser:', error)
-  }
-})
-
+const jwtToken = useSessionStore().token;
+const webSocketStore = useWebSocketStore();
+const alerts = webSocketStore.alerts;
+const events = webSocketStore.events;
 </script>
 
 <template>
@@ -127,17 +34,15 @@ onMounted(async () => {
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
           <template v-for="(event, index) in events" :key="index">
-            <EventCard
-              :event-id="event.id"
-              :name="event.name"
-              :description="event.description"
-              :content="event.content"
-              :severity="event.severity"
-              :type="event.type"
-              :status="event.status"
-              :location="event.location"
-              :updatedAt="event.updatedAt"
-            />
+            <RouterLink :to="'events/' + event.id" class="relative">
+              <EventCard
+                :description="event.description"
+                :severity="event.severity"
+                :time="event.startDate ? new Date(event.startDate).toISOString() : ''"
+                :title="event.title"
+                variant="default"
+              />
+            </RouterLink>
           </template>
         </div>
       </div>

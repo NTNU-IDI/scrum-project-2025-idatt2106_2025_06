@@ -36,12 +36,14 @@ import router from '@/router/router.js'
 import { useSessionStore } from '@/stores/session'
 import { useStorageStore } from '@/stores/storage'
 import EditStorage from '@/components/EditStorage.vue'
+import axios from 'axios'
 
 const username = ref('');
 const email = ref('');
 
 const householdName = ref('');
-const location = ref('');
+const address = ref('');
+const resolvedAddresses = ref({})
 
 const joinToken = ref('')
 
@@ -52,35 +54,158 @@ const storageStore = useStorageStore()
 const storages = computed(() => storageStore.storages)
 const membersByStorageId = computed(() => storageStore.membersByStorageId)
 
+const oldPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const passwordError = ref('')
+const passwordSuccess = ref('')
+
 async function createNewStorage() {
   const token = sessionStore.token
 
-  const response = await storageStore.create(
-    householdName.value, token)
+  let location = null;
+
+  if (address.value.trim()) {
+    try {
+      const response = await axios.get(
+        'https://nominatim.openstreetmap.org/search',
+        {
+          params: {
+            q: address.value,
+            countrycodes: 'no',
+            format: 'json',
+            limit: 1,
+          },
+          headers: {
+            'Accept-Language': 'no',
+          },
+        }
+      );
+
+      const result = response.data[0];
+      if (result) {
+        location = {
+          latitude: parseFloat(result.lat),
+          longitude: parseFloat(result.lon),
+        };
+      } else {
+        console.warn('Fant ingen lokasjon for adressen');
+      }
+    } catch (error) {
+      console.error('Feil ved henting av koordinater:', error);
+    }
+  }
+
+  const response = await storageStore.create(householdName.value, token, location);
 
   if (response) {
-    console.log("Husstand opprettet")
+    householdName.value = '';
+    address.value = '';
   }
+
+  await storageStore.fetchAll(token)
+  await loadAddresses()
 }
+
 
 async function joinStorage() {
   if (!joinToken.value) return
-
   const success = await storageStore.join(joinToken.value, sessionStore.token)
-
   if (success) {
-    console.log('Bli med i husstand: Vellykket')
     joinToken.value = ''
   } else {
-    console.error('Kunne ikke bli med i husstand')
+    console.error('Could not join storage')
   }
 }
 
+function openEditProfile() {
+  if (user.value) {
+    username.value = user.value.name;
+    email.value = user.value.email;
+  }
+}
+
+async function submitProfileUpdate() {
+  const success = await sessionStore.updateProfile(username.value, email.value)
+  if (success) {
+
+    await storageStore.fetchAll(sessionStore.token)
+  }
+}
+
+async function submitChangePassword() {
+  passwordError.value = ''
+  passwordSuccess.value = ''
+
+  if (newPassword.value !== confirmPassword.value) {
+    passwordError.value = 'Passwords do not match.'
+    return
+  }
+
+  const success = await sessionStore.updatePassword(
+    oldPassword.value,
+    newPassword.value,
+    confirmPassword.value
+  )
+
+  if (success) {
+    passwordSuccess.value = 'Passord endret!'
+    oldPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+  } else {
+    passwordError.value = 'Kunne ikke endre passord.'
+  }
+}
+
+async function removeUser(userId, storageId) {
+  try {
+    const success = await storageStore.removeMember(userId, storageId, sessionStore.token)
+    if (success) {
+      console.log('Medlem fjernet')
+    } else {
+      console.error('Klarte ikke fjerne medlem')
+    }
+  } catch (e) {
+    console.error('Feil ved fjerning:', e)
+  }
+}
+
+async function resolveAddressFromLocation(location) {
+  const latitude = location.latitude
+  const longitude = location.longitude
+
+    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`, {
+  });
+
+  if (response.data.error) throw new Error(response.data.error)
+
+  const address = response.data.address;
+
+  const road = address.road || 'Ukjent gate';
+  const houseNumber = address.house_number || 'ukjent nummer';
+  const postcode = address.postcode || 'ukjent postnummer';
+  const city = address.city || address.town || address.village || 'ukjent sted';
+
+  return `${road} ${houseNumber}, ${postcode} ${city}`;
+}
+
+async function loadAddresses() {
+  for (const s of storageStore.storages) {
+    if (s.location?.latitude && s.location?.longitude) {
+      try {
+        const address = await resolveAddressFromLocation(s.location)
+        resolvedAddresses.value[s.id] = address
+      } catch (err) {
+        console.error(`Kunne ikke resolve adresse for storage ${s.id}:`, err)
+      }
+    }
+  }
+}
 
 onMounted(async () => {
   if (!sessionStore.isAuthenticated) {
     router.push('/login')
-    console.log("Det er noe galt med innloggingen");
   }
 
   if (user.value) {
@@ -90,17 +215,12 @@ onMounted(async () => {
 
   try {
     await storageStore.fetchAll(sessionStore.token)
+    await loadAddresses()
+
   } catch (error) {
-    console.error("Klarte ikke hente husstander og medlemmer:", error)
+    console.error("Could not fetch storages and members:", error)
   }
 });
-
-function openEditProfile() {
-  if (user.value) {
-    username.value = user.value.name;
-    email.value = user.value.email;
-  }
-}
 </script>
 
 <template>
@@ -125,28 +245,17 @@ function openEditProfile() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle class="text-2xl">Rediger profil</DialogTitle>
-                <Label>
-                  Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.
-                </Label>
-                <Input
-                  v-model="username"
-                  placeholder="Navn"
-                  type="text"
-                />
-                <Input
-                  v-model="email"
-                  placeholder="Epostadresse"
-                  type="email"
-                />
+                <Label>Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.</Label>
+                <Input v-model="username" placeholder="Navn" type="text" />
+                <Input v-model="email" placeholder="Epostadresse" type="email" />
               </DialogHeader>
               <DialogFooter class="flex flex-col items-center">
                 <DialogClose>
-                  <Button class="w-48">Lagre</Button>
+                  <Button class="w-48" @click="submitProfileUpdate">Lagre</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
           </Dialog>
-
           <Dialog>
             <DialogTrigger>
               <Button class="w-48">Endre passord</Button>
@@ -154,22 +263,18 @@ function openEditProfile() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle class="text-2xl">Endre passord</DialogTitle>
-                <Input
-                  placeholder="Gammelt passord"
-                  type="password"
-                />
-                <Input
-                  placeholder="Nytt passord"
-                  type="password"
-                />
-                <Input
-                  placeholder="Gjenta nytt passord"
-                  type="password"
-                />
+                <Input v-model="oldPassword" placeholder="Gammelt passord" type="password" />
+                <Input v-model="newPassword" placeholder="Nytt passord" type="password" />
+                <Input v-model="confirmPassword" placeholder="Gjenta nytt passord" type="password" />
+                <p v-if="passwordError" class="text-red-600 font-bold">{{ passwordError }}</p>
+                <p v-if="passwordSuccess" class="text-green-600 font-bold">{{ passwordSuccess }}</p>
               </DialogHeader>
+              <div class="flex flex-col items-center">
+                <Button class="w-48" @click="submitChangePassword">Endre passord</Button>
+              </div>
               <DialogFooter class="flex flex-col items-center">
                 <DialogClose>
-                  <Button class="w-48">Lagre</Button>
+                  <Button class="w-48">Lukk</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
@@ -182,7 +287,7 @@ function openEditProfile() {
                   <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
                     <h3 class="text-xl font-bold">{{ s.name }}</h3>
                     <p>Husstandsnummer: {{ s.token }}</p>
-                    <p>Lokasjon: {{ s.location != null ? s.location : 'Ikke angitt' }}</p>
+                    <p>Lokasjon: {{ resolvedAddresses[s.id] || 'Laster...' }}</p>
                     <h4 class="mt-2 font-semibold">Medlemmer:</h4>
                     <ul v-if="membersByStorageId[s.id]">
                       <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
@@ -190,7 +295,30 @@ function openEditProfile() {
                       </li>
                     </ul>
                     <p v-else>Laster medlemmer...</p>
-                    <EditStorage :storage="s" />
+                    <div v-if="user.id === s.storageOwner">
+                      <EditStorage :storage="s" />
+                    </div>
+                    <div v-else class="flex flex-col items-center gap-4">
+                      <AlertDialog>
+                        <AlertDialogTrigger as-child >
+                            <Button class="w-48">Forlat husstand</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              <Label>
+                                Er du sikker på at du ønsker å forlate husstanden? Dette kan ikke angres.
+                              </Label>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Nei</AlertDialogCancel>
+                            <AlertDialogAction @click="removeUser(user.id, s.id)">Ja</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </div>
               </CardDescription>
@@ -207,13 +335,13 @@ function openEditProfile() {
                     placeholder="Husstandsnavn"
                     type="text"
                   />
-                  <!--
+
                   <Input
-                    v-model="location"
-                    placeholder="Lokasjon (valgfritt)"
+                    v-model="address"
+                    placeholder="Adresse (valgfritt)"
                     type="text"
                   />
-                  -->
+
                   <DialogClose>
                     <Button @click="createNewStorage()" class="w-48">Opprett</Button>
                   </DialogClose>

@@ -19,7 +19,7 @@ INSERT INTO marker (
           null,
           'Sykehus',
           'Oslo sykehus',
-          ST_PointFromText('POINT (10.4024 63.4196)', 4326),
+          ST_PointFromText('POINT (10.7153 59.9486)', 4326),
           'hospital',
           '2025-05-01 18:30:00',
           '2025-05-01 18:30:00',

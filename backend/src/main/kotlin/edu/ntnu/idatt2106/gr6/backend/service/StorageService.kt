@@ -4,6 +4,7 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.CreateStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageSummary
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.SimpleUserResponse
+import edu.ntnu.idatt2106.gr6.backend.model.Location
 import edu.ntnu.idatt2106.gr6.backend.model.toResponse
 import edu.ntnu.idatt2106.gr6.backend.repository.StorageRepository
 import org.slf4j.LoggerFactory
@@ -32,17 +33,17 @@ class StorageService(
         val userId: UUID = userContextService.getCurrentUserId()
         logger.info("Creating storage for user $userId")
 
-        // Save the storage entity
+        val location = request.location
+
         val storage = storageRepository.saveStorage(
             name = request.name,
             storageOwner = userId.toString(),
-            latitude = request.latitude,
-            longitude = request.longitude
+            location = request.location
         )
 
-        // Map model to DTO
         return storage.toResponse()
     }
+
 
     /**
      * Finds a storage by its ID.

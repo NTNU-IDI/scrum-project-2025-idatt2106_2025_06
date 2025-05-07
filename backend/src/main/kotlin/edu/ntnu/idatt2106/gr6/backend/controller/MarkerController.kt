@@ -2,6 +2,8 @@ package edu.ntnu.idatt2106.gr6.backend.controller
 
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs
+import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.ClosestMarkerRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.ClosestMarkerResponse
 import edu.ntnu.idatt2106.gr6.backend.service.MarkerService
 import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.CreateMarkerResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.CreateMarkerRequest
@@ -10,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -112,5 +115,25 @@ class MarkerController(
         val markers = markerService.getAllMarkers()
         logger.info("Retrieved ${markers.size} markers")
         return ResponseEntity.ok().body(markers)
+    }
+
+    @PostMapping("/closest")
+    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!Make a uniqe auth for this action, now it is set to 'CREATE_STORAGE'!!!!
+    @Operation(summary = "Finds the closest marker by type and location")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Closest marker found"),
+            ApiResponse(responseCode = "400", description = "Invalid input"),
+            ApiResponse(responseCode = "404", description = "No marker found"),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
+    fun getClosestMarker(@RequestBody @Parameter request: ClosestMarkerRequest): ResponseEntity<ClosestMarkerResponse> {
+        logger.info("Received request to get closest marker of type: ${request.type}")
+        val result = markerService.getClosestMarker(request)
+        return result?.let {
+            logger.info("Closest marker ID: $it")
+            ResponseEntity.ok(it)
+        } ?: ResponseEntity.notFound().build()
     }
 }

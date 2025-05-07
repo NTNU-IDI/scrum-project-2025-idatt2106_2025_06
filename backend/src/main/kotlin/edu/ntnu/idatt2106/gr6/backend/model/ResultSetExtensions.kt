@@ -30,3 +30,8 @@ fun ResultSet.getMarkerType(): MarkerType {
     val type = getString("type")
     return MarkerType.fromString(type)
 }
+
+fun ResultSet.getNotificationType(): NotificationType {
+    val type = getString("type")
+    return NotificationType.fromString(type)
+}
