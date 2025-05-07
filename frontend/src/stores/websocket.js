@@ -20,8 +20,8 @@ export const useWebSocketStore = defineStore('websocket', {
         const messages = Array.isArray(parsed) ? parsed : [parsed];
 
         messages.forEach(message => {
-          const formattedTime = message.startDate
-            ? new Date(message.startDate).toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', hour12: false })
+          const formattedTime = message.updatedAt
+            ? new Date(message.updatedAt).toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', hour12: false })
             : new Date().toLocaleString('NO', { month: 'short', day: '2-digit', hour: '2-digit', hour12: false });
 
           if (source === '/topic/public/newsAlerts') {
@@ -39,7 +39,7 @@ export const useWebSocketStore = defineStore('websocket', {
             description: message.description || 'No Description',
             content: message.content || 'No Content',
             severity: message.severity || 'low',
-            time: formattedTime,
+            time: message.updatedAt,
           });
         }})
 
