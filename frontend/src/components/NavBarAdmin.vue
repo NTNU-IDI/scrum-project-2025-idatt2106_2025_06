@@ -22,8 +22,8 @@ const handleLogout = async () => {
   <nav class="sticky top-0 z-50 w-full py-2 shadow">
     <div class="flex items-center justify-between max-w-7xl m-auto">
       <router-link class="flex min-w-40 h-10 gap-4 items-center hover:scale-110 transition" to="/admin">
-        <img alt="logo" src="">
-        <p>Krisefikser</p>
+        <img alt="logo" height="32" src="/krisefikserLogo.svg" width="32" />
+        <p class="font-bold">KRISEFIKSER</p>
       </router-link>
       <div
         class="gap-10 hidden sm:flex h-10 items-center">
