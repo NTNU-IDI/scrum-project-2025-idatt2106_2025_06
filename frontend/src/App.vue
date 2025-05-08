@@ -12,6 +12,8 @@ const admin = ['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role)
   <main class="h-screen flex flex-col w-full">
     <Navbar v-if="!admin" />
     <NavBarAdmin v-else />
-    <RouterView class="max-w-6xl" />
+    <div class="flex-1 container mx-auto px-4 py-8">
+      <RouterView />
+    </div>
   </main>
 </template>

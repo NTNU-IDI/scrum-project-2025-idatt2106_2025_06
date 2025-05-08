@@ -15,6 +15,7 @@ import AfterView from "@/views/AfterView.vue";
 import AdminView from "@/views/AdminView.vue";
 import AdminMap from "@/views/AdminMapView.vue";
 import { useSessionStore } from '@/stores/session.js'
+import ScenarioDetailView from '@/views/ScenarioDetailView.vue'
 
 
 const routes = [
@@ -31,7 +32,12 @@ const routes = [
   {path: '/during', component: DuringView, name: 'during'},
   {path: '/after', component: AfterView, name: 'after'},
   {path: '/admin/map', component: AdminMap, name: 'admin-map', meta: { requiresAdminAccess: true }, },
-  {path: '/admin', component: AdminView, name: 'admin', meta: { requiresAdminAccess: true }, }
+  {path: '/admin', component: AdminView, name: 'admin', meta: { requiresAdminAccess: true }, },
+  {path: '/scenario/:id',
+  component: ScenarioDetailView,
+  name: 'scenario-detail',
+  props: true,
+  },
 ]
 
 const router = createRouter({

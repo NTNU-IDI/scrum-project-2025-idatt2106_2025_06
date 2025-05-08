@@ -1,0 +1,34 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useScenarioStore } from '@/stores/scenario'
+import { useSessionStore } from '@/stores/session'
+
+const route = useRoute()
+const scenarioStore = useScenarioStore()
+const sessionStore = useSessionStore()
+const scenario = ref(null)
+
+onMounted(async () => {
+  if (!scenarioStore.scenarios.length) {
+    await scenarioStore.fetchScenarios(sessionStore.token)
+  }
+  scenario.value = scenarioStore.scenarios.find(s => s.id === route.params.id)
+})
+
+</script>
+
+<template>
+    <div class="max-w-4xl mx-auto p-6">
+      <div v-if="scenario">
+        <h1 class="text-3xl font-bold mb-4">{{ scenario.title }}</h1>
+        <p class="text-lg mb-2 text-gray-700">{{ scenario.description }}</p>
+        <div class="prose mb-4">
+          {{ scenario.content }}
+        </div>
+      </div>
+      <div v-else class="text-center text-gray-500">
+        Laster scenario...
+      </div>
+    </div>
+</template>

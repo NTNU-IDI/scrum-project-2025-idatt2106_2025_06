@@ -1,8 +1,9 @@
 <script setup>
 import { Button } from '@/components/ui/button/index.js'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.js'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import PublishAlert from '@/components/PublishAlert.vue'
 import AlertCard from '@/components/AlertCard.vue'
+import ScenarioCard from '@/components/ScenarioCard.vue'
 import { ref } from 'vue'
 
 const alerts = ref([
@@ -121,12 +122,13 @@ const alerts = ref([
 
 <template>
   <div class="m-auto flex flex-wrap relative w-full py-10 gap-6 items-stretch mt-10">
-    <Card class="flex-1 basis-1/4 min-w-[200px] gap-6 max-h-[650px]">
-      <CardHeader>
-        <CardTitle class="text-2xl">Rediger scenario informasjon</CardTitle>
-      </CardHeader>
-      <CardContent class="flex flex-col gap-2 h-full max-h-[calc(100%-80px)]">
-        TBA
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Card>
+        <CardHeader>
+          <CardTitle>Rediger scenario informasjon</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScenarioCard />
       </CardContent>
     </Card>
 
@@ -164,6 +166,7 @@ const alerts = ref([
         </div>
       </CardContent>
     </Card>
+  </div>
   </div>
 </template>
 
