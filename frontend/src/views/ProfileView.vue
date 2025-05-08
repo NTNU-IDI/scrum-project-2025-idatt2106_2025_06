@@ -40,6 +40,7 @@ import axios from 'axios'
 
 const username = ref('');
 const email = ref('');
+const trackingEnabled = ref(false);
 const trackingDeleted = ref(false)
 
 const householdName = ref('');
@@ -201,6 +202,16 @@ async function loadAddresses() {
         console.error(`Kunne ikke resolve adresse for storage ${s.id}:`, err)
       }
     }
+  }
+}
+
+async function changeLocationTracking() {
+  trackingEnabled.value = !trackingEnabled.value
+  const success = await sessionStore.updateLocationTracking(trackingEnabled.value)
+  if (success) {
+    console.log('Tracking preference updated')
+  } else {
+    console.error('Could not update tracking preference')
   }
 }
 
