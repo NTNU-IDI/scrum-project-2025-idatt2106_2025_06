@@ -5,7 +5,6 @@ export async function createMarker(createMarkerRequest) {
   try {
     console.log('Creating marker..')
     const response = await api.post('/markers/create', createMarkerRequest)
-    console.log('Marker created successfully:', response.data)
     return response.data
   } catch (error) {
     console.error('Failed to create marker:', error)
