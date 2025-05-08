@@ -32,6 +32,7 @@ export const useSessionStore = defineStore('session', () => {
       joinedAt: response.joinedAt,
       admin: response.admin,
       verified: response.verified,
+      trackingEnabled: response.trackingEnabled,
       role: response.role,
       permissions: response.permissions
     }
