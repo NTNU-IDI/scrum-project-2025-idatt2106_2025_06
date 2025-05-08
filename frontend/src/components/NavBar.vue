@@ -8,7 +8,7 @@ const isLoggedIn = computed(() => sessionStore.token);
 </script>
 
 <template>
-  <nav class="sticky top-0 z-50 w-full py-2 shadow">
+  <nav class="sticky top-0 z-50 w-full py-2 shadow backdrop-blur-lg bg-white/75">
     <div class="flex items-center justify-between max-w-6xl m-auto">
       <router-link class="flex min-w-40 h-10 gap-2 items-center hover:scale-110 transition" to="/">
         <img alt="logo" height="32" src="/krisefikserLogo.svg" width="32" />

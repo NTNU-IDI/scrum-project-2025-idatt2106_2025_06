@@ -1,20 +1,20 @@
 import api from '@/config/api.js'
 
-export async function createStorage(name) {
+export async function createStorage(name, token, location) {
   try {
     const response = await api.post(
       '/storages/create',
-      { name },
+      { name, location },
       {
         headers: {
           'Content-Type': 'application/json'
         }
       }
-    )
-    return response.data
+    );
+    return response.data;
   } catch (error) {
-    console.error('Create storage error:', error)
-    throw error
+    console.error('Create storage error:', error);
+    throw error;
   }
 }
 

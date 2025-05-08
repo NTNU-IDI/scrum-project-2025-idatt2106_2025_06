@@ -1,140 +1,13 @@
 <script setup>
 import AlertCard from '@/components/AlertCard.vue'
 import EventCard from '@/components/EventCard.vue'
+import { RouterLink } from 'vue-router'
 
-const alerts = [
-  {
-    id: 1,
-    title: 'GODE NYHETER! lalal',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 2,
-    title: 'Bolle',
-    description:
-      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 3,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-    time: '11:42',
-    severity: 'yellow',
-  },
-  {
-    id: 4,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-    time: '11:42',
-    severity: 'green',
-  },
-  {
-    id: 5,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 6,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 7,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-  {
-    id: 8,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-  },
-  {
-    id: 9,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-  },
-  {
-    id: 10,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 11,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 12,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-  {
-    id: 13,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-  },
-  {
-    id: 14,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-  },
-  {
-    id: 15,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-]
+import { useWebSocketStore } from '@/stores/websocket.js';
 
-const events = [
-  {
-    id: 1,
-    title: 'GODE NYHETER! lalal',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-    time: 'Nå',
-    severity: 'info',
-  },
-  {
-    id: 2,
-    title: 'Bolle',
-    description:
-      'Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.Gratis bolle på Element. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang. Denne teksten er lang.',
-    time: 'Nå',
-    severity: 'red',
-  },
-  {
-    id: 3,
-    title: 'Gå vekk alerts',
-    description: 'Snart skal alerts slutte å vises. Dette skal kunne scrolles plis',
-    time: '11:42',
-    severity: 'yellow',
-  },
-  {
-    id: 4,
-    title: 'Håp',
-    description: 'Håper denne er borte.',
-    time: '11:42',
-    severity: 'green',
-  },
-  {
-    id: 5,
-    title: 'Bø',
-    description: 'Borte... bø!.',
-  },
-  {
-    id: 6,
-    title: 'GODE NYHETER!',
-    description: 'En bombe er sluppet på sluppen, alle eksamener avlyst.',
-  },
-  {
-    id: 7,
-    title: 'Bolle',
-    description: 'Gratis bolle på Element.',
-  },
-]
+const webSocketStore = useWebSocketStore();
+const alerts = webSocketStore.alerts;
+const events = webSocketStore.events;
 </script>
 
 <template>
@@ -158,16 +31,19 @@ const events = [
     <div class="mt-16">
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
-          <template v-for="(event, index) in events" :key="index">
-            <RouterLink :to="'events/' + event.id" class="relative">
+          <template v-for="event in events" :key="event.id">
               <EventCard
+                :event-id="event.id"
+                :name="event.title"
                 :description="event.description"
+                :content="event.content"
                 :severity="event.severity"
-                :time="event.time"
-                :title="event.title"
+                :type="event.type"
+                :status="event.status"
+                :location="event.location"
+                :updatedAt="event.time"
                 variant="default"
               />
-            </RouterLink>
           </template>
         </div>
       </div>

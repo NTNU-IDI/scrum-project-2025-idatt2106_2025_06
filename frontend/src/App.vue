@@ -1,11 +1,19 @@
 <script setup>
-import {RouterView} from 'vue-router'
-import Navbar from "@/components/NavBar.vue";
+import { RouterView } from 'vue-router'
+import Navbar from '@/components/NavBar.vue'
+import { useSessionStore } from '@/stores/session.js'
+import NavBarAdmin from '@/components/NavBarAdmin.vue'
+import Footer from '@/components/footer.vue'
+
+const session = useSessionStore()
+const admin = ['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role)
 </script>
 
 <template>
   <main class="h-screen flex flex-col w-full">
-    <Navbar/>
-    <RouterView class="max-w-6xl"/>
+    <Navbar v-if="!admin" />
+    <NavBarAdmin v-else />
+    <RouterView class="max-w-6xl min-h-[calc(100vh-3.5rem)]" />
+    <Footer />
   </main>
 </template>

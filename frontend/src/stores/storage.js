@@ -23,8 +23,8 @@ export const useStorageStore = defineStore('storage', () => {
     }
   }
 
-  async function create(name, token) {
-    const response = await createStorage(name, token)
+  async function create(name, token, address) {
+    const response = await createStorage(name, token, address)
 
     if (!Array.isArray(storages.value)) {
       console.warn('storages.value var ikke en liste – reinitialiserer den.')
@@ -41,11 +41,10 @@ export const useStorageStore = defineStore('storage', () => {
   async function editStorage(id, name, location, token) {
     const updated = await updateStorage(id, name, location, token)
 
-    // Oppdater lokalt lagret storage
     const index = storages.value.findIndex(s => s.id === id)
     if (index !== -1) {
       storages.value[index].name = updated.name
-      storages.value[index].location = updated.location
+      storages.value[index].address = updated.location
     }
 
     return updated

@@ -29,9 +29,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="m-auto">
-    <BentoGrid>
-      <!-- Card 1 -->
+  <div class="m-auto flex justify-center">
+    <BentoGrid class="my-auto">
       <BentoCard
         :Icon="ArrowRightIcon"
         cta="Les mer"
@@ -41,7 +40,6 @@ onMounted(async () => {
         name="Krisescenarioer"
       />
 
-      <!-- Card 2 -->
       <BentoCard
         :Icon="ArrowRightIcon"
         cta="Les mer"
@@ -52,7 +50,6 @@ onMounted(async () => {
       >
       </BentoCard>
 
-      <!-- Nyheter -->
       <BentoCardCustom
         customClass="col-span-1 min-h-[30rem] group hover:group-hover:bg-transparent"
         href="/alerts"
@@ -80,7 +77,6 @@ onMounted(async () => {
         </div>
       </BentoCardCustom>
 
-      <!-- Utgår snart -->
       <BentoCardCustom customClass="col-span-3 min-h-[30rem] w-[45rem]" class="cursor-default" name="Beredskap">
         <div>
           <div v-if="!userLoggedIn" class="flex flex-col h-[20rem] gap-3 justify-center">

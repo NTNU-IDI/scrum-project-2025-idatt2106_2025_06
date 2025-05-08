@@ -9,9 +9,16 @@ class UserDTOs {
         val email: String,
         val createdAt: Instant,
         val role: String,
+        val verified: Boolean,
+        val trackingEnabled: Boolean,
         val permissions: Set<String>,
         val token: String,
         val expiresIn: Long,
+    )
+
+    data class SimpleUserResponse (
+        val id: String,
+        val name: String
     )
 
     data class CreateUserRequest(

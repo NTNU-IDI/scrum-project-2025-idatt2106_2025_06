@@ -13,11 +13,13 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import org.springframework.messaging.simp.SimpMessagingTemplate
 
 @RestController
 @RequestMapping("/api/events")
 class EventController(
     private val eventService: EventService,
+    private val messagingTemplate: SimpMessagingTemplate
 ) {
     private val logger = LoggerFactory.getLogger(EventController::class.java)
 
@@ -40,6 +42,7 @@ class EventController(
         @Parameter request: CreateEventRequest): ResponseEntity<EventResponse> {
         logger.info("Received event create request: $request")
         val response = eventService.createEvent(request)
+        messagingTemplate.convertAndSend("/topic/public/events", response)
         logger.info("Event created with ID: ${response.id}")
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
