@@ -86,7 +86,30 @@ class StorageService(
 
     @Transactional
     fun getStoragesByUserId(): List<StorageSummary> {
-        val userId = userContextService.getCurrentUserId()
-        return storageRepository.findStoragesByUserId(userId.toString())
+        val userId = userContextService.getCurrentUserId().toString()
+        return storageRepository.findStoragesByUserId(userId)
+    }
+
+
+    /**
+     * Deletes the storage if the current user is the owner of the storage
+     *
+     * @param storageId The ID of the storage the user wants to delete
+     * @return          ´true´ if the storage was deleted, ´false´ if not
+     */
+    @Transactional
+    fun deleteStorage(storageId: String): Boolean {
+        val currentUserId = userContextService.getCurrentUserId().toString()
+        logger.info("User $currentUserId is attempting to delete storage $storageId")
+
+        val deleted = storageRepository.deleteStorage(storageId, currentUserId)
+
+        if (deleted) {
+            logger.info("User $currentUserId deleted storage $storageId, succesfully")
+        } else {
+            logger.info("User $currentUserId did NOT deleted storage $storageId, succesfully!!!!")
+        }
+
+        return deleted
     }
 }

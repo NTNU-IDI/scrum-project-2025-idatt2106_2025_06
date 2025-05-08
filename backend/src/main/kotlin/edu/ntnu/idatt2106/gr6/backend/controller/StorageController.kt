@@ -99,7 +99,7 @@ class StorageController(
     }
 
     @PostMapping("/join")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!Make a uniqe auth for this action, now it is set to 'CREATE_STORAGE'!!!!
+    @PreAuthorize("hasAuthority('JOIN_STORAGE')")
     @Operation(
         summary = "Join a storage",
         description = "Join a storage by sending a token in the JSON body"
@@ -131,7 +131,7 @@ class StorageController(
 
 
     @GetMapping("/{id}/members")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!Make a uniqe auth for this action, now it is set to 'CREATE_STORAGE'!!!!
+    @PreAuthorize("hasAuthority('GET_STORAGE_MEMBERS')")
     @Operation(
         summary = "Get member names of a storage",
         description = "Retrieves all user names who are members of the given storage"
@@ -157,7 +157,7 @@ class StorageController(
     }
 
     @PostMapping("/remove-member")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!Make a uniqe auth for this action, now it is set to 'CREATE_STORAGE'!!!!
+    @PreAuthorize("hasAuthority('REMOVE_STORAGE_MEMBERS')")
     @Operation(
         summary = "Remove user from storage",
         description = "Removes a user from a storage using a JSON body with storageId and userId"
@@ -188,7 +188,7 @@ class StorageController(
     }
 
     @GetMapping("/my-storages")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // !!!!!!!
+    @PreAuthorize("hasAuthority('GET_STORAGE')")
     @Operation(summary = "Get all storages a user is connected to")
     @ApiResponses(
         value = [
@@ -202,5 +202,39 @@ class StorageController(
     ): ResponseEntity<List<StorageSummary>> {
         val storages = storageService.getStoragesByUserId()
         return ResponseEntity.ok(storages)
+    }
+
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_STORAGE')")
+    @Operation(
+        summary = "Delete a storage by ID",
+        description = "Deletes the specified storage only if the user is the storage owner"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Storage successfully deleted"),
+            ApiResponse(responseCode = "403", description = "User is not the storage owner"),
+            ApiResponse(responseCode = "404", description = "Storage not found"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "500", description = "Internal server error"),
+        ],
+    )
+    fun deleteStorage(
+        @PathVariable
+        @Parameter(description = "ID of the storage", required = true)
+        id: String
+    ): ResponseEntity<Void> {
+        logger.info("Attempting to delete storage with ID: $id")
+
+        val success = storageService.deleteStorage(id)
+
+        return if (success) {
+            logger.info("Successfully deleted storage with ID: $id")
+            ResponseEntity.ok().build()
+        } else {
+            logger.warn("Storage $id could NOT be deleted!")
+            ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
     }
 }

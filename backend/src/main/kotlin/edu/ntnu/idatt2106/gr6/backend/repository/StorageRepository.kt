@@ -201,6 +201,48 @@ class StorageRepository(private val dataSource: DataSource) {
         return storages
     }
 
+    /**
+     * Deletes a storage from the database. Only an owner can do this
+     *
+     * @param storageId The ID of the storage to delete.
+     * @param userId The ID of the user attempting to delete the storage.
+     * @return `true` if the storage was successfully deleted, `false` if the user is not the owner
+     *         or the storage does not exist.
+     */
+    fun deleteStorage(
+        storageId: String,
+        userId: String
+    ): Boolean {
+        val checkOwnerSql = """
+            SELECT COUNT(*)
+            FROM storages
+            WHERE id = ? AND storage_owner = ?
+        """.trimIndent()
+
+        val deleteSql = """
+            DELETE
+            FROM storages
+            WHERE id = ?
+        """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(checkOwnerSql).use { stmt ->
+                stmt.setString(1, storageId)
+                stmt.setString(2, userId)
+                stmt.executeQuery().use { rs ->
+                    if (rs.next() && rs.getInt(1) == 0) {
+                        return false
+                    }
+                }
+            }
+
+            conn.prepareStatement(deleteSql).use { stmt ->
+                stmt.setString(1, storageId)
+                val rowsAffected = stmt.executeUpdate()
+                return rowsAffected > 0
+            }
+        }
+    }
 
     private fun mapRowToStorage(rs: ResultSet): Storage {
         val lat = rs.getObject("latitude") as? Double
