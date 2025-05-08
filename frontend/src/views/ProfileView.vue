@@ -383,18 +383,18 @@ onMounted(async () => {
           <Label class="text-xl">Personvern:</Label>
           <CardDescription>
             <div class="flex flex-col items-center text-center gap-4">
-              <div v-if="trackingPreference === true" class="flex flex-col items-center gap-4">
+              <div v-if="trackingEnabled === true" class="flex flex-col items-center gap-4">
                 <div class="text-left">
                   <Label>Du deler lokasjonen din med Krisefikser. Ønsker du å skru av stedstjenester?</Label>
                 </div>
-                <Button @click="changeTrackingPreference" class="w-48">Skru av</Button>
+                <Button @click="changeLocationTracking" class="w-48">Skru av</Button>
               </div>
 
-              <div v-if="trackingPreference === false" class="flex flex-col items-center gap-4">
+              <div v-if="trackingEnabled === false" class="flex flex-col items-center gap-4">
                 <div class="text-left">
                   <Label>Du deler ikke lokasjonen din med Krisefikser. Ønsker du å skru på stedstjenester?</Label>
                 </div>
-                <Button @click="changeTrackingPreference" class="w-48">Skru på</Button>
+                <Button @click="changeLocationTracking" class="w-48">Skru på</Button>
               </div>
             </div>
           </CardDescription>
