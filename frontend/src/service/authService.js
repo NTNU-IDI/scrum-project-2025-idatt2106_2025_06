@@ -47,3 +47,23 @@ export async function changePassword(oldPassword, newPassword) {
     throw error
   }
 }
+
+export async function changeLocationTracking(locationTracking) {
+  try {
+    const response = await api.put('/user/privacy-policy/change-location-tracking', { locationTracking })
+    return response.data
+  } catch (error) {
+    console.error('Change location tracking error:', error)
+    throw error
+  }
+}
+
+export async function deleteLocationHistory() {
+  try {
+    const response = await api.post('/user/privacy-policy/delete-location-history')
+    return response.data
+  } catch (error) {
+    console.error('Delete location history error:', error)
+    throw error
+  }
+}
