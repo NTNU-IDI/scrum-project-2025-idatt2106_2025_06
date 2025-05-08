@@ -46,6 +46,8 @@ const combinedOpeningHours = computed(() => {
   return '';
 });
 
+// Oppretter et objekt som kartlegger ukedager til åpningstider,
+// setter null for dager som ikke er valgt.
 const openingHours = computed(() => {
   return daysOfWeek.reduce((acc, day) => {
     if (selectedDays.value.includes(day.key)) {
