@@ -1,8 +1,10 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.CreateStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.UpdateStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.SimpleUserResponse
 import edu.ntnu.idatt2106.gr6.backend.model.Location
 import edu.ntnu.idatt2106.gr6.backend.model.toResponse
@@ -90,6 +92,24 @@ class StorageService(
         return storageRepository.findStoragesByUserId(userId)
     }
 
+    /**
+     * Optionally updates the name and location of a storage
+     *
+     * @param request The update request contains the id, new name and location
+     * @return `true` if the storage was successfully updated, `false` if not
+     */
+    @Transactional
+    fun updateStorage(request: UpdateStorageRequest): Boolean {
+        val userId = userContextService.getCurrentUserId().toString()
+        logger.info("User $userId is attempting to update the storage ${request.id}")
+
+        return storageRepository.updateStorageIfOwner(
+            storageId = request.id,
+            userId = userId,
+            newName = request.name,
+            newLocation = request.location
+        )
+    }
 
     /**
      * Deletes the storage if the current user is the owner of the storage
