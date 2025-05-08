@@ -61,7 +61,6 @@ async function handleSubmit() {
 
     console.log('Sending marker:', requestBody)
     await createMarker(requestBody)
-    console.log('Markør opprettet!')
   } catch (error) {
     console.error('Failed to create marker', error)
   }
@@ -76,6 +75,11 @@ async function handleSubmit() {
       <Input v-model="title" class="border w-full" id="title" placeholder="Navn på markør" />
     </div>
 
+    <div class="flex align-middle">
+      <Label class="m-2" for="description">Beskrivelse</Label>
+      <Input v-model="description" class="border w-full" id="description" placeholder="Kort innhold av markør" />
+    </div>
+
     <div class="flex items-center">
       <Label class="m-2" for="latitude">Posisjon</Label>
       <div class="flex flex-col ">
@@ -88,7 +92,6 @@ async function handleSubmit() {
         <Input class="border w-full" id="longitude" placeholder="eks: 10.422132" v-model="longitude" />
       </div>
     </div>
-
 
     <div class="flex align-middle items-center">
       <Label class="m-2" for="type">Stedstype</Label>
@@ -110,11 +113,6 @@ async function handleSubmit() {
           </SelectContent>
         </Select>
       </div>
-    </div>
-
-    <div class="flex align-middle">
-      <Label class="m-2" for="description">Beskrivelse</Label>
-      <Input v-model="description" class="border w-full" id="description" placeholder="Kort innhold av markør" />
     </div>
 
     <div class="flex align-middle mt-4">
