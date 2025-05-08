@@ -45,7 +45,8 @@ export async function fetchStorageMembers(storageId) {
 
 export async function updateStorage(id, name, location) {
   try {
-    const response = await api.put(`/storages/${id}`, {
+    const response = await api.put(`/storages/update`, {
+      id,
       name,
       location,
     })

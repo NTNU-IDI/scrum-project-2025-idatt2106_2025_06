@@ -229,6 +229,11 @@ async function deleteTrackingHistory() {
   }
 }
 
+async function handleStorageUpdated() {
+  await storageStore.fetchAll(sessionStore.token)
+  await loadAddresses()
+}
+
 onMounted(async () => {
   if (!sessionStore.isAuthenticated) {
     router.push('/login')
@@ -325,7 +330,7 @@ onMounted(async () => {
                     </ul>
                     <p v-else>Laster medlemmer...</p>
                     <div v-if="user.id === s.storageOwner">
-                      <EditStorage :storage="s" />
+                      <EditStorage :storage="s" @updated="handleStorageUpdated"/>
                     </div>
                     <div v-else class="flex flex-col items-center gap-4">
                       <AlertDialog>
