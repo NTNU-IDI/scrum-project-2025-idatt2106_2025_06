@@ -20,7 +20,7 @@ const isLoggedIn = computed(() => sessionStore.token);
         <router-link class="hover:scale-110 transition" to="/map">Kart</router-link>
       </div>
       <router-link
-        class="flex max-w-100 min-w-100 justify-end h-10 gap-4 items-center hover:scale-110 transition "
+        class="flex min-w-40 justify-end h-10 gap-4 items-center hover:scale-110 transition "
         to="/profile"
       >
         <p v-if="!isLoggedIn">Logg inn</p>
