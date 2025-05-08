@@ -46,7 +46,7 @@
             <TabsTrigger value="marker">Markører</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="event"> </TabsContent>
+          <TabsContent value="event"></TabsContent>
 
           <TabsContent value="marker">
             <div class="flex flex-col gap-4">
@@ -61,14 +61,6 @@
                   Dine lagre ({{ counts.storages }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button
-                    :disabled="!settings.showStorages"
-                    size="icon"
-                    variant="outline"
-                    @click="goToNearest('storage')"
-                  >
-                    <Navigation class="size-5" />
-                  </Button>
                   <Button
                     :variant="settings.showStorages ? 'default' : 'outline'"
                     size="icon"
@@ -91,14 +83,6 @@
                   Dine markører ({{ counts.personal }})
                 </label>
                 <div class="flex items-center gap-2">
-                  <Button
-                    :disabled="!settings.showPersonal"
-                    size="icon"
-                    variant="outline"
-                    @click="goToNearest('personal')"
-                  >
-                    <Navigation class="size-5" />
-                  </Button>
                   <Button
                     :variant="settings.showPersonal ? 'default' : 'outline'"
                     size="icon"
@@ -125,7 +109,7 @@
                     :disabled="!settings.showShelters"
                     size="icon"
                     variant="outline"
-                    @click="goToNearest('shelter')"
+                    @click="mapRef.flyToNearest('Shelter')"
                   >
                     <Navigation class="size-5" />
                   </Button>
@@ -155,7 +139,7 @@
                     :disabled="!settings.showDefibrillators"
                     size="icon"
                     variant="outline"
-                    @click="goToNearest('defibrillator')"
+                    @click="mapRef.flyToNearest('Defibrillator')"
                   >
                     <Navigation class="size-5" />
                   </Button>
@@ -185,7 +169,7 @@
                     :disabled="!settings.showEmergencyClinics"
                     size="icon"
                     variant="outline"
-                    @click="goToNearest('emergencyClinic')"
+                    @click="mapRef.flyToNearest('EmergencyClinic')"
                   >
                     <Navigation class="size-5" />
                   </Button>
@@ -215,7 +199,7 @@
                     :disabled="!settings.showDistributionPoints"
                     size="icon"
                     variant="outline"
-                    @click="goToNearest('distributionPoint')"
+                    @click="mapRef.flyToNearest('DistributionPoint')"
                   >
                     <Navigation class="size-5" />
                   </Button>
@@ -245,7 +229,7 @@
                     :disabled="!settings.showPoliceStations"
                     size="icon"
                     variant="outline"
-                    @click="goToNearest('policeStation')"
+                    @click="mapRef.flyToNearest('PoliceStation')"
                   >
                     <Navigation class="size-5" />
                   </Button>
@@ -275,7 +259,7 @@
                     :disabled="!settings.showPharmacies"
                     size="icon"
                     variant="outline"
-                    @click="goToNearest('pharmacy')"
+                    @click="mapRef.flyToNearest('Pharmacy')"
                   >
                     <Navigation class="size-5" />
                   </Button>
@@ -305,7 +289,7 @@
                     :disabled="!settings.showGeneral"
                     size="icon"
                     variant="outline"
-                    @click="goToNearest('general')"
+                    @click="mapRef.flyToNearest('General')"
                   >
                     <Navigation class="size-5" />
                   </Button>
@@ -407,10 +391,6 @@ const counts = computed(() => ({
   pharmacy: markers.value.filter((m) => m.type === 'Pharmacy').length,
   storages: storages.value.length,
 }))
-
-function goToNearest(type) {
-  mapRef.value?.flyToNearest(type)
-}
 
 onMounted(async () => {
   markers.value = await getAllMarkers()

@@ -4,9 +4,7 @@ import EventCard from '@/components/EventCard.vue'
 import { RouterLink } from 'vue-router'
 
 import { useWebSocketStore } from '@/stores/websocket.js';
-import { useSessionStore} from '@/stores/session.js'
 
-const jwtToken = useSessionStore().token;
 const webSocketStore = useWebSocketStore();
 const alerts = webSocketStore.alerts;
 const events = webSocketStore.events;
@@ -33,16 +31,19 @@ const events = webSocketStore.events;
     <div class="mt-16">
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
-          <template v-for="(event, index) in events" :key="index">
-            <RouterLink :to="'events/' + event.id" class="relative">
+          <template v-for="event in events" :key="event.id">
               <EventCard
+                :event-id="event.id"
+                :name="event.title"
                 :description="event.description"
+                :content="event.content"
                 :severity="event.severity"
-                :time="event.startDate ? new Date(event.startDate).toISOString() : ''"
-                :title="event.title"
+                :type="event.type"
+                :status="event.status"
+                :location="event.location"
+                :updatedAt="event.time"
                 variant="default"
               />
-            </RouterLink>
           </template>
         </div>
       </div>

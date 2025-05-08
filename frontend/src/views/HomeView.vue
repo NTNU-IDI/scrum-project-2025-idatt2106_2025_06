@@ -4,9 +4,8 @@ import AlertCard from '@/components/AlertCard.vue'
 </script>
 
 <template>
-  <div class="m-auto mt-20">
-    <BentoGrid>
-      <!-- Card 1 -->
+  <div class="m-auto flex justify-center">
+    <BentoGrid class="my-auto">
       <BentoCard
         :Icon="ArrowRightIcon"
         cta="Les mer"
@@ -16,7 +15,6 @@ import AlertCard from '@/components/AlertCard.vue'
         name="Krisescenarioer"
       />
 
-      <!-- Card 2 -->
       <BentoCard
         :Icon="ArrowRightIcon"
         cta="Les mer"
@@ -27,7 +25,6 @@ import AlertCard from '@/components/AlertCard.vue'
       >
       </BentoCard>
 
-      <!-- Nyheter -->
       <BentoCardCustom
         customClass="col-span-1 min-h-[30rem] group hover:group-hover:bg-transparent"
         href="/alerts"
@@ -55,7 +52,6 @@ import AlertCard from '@/components/AlertCard.vue'
         </div>
       </BentoCardCustom>
 
-      <!-- Utgår snart -->
       <!-- TODO legge til beredskapslager her -->
       <BentoCardCustom customClass="col-span-3 min-h-[30rem]" href="/inventory" name="Utgår snart">
         <div>TBA</div>
