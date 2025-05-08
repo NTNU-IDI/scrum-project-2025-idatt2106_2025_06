@@ -27,9 +27,9 @@ const delegatedProps = computed(() => {
 
 const severityColors = {
   info: 'bg-blue-500',
-  red: 'bg-red-500',
-  yellow: 'bg-yellow-400',
-  green: 'bg-green-500',
+  high: 'bg-red-500',
+  medium: 'bg-yellow-400',
+  low: 'bg-green-500',
 };
 
 const forwardedProps = useForwardProps(delegatedProps);
