@@ -1,5 +1,19 @@
 import api from '@/config/api'
 
+
+export async function createMarker(createMarkerRequest) {
+  try {
+    console.log('Creating marker..')
+    const response = await api.post('/markers/create', createMarkerRequest)
+    console.log('Marker created successfully:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('Failed to create marker:', error)
+    const message = error.response?.data?.message || 'Kunne ikke opprette markør'
+    throw new Error(message)
+  }
+}
+
 export async function getAllMarkers() {
   try {
     console.log('Fetching all markers..')
