@@ -9,7 +9,7 @@
           <p class="text-sm font-semibold mb-1">Din posisjon</p>
           <p class="text-neutral-500">{{ mapRef?.statusMessage }}</p>
         </div>
-        <Button variant="outline" @click="mapRef.flyToUser()">
+        <Button class="size-10" variant="outline" @click="mapRef.flyToUser()">
           <Navigation />
         </Button>
       </div>
@@ -30,15 +30,6 @@
         </Select>
       </div>
 
-      <div class="mb-6">
-        <input
-          v-model="settings.searchQuery"
-          class="w-full border rounded px-2 py-1"
-          placeholder="Søk etter markør..."
-          type="text"
-        />
-      </div>
-
       <div class="flex flex-col">
         <Tabs v-model="activeTab" class="w-full">
           <TabsList class="grid w-full grid-cols-2">
@@ -46,10 +37,58 @@
             <TabsTrigger value="marker">Markører</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="event"></TabsContent>
+          <TabsContent value="event">
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <label class="items-center text-sm font-semibold">
+                  Vis hendelser ({{ events.length }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :variant="settings.showEvents ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showEvents = !settings.showEvents"
+                  >
+                    <Eye v-if="settings.showEvents" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+              <div v-if="settings.showEvents" class="flex flex-col gap-2">
+                <EventCard
+                  v-for="event in events"
+                  :key="event.id"
+                  :content="event.content"
+                  :description="event.description"
+                  :event-id="event.id"
+                  :name="event.name"
+                  :severity="event.severity"
+                  :status="event.status"
+                  :type="event.type"
+                  :updated-at="event.updatedAt"
+                  variant="map"
+                />
+              </div>
+            </div>
+          </TabsContent>
 
           <TabsContent value="marker">
-            <div class="flex flex-col gap-4">
+            <div class="mb-6">
+              <input
+                v-model="settings.searchQuery"
+                class="w-full border rounded px-2 py-1"
+                placeholder="Søk etter markør..."
+                type="text"
+              />
+            </div>
+            <div class="flex items-center gap-2 mb-6 text-neutral-500">
+              <span>Trykk på </span>
+              <div class="border size-6 flex justify-center items-center rounded-md">
+                <Navigation class="size-3 text-neutral-500" />
+              </div>
+              <span> for å finne nærmeste</span>
+            </div>
+            <div class="flex flex-col gap-2">
               <div class="flex justify-between items-center mb-2">
                 <label
                   :class="{
@@ -312,6 +351,7 @@
     <Map
       ref="mapRef"
       v-model="location"
+      :events="events"
       :markers="markers"
       :settings="settings"
       :start-selection="startSelection"
@@ -324,7 +364,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { getAllMarkers } from '@/service/markerService'
-import { fetchStorages } from '@/service/storageService'
 import Map from '@/components/Map.vue'
 import { Button } from '@/components/ui/button'
 import {
@@ -349,6 +388,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import EventCard from '@/components/EventCard.vue'
+import { fetchEvents } from '@/service/eventService.js'
+import { useSessionStore } from '@/stores/session.js'
+import { fetchStorages } from '@/service/storageService.js'
 
 const activeTab = ref('event')
 const mapRef = ref(null)
@@ -363,12 +406,17 @@ const settings = reactive({
   showPoliceStations: true,
   showPharmacies: true,
   showStorages: true,
+  showEvents: true,
   searchQuery: '',
   minCapacity: 0,
 })
 const markers = ref([])
 const storages = ref([])
+const events = ref([])
 const startSelection = ref('current')
+
+const sessionStore = useSessionStore()
+const user = computed(() => sessionStore.user)
 
 const startOptions = computed(() => {
   const opts = [{ label: 'Din posisjon', value: 'current' }]
@@ -395,6 +443,8 @@ const counts = computed(() => ({
 onMounted(async () => {
   markers.value = await getAllMarkers()
   storages.value = await fetchStorages()
+  console.log('Storages:', storages.value)
+  events.value = await fetchEvents()
 })
 </script>
 
