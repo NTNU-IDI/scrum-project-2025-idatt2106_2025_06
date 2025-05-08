@@ -40,7 +40,6 @@ import axios from 'axios'
 
 const username = ref('');
 const email = ref('');
-const trackingEnabled = ref(false);
 const trackingDeleted = ref(false)
 
 const householdName = ref('');
@@ -206,12 +205,18 @@ async function loadAddresses() {
 }
 
 async function changeLocationTracking() {
-  trackingEnabled.value = !trackingEnabled.value
-  const success = await sessionStore.updateLocationTracking(trackingEnabled.value)
+  if (!user.value) {
+    console.warn("Bruker er ikke innlogget – kan ikke endre tracking")
+    return
+  }
+  const current = user.value.trackingEnabled
+  const success = await sessionStore.updateLocationTracking(!current)
   if (success) {
-    console.log('Tracking preference updated')
+    if (user.value) {
+      user.value.trackingEnabled = !current
+    }
   } else {
-    console.error('Could not update tracking preference')
+    console.error("Kunne ikke oppdatere tracking-preference")
   }
 }
 
@@ -236,7 +241,6 @@ onMounted(async () => {
 
   if (trackingDeleted.value === true) {
     trackingDeleted.value = false
-    console.log('Tracking deleted value ved oppstart:', trackingDeleted.value)
   }
 
   try {
@@ -383,14 +387,14 @@ onMounted(async () => {
           <Label class="text-xl">Personvern:</Label>
           <CardDescription>
             <div class="flex flex-col items-center text-center gap-4">
-              <div v-if="trackingEnabled === true" class="flex flex-col items-center gap-4">
+              <div v-if="user?.trackingEnabled" class="flex flex-col items-center gap-4">
                 <div class="text-left">
                   <Label>Du deler lokasjonen din med Krisefikser. Ønsker du å skru av stedstjenester?</Label>
                 </div>
                 <Button @click="changeLocationTracking" class="w-48">Skru av</Button>
               </div>
 
-              <div v-if="trackingEnabled === false" class="flex flex-col items-center gap-4">
+              <div v-else class="flex flex-col items-center gap-4">
                 <div class="text-left">
                   <Label>Du deler ikke lokasjonen din med Krisefikser. Ønsker du å skru på stedstjenester?</Label>
                 </div>

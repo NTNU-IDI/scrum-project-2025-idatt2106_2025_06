@@ -40,7 +40,6 @@ export async function changePassword(oldPassword, newPassword) {
         'Content-Type': 'application/json'
       }
     })
-    console.log(response.data)
     return response.data
   } catch (error) {
     console.error('Change password error:', error)
@@ -50,11 +49,11 @@ export async function changePassword(oldPassword, newPassword) {
 
 export async function changeLocationTracking(locationTracking) {
   try {
-    const response = await api.put('/user/privacy-policy/change-location-tracking', { locationTracking })
-    return response.data
+    await api.post('/user/privacy-policy/change-location-tracking', { "trackingEnabled": locationTracking })
+    return true
   } catch (error) {
     console.error('Change location tracking error:', error)
-    throw error
+    return false
   }
 }
 

@@ -33,13 +33,14 @@ export const useSessionStore = defineStore('session', () => {
     sessionStorage.setItem('token', response.token)
     user.value = {
       id: response.id,
-      email: response.email,
       name: response.name,
+      email: response.email,
       joinedAt: response.joinedAt,
       admin: response.admin,
       verified: response.verified,
       role: response.role,
-      permissions: response.permissions
+      permissions: response.permissions,
+      trackingEnabled: response.trackingEnabled
     }
     sessionStorage.setItem('user', JSON.stringify(user.value))
   }
@@ -94,8 +95,7 @@ export const useSessionStore = defineStore('session', () => {
 
   async function updateLocationTracking(locationTracking) {
     try {
-      const response = await changeLocationTracking(locationTracking)
-      setToken(response)
+      await changeLocationTracking(locationTracking)
       return true
     } catch (error) {
       console.error('Error changing location tracking:', error)
