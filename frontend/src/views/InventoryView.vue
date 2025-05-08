@@ -229,7 +229,9 @@ onMounted( async () => {
   <div v-else-if="startupFinished && allStorages.length === 0" class="flex-col m-auto mt-10 justify-center">
     <p class="text-xl font-bold m-1 text-center"> Finner ingen husstander </p>
     <p class="m-1 text-center">For å se lager må du være med i en husstand eller opprett en egen.</p>
-    <Button @click="router.push('/profile')" class="my-2 w-full">Bli med i husstand</Button>
+    <RouterLink to="/profile" class="my-2 w-full">
+      <Button>Bli med i husstand</Button>
+    </RouterLink>
   </div>
 </template>
 

@@ -1,7 +1,6 @@
 <script setup>
 
 import { Button } from '@/components/ui/button/index.js'
-import router from '@/router/router.js'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table/index.js'
 import { useInventoryStore } from '@/stores/inventory.js'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -165,7 +164,9 @@ onMounted(async () => {
         </Select>
       </div>
       <div class="mx-auto">
-        <Button :storageId="activeStorageId" @click="router.push('/inventory')">Gå til sjekkliste og lager</Button>
+        <RouterLink to="/inventory">
+          <Button>Gå til sjekkliste og lager</Button>
+        </RouterLink>
       </div>
     </div>
 

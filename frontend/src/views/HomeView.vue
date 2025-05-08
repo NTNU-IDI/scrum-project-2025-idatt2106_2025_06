@@ -6,7 +6,6 @@ import { ArrowRightIcon } from 'lucide-vue-next'
 import { useSessionStore } from '@/stores/session.js'
 import { computed, onMounted, ref } from 'vue'
 import { Button } from '@/components/ui/button/index.js'
-import router from '@/router/router.js'
 import { useStorageStore } from '@/stores/storage.js'
 
 const sessionStore = useSessionStore();
@@ -83,12 +82,16 @@ onMounted(async () => {
         <div>
           <div v-if="!userLoggedIn" class="flex flex-col h-[20rem] gap-3 justify-center">
             <p class="text-lg text-center font-bold">Du må være innlogget for å se beredskap og utgår snart.</p>
-            <Button class="mx-auto" @click="router.push('/login')">Logg inn</Button>
+            <RouterLink to="/login" class="mx-auto">
+              <Button>Logg inn</Button>
+            </RouterLink>
           </div>
           <div v-else-if="startupFinished && storages.length === 0" class="flex flex-col h-[20rem] gap-3 justify-center">
             <p class="text-lg font-bold text-center"> Finner ingen husstander </p>
             <p class="text-center">For å se lager må du være med i en husstand eller opprett en egen.</p>
-            <Button @click="router.push('/profile')" class="mx-auto">Bli med i husstand</Button>
+            <RouterLink to="/profile" class="mx-auto">
+              <Button>Bli med i husstand</Button>
+            </RouterLink>
           </div>
           <div v-else-if="startupFinished && storages.length > 0">
             <ExpiringSoon/>
