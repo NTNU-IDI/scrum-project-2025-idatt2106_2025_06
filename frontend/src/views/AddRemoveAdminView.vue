@@ -14,7 +14,7 @@ const newUsername = ref('')
 const newEmail = ref('')
 
 
-//const token = sessionStorage.getItem('token')
+//const token = sessionStorage.getItem('token') usikker på om denne skal være med
 
 onMounted(async () => {
   moderatorStore.fetchAll()
