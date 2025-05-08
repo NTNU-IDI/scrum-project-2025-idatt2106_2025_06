@@ -2,7 +2,6 @@
 
 import {
   Dialog,
-  DialogClose,
   DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle,
   DialogTrigger
@@ -20,7 +19,7 @@ import { Input } from '@/components/ui/input/index.js'
 import { Button } from '@/components/ui/button/index.js'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover/index.js'
 import { Calendar } from '@/components/ui/calendar/index.js'
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import {
   DateFormatter,
   getLocalTimeZone, parseDate
@@ -31,6 +30,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 const dateFormat = new DateFormatter('nb-NO', {
   dateStyle: 'long',
 })
+
+const inventoryStore = useInventoryStore();
 
 const isNewItemDialogOpen = ref();
 
@@ -60,8 +61,6 @@ function handleAmountInput(e) {
   itemAmount.value = value;
 }
 
-const inventoryStore = useInventoryStore();
-
 const handleEdit = () => {
   let formattedExpDate;
   if (expirationDate.value) {
@@ -73,8 +72,23 @@ const handleEdit = () => {
   isNewItemDialogOpen.value = false;
 }
 
+watch(
+  () => props.item,
+  () => {
+    currentItem.value = props.item
+    currentItem.value = props.item;
+    itemType.value = props.typeId;
+    itemId.value = currentItem.value.id;
+    itemName.value = currentItem.value.name;
+    itemAmount.value = String(currentItem.value.amount);
+    itemUnit.value = currentItem.value.unitId;
+    expirationDate.value = currentItem.value.expiryDate ?
+      parseDate(currentItem.value.expiryDate) : '';
+  },
+)
+
 watch(isNewItemDialogOpen, (value) => {
-    if (!value) {
+  if (!value) {
       itemAmount.value = String(currentItem.value.amount);
       expirationDate.value = currentItem.value.expiryDate ?
         parseDate(currentItem.value.expiryDate) : '';
