@@ -4,6 +4,7 @@ import { RouterView } from 'vue-router'
 import { useSessionStore } from '@/stores/session.js'
 import Navbar from '@/components/NavBar.vue'
 import NavBarAdmin from '@/components/NavBarAdmin.vue'
+import Footer from '@/components/footer.vue'
 
 const session = useSessionStore()
 
@@ -24,6 +25,7 @@ watch(
   <main class="h-screen flex flex-col w-full">
     <Navbar v-if="!isModOrAdmin" />
     <NavBarAdmin v-else />
-    <RouterView class="max-w-6xl" />
+    <RouterView class="max-w-6xl min-h-[calc(100vh-3.5rem)]" />
+    <Footer />
   </main>
 </template>

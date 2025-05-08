@@ -28,7 +28,8 @@ class JwtService {
     @Value("\${security.jwt.expiration-time}")
     private var expiration: Long = 0
 
-
+    @Value("\${email.verification.expiration-time}")
+    private var emailVerificationExpiration: Long = 0
 
     fun generateToken(userDetails: UserDetails): String {
         val now = System.currentTimeMillis()
@@ -75,6 +76,11 @@ class JwtService {
         return claims["email"] as? String
     }
 
+    fun extractPurposeFromToken(token: String): String? {
+        val claims = getAllClaimsFromToken(token)
+        return claims["purpose"] as? String
+    }
+
     fun isTokenValid(
         token: String,
         userDetails: UserDetails
@@ -82,6 +88,14 @@ class JwtService {
         val extractedUserId: UUID? = extractUserIdFromToken(token)
         val userIdFromUserDetails = if (userDetails is User) userDetails.id else null
         return extractedUserId != null && extractedUserId == userIdFromUserDetails && !isTokenExpired(token)
+    }
+
+    fun isVerificationTokenValid(
+        token: String
+    ): Boolean {
+        val claims = getAllClaimsFromToken(token)
+        val purpose = claims["purpose"] as? String
+        return purpose == "email_verification" && !isTokenExpired(token)
     }
 
 
@@ -94,7 +108,22 @@ class JwtService {
         return claims.expiration.before(Date())
     }
 
-    private fun getAllClaimsFromToken(token: String): Claims =
+    fun generateVerificationToken(userID: UUID, email: String): String {
+        val now = System.currentTimeMillis()
+        val validationExpiration = now + (10 * 60 * 1000) // 10 minuttes
+
+        return Jwts
+            .builder()
+            .subject(userID.toString())
+            .claim("email", email)
+            .claim("purpose", "email_verification")
+            .issuedAt(Date(now))
+            .expiration(Date(validationExpiration))
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact()
+    }
+
+    fun getAllClaimsFromToken(token: String): Claims =
         Jwts
             .parser()
             .verifyWith(getSignInKey())
