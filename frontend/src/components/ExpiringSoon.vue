@@ -15,9 +15,11 @@ import {
   SelectValue
 } from '@/components/ui/select/index.js'
 import { DonutChart } from '@/components/ui/chart-donut/index.js'
+import { useSessionStore } from '@/stores/session.js'
 
 const storageStore = useStorageStore();
 const inventoryStore = useInventoryStore();
+const sessionStore = useSessionStore();
 
 const items = computed(() => inventoryStore.expiresSoonItems)
 const storages = computed(() => storageStore.storages)
@@ -130,10 +132,12 @@ watch(() => activeStorageId.value, async (newId) => {
 })
 
 onMounted(async () => {
-  activeStorageId.value = storages.value[0].id;
-  activeStorageName.value = storages.value[0].name;
+  if (sessionStore.isAuthenticated) {
+    activeStorageId.value = storages.value[0].id;
+    activeStorageName.value = storages.value[0].name;
 
-  await inventoryStore.getExpiresSoonItems(activeStorageId.value);
+    await inventoryStore.getExpiresSoonItems(activeStorageId.value);
+  }
 
 });
 </script>

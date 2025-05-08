@@ -18,10 +18,12 @@ const storages = computed(() => storageStore.storages);
 const startupFinished = ref(false);
 
 onMounted(async () => {
-  try {
-    await storageStore.fetchAll(sessionStore.token)
-  } catch (error) {
-    console.error("Klarte ikke hente husstander:", error)
+  if (sessionStore.isAuthenticated) {
+    try {
+      await storageStore.fetchAll(sessionStore.token)
+    } catch (error) {
+      console.error("Klarte ikke hente husstander:", error)
+    }
   }
 
   startupFinished.value = true;
