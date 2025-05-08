@@ -9,7 +9,7 @@
           <p class="text-sm font-semibold mb-1">Din posisjon</p>
           <p class="text-neutral-500">{{ mapRef?.statusMessage }}</p>
         </div>
-        <Button variant="outline" @click="mapRef.flyToUser()">
+        <Button class="size-10" variant="outline" @click="mapRef.flyToUser()">
           <Navigation />
         </Button>
       </div>
@@ -30,15 +30,6 @@
         </Select>
       </div>
 
-      <div class="mb-6">
-        <input
-          v-model="settings.searchQuery"
-          class="w-full border rounded px-2 py-1"
-          placeholder="Søk etter markør..."
-          type="text"
-        />
-      </div>
-
       <div class="flex flex-col">
         <Tabs v-model="activeTab" class="w-full">
           <TabsList class="grid w-full grid-cols-2">
@@ -46,10 +37,42 @@
             <TabsTrigger value="marker">Markører</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="event"></TabsContent>
+          <TabsContent value="event">
+            <div class="flex flex-col gap-2">
+              <EventCard
+                description="lollololol"
+                severity="high"
+                time="Nå"
+                title="lol"
+                variant=""
+              />
+              <EventCard
+                description="lollsololol"
+                severity="high"
+                time="Nå"
+                title="lol"
+                variant=""
+              />
+            </div>
+          </TabsContent>
 
           <TabsContent value="marker">
-            <div class="flex flex-col gap-4">
+            <div class="mb-6">
+              <input
+                v-model="settings.searchQuery"
+                class="w-full border rounded px-2 py-1"
+                placeholder="Søk etter markør..."
+                type="text"
+              />
+            </div>
+            <div class="flex items-center gap-2 mb-6 text-neutral-500">
+              <span>Trykk på </span>
+              <div class="border size-6 flex justify-center items-center rounded-md">
+                <Navigation class="size-3 text-neutral-500" />
+              </div>
+              <span> for å finne nærmeste</span>
+            </div>
+            <div class="flex flex-col gap-2">
               <div class="flex justify-between items-center mb-2">
                 <label
                   :class="{
@@ -349,6 +372,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import EventCard from '@/components/EventCard.vue'
 
 const activeTab = ref('event')
 const mapRef = ref(null)
