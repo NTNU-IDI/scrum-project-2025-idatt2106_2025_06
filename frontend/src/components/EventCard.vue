@@ -137,7 +137,7 @@ const handleEdit = () => {
         <p
           :class="[
             'text-md text-neutral-600 overflow-hidden',
-            variant === 'admin' || 'map' ? 'truncate' : '',
+            variant === 'admin' || variant === 'map' ? 'truncate' : '',
           ]"
         >
           {{ props.description || props.content }}
