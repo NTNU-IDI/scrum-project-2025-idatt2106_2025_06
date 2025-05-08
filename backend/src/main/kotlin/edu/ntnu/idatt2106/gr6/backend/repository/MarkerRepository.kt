@@ -19,11 +19,12 @@ class MarkerRepository(
 
     fun createMarker(marker: Marker): Marker {
         val sql = """
-        INSERT INTO marker (
-            id, event_id, name, ST_, description, 
-            contact_info, opening_hours, image_id, type
-        ) VALUES (?, ?, ?, ST_PointFromText(?, 4326), ?, ?, ?, ?, ?)
-    """.trimIndent()
+     INSERT INTO marker (
+         id, event_id, name, location, description, 
+         contact_info, opening_hours, image_id, type
+     ) VALUES (?, ?, ?, ST_PointFromText(?, 4326), ?, ?, ?, ?, ?)
+ """.trimIndent()
+
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
