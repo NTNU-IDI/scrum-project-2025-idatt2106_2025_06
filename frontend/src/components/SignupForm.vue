@@ -60,7 +60,7 @@ const registerUser = async () => {
 
 const closeDialog = () => {
   isDialogOpen.value = false;
-  router.push("/login"); // Redirect to login page after closing the popup
+  router.push("/login");
 };
 </script>
 
