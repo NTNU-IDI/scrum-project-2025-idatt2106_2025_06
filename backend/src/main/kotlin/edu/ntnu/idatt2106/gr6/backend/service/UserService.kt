@@ -33,7 +33,7 @@ class UserService(
             throw UserAlreadyExistsException.forEmail(request.email)
         }
 
-        val updated = userRepository.updateUser(userId, request.name, request.email)
+        val updated = userRepository.updateUser(userId, request.name, request.email, true)
         if (!updated) {
             throw DatabaseNoRowsAffectedException.forQuery(userId.toString())
         }
