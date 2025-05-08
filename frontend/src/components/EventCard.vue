@@ -118,7 +118,7 @@ const handleEdit = () => {
             <h1
               :class="[
                 'font-bold',
-                variant === 'admin' || 'map' ? 'text-md' : 'text-2xl',
+                variant === 'admin' || variant === 'map' ? 'text-md' : 'text-2xl',
                 variant === 'map' ? 'truncate overflow-hidden w-full min-w-0' : '',
               ]"
             >
