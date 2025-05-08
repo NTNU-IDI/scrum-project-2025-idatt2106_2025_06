@@ -94,7 +94,18 @@ class UserController(
     fun testEmail(): ResponseEntity<String> {
         try {
             logger.info("Received request to send verification email")
-            val response = emailService.sendVerificationEmail()
+            val content = """
+            <html>
+                <body>
+                    <h2>Email Verifisering</h2>
+                    <p>Takk for at du registerer deg hos krisefikser. Vennligst klikk på linken nedenfor for å bekrefte at det er deg</p>
+                    <p><a href=verificationLink>Verify Email</a></p>
+                    <p>Den linken er gyldig i kun 10 minutter.</p>
+                    <p>Hvis du ikke har laget en bruker, vennligst ignorer denne eposten.</p>
+                </body>
+            </html>
+        """.trimIndent()
+            val response = emailService.sendEmail("matti.holestol@gmail.com", "Testsssss Subject", content)
             return ResponseEntity.ok("Email sent successfully: $response")
         } catch (e: Exception) {
             return ResponseEntity.internalServerError().body("Failed to send email: ${e.message}")
