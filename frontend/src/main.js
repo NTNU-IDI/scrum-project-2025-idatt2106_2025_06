@@ -4,9 +4,7 @@ import {createApp} from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from "@/router/router.js";
-import { useSessionStore } from '@/stores/session.js'
-import { initializeWebSocket} from '@/lib/websocket.js'
-import { useWebSocketStore } from '@/stores/websocket.js'
+import { startSendingUserLocation, stopSendingUserPosition } from './service/locationService.js'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -14,8 +12,9 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 
-const session = useSessionStore()
-const webSocketStore = useWebSocketStore()
-webSocketStore.initialize(session.token)
+
+app.config.globalProperties.$startSendingUserLocation = () => startSendingUserLocation;
+app.config.globalProperties.$stopSendingUserPosition = stopSendingUserPosition;
+
 
 app.mount('#app')
