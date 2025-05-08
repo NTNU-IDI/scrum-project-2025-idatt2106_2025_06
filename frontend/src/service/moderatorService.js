@@ -1,17 +1,12 @@
-import axios from 'axios';
+import api from '@/config/api.js'
 
-
-
-export async function createModerator(name, email, username, token) {
+export async function createModerator(name, email, username) {
   try {
-    const response = await axios.post('http://localhost:8080/api/moderator/create',
-      { name, email, username },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
-      }
-    )
+    const response = await api.post('moderator/create', {
+      name,
+      email,
+      username
+    })
     return response.data;
   } catch (error) {
     console.error('Create moderator error:', error)
@@ -19,34 +14,21 @@ export async function createModerator(name, email, username, token) {
   }
 }
 
-export async function fetchModerators(token) {
+export async function fetchModerators() {
   try {
-    const response = await axios.get('http://localhost:8080/api/moderator/all',
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
-      }
-    )
+    const response = await api.get('/moderator/all')
     return response.data;
   } catch (error) {
     console.error('Fetch moderators error:', error)
     throw error
   }
-
 }
 
-
-export async function removeModerator(name, username, email, id, token) {
+export async function removeModerator(name, username, email, id) {
   try {
-    const response = await axios.post('http://localhost:8080/api/moderator/remove',
-      { name, email, id },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
+    const response = await api.post('/moderator/remove', {
+      name, email, id
+    })
     return response.data;
   } catch (error) {
     console.error('Remove admin error', error)

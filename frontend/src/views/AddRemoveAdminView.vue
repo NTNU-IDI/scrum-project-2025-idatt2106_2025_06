@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { useModeratorStore } from '@/stores/moderator.js'
 
 const moderatorStore = useModeratorStore()
+
 const newName = ref('')
 const newUsername = ref('')
 const newEmail = ref('')
@@ -16,27 +17,24 @@ const newEmail = ref('')
 //const token = sessionStorage.getItem('token')
 
 onMounted(async () => {
-  //if (!token) return
-  moderatorStore.value = await fetchModerators(/*token*/)
+  moderatorStore.fetchAll()
 })
 
 const handleAdd = async () => {
-  if (!newName.value || !newEmail.value /* || !token */ ) {
+  if (!newName.value || !newEmail.value || !newUsername.value) {
     alert("Fyll inn begge felt")
     return
   }
 
-  await createModerator(newName.value, newEmail.value)
-  moderatorStore.value = await fetchModerators()
+  await moderatorStore.add(newName.value, newEmail.value, newName.value)
   newName.value = ''
   newEmail.value = ''
-  alert('Moderator lagt til!')
+  newUsername.value = ''
+  alert('Moderator fjernet!')
 }
 
-const handleRemove = async (email) => {
-  //if (!token) return
-  await removeModerator(email, /*token*/)
-  moderatorStore.value = await fetchModerators()
+const handleRemove = async (mod) => {
+  await moderatorStore.remove(mod.name, mod.email, mod.id, mod.username)
   alert('Moderator fjernet!')
 }
 
