@@ -16,6 +16,7 @@ import AdminView from "@/views/AdminView.vue";
 import AdminMap from "@/views/AdminMapView.vue";
 import { useSessionStore } from '@/stores/session.js'
 
+
 const routes = [
   {path: '/', component: HomeView, name: 'home'},
   {path: '/alerts', component: AlertsView, name: 'alerts'},

@@ -1,22 +1,8 @@
 <script setup>
-import {Button} from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
@@ -36,9 +22,9 @@ async function login() {
     const success = await session.login(email.value, password.value)
     if (success) {
       if (['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role)) {
-        router.push('/admin')
+        await router.push('/admin')
       } else {
-        router.push('/')
+        await router.push('/')
       }
     } else {
       errorMessage.value = 'Feil e-post eller passord.'
@@ -49,10 +35,10 @@ async function login() {
     } else if (error.response && error.response.data && error.response.data.message) {
       errorMessage.value = error.response.data.message
     } else {
-      errorMessage.value = "Innlogging feilet. Prøv igjen senere."
+      errorMessage.value = 'Innlogging feilet. Prøv igjen senere.'
     }
-    console.log('Error: ', errorMessage.value);
-    return null;
+    console.log('Error: ', errorMessage.value)
+    return null
   }
 }
 </script>
@@ -62,33 +48,24 @@ async function login() {
     <CardHeader>
       <CardTitle class="text-2xl"> Logg inn</CardTitle>
 
-      <CardDescription>
-        Skriv inn epost-adresse og passord for å logge inn
-      </CardDescription>
-
+      <CardDescription> Skriv inn epost-adresse og passord for å logge inn </CardDescription>
     </CardHeader>
     <CardContent>
       <div class="grid gap-4">
         <form @submit.prevent="login">
-
           <div class="grid gap-2">
-
             <Label for="email">Epost</Label>
             <Input id="email" v-model="email" placeholder="m@example.com" required type="email" />
 
             <div class="flex items-center">
               <Label for="password">Passord</Label>
-              <a class="ml-auto inline-block text-sm underline" href="#">
-                Glemt passord?
-              </a>
+              <a class="ml-auto inline-block text-sm underline" href="#"> Glemt passord? </a>
             </div>
 
             <Input id="password" v-model="password" required type="password" />
             <Button class="w-full" type="submit">Logg inn</Button>
             <p v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</p>
-
           </div>
-
         </form>
       </div>
 

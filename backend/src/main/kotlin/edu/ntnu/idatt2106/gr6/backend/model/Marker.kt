@@ -1,44 +1,48 @@
 package edu.ntnu.idatt2106.gr6.backend.model
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 import edu.ntnu.idatt2106.gr6.backend.DTOs.Location
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.MapsId
 import jakarta.persistence.OneToOne
 
 sealed class MarkerType {
-    object FoodBank : MarkerType()
-    object WaterDistribution : MarkerType()
-    object Clinic : MarkerType()
-    object Pharmacy : MarkerType()
-    object Hospital : MarkerType()
-    object BombShelter : MarkerType()
-    object Household : MarkerType()
-    object Other : MarkerType()
+    object Shelter: MarkerType()
+    object Defibrillator: MarkerType()
+    object EmergencyClinic: MarkerType()
+    object DistributionPoint: MarkerType()
+    object PoliceStation: MarkerType()
+    object Pharmacy: MarkerType()
+    object General: MarkerType()
 
+    @JsonValue
     override fun toString(): String {
         return when (this) {
-            is FoodBank -> "food_bank"
-            is Hospital -> "hospital"
-            is Clinic -> "clinic"
-            is Pharmacy -> "pharmacy"
-            is WaterDistribution -> "water_distribution"
-            is BombShelter -> "bomb_shelter"
-            is Household -> "household"
-            is Other -> "other"
+            is Shelter -> "Shelter"
+            is Defibrillator -> "Defibrillator"
+            is EmergencyClinic -> "EmergencyClinic"
+            is DistributionPoint -> "DistributionPoint"
+            is PoliceStation -> "PoliceStation"
+            is Pharmacy -> "Pharmacy"
+            is General -> "General"
         }
     }
 
     companion object {
+        @JvmStatic
+        @JsonCreator
+        fun fromJson(value: String): MarkerType = fromString(value)
+
         fun fromString(type: String): MarkerType {
             return when (type) {
-                "food_bank" -> FoodBank
-                "water_distribution" -> WaterDistribution
-                "clinic" -> Clinic
-                "pharmacy" -> Pharmacy
-                "hospital" -> Hospital
-                "bomb_shelter" -> BombShelter
-                "household" -> Household
-                else -> Other
+                "Shelter" -> Shelter
+                "Defibrillator" -> Defibrillator
+                "EmergencyClinic" -> EmergencyClinic
+                "DistributionPoint" -> DistributionPoint
+                "PoliceStation" -> PoliceStation
+                "Pharmacy" -> Pharmacy
+                else -> General
             }
         }
     }
