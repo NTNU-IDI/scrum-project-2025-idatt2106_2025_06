@@ -9,6 +9,17 @@ const scenarioStore = useScenarioStore()
 const sessionStore = useSessionStore()
 const scenario = ref(null)
 
+const formatDate = (isoDate) => {
+  const date = new Date(isoDate)
+  return date.toLocaleDateString('no-NO', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 onMounted(async () => {
   if (!scenarioStore.scenarios.length) {
     await scenarioStore.fetchScenarios(sessionStore.token)
@@ -22,6 +33,8 @@ onMounted(async () => {
     <div class="max-w-4xl mx-auto p-6">
       <div v-if="scenario">
         <h1 class="text-3xl font-bold mb-4">{{ scenario.title }}</h1>
+        <p>Opprettet: {{ formatDate(scenario.updatedAt) }}</p>
+        <p>Sist endret: {{ scenario.createdAt }} </p>
         <p class="text-lg mb-2 text-gray-700">{{ scenario.description }}</p>
         <div class="prose mb-4">
           {{ scenario.content }}
