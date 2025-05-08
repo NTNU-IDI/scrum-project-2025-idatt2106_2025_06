@@ -37,10 +37,10 @@ export async function fetchModerators(token) {
 }
 
 
-export async function removeModerator(email, token) {
+export async function removeModerator(name, username, email, id, token) {
   try {
     const response = await axios.post('http://localhost:8080/api/moderator/remove',
-      { email },
+      { name, email, id },
       {
         headers: {
           Authorization: `Bearer ${token}`,

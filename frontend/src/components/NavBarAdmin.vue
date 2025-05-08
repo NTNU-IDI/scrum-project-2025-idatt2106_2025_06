@@ -8,9 +8,13 @@ import { useRouter} from 'vue-router'
 const router = useRouter()
 const session = useSessionStore()
 
-function handleLogout() {
-  session.logout()
-  router.push('/login')
+const handleLogout = async () => {
+  try {
+    await session.logout()
+    router.push('/login')
+  } catch (error) {
+    console.error('Logout failed:',error)
+  }
 }
 
 const isAdmin = computed(() => session.user?.role === 'ADMIN')

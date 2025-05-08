@@ -20,7 +20,7 @@ export async function createModerator(name, email, username) {
   })
 }
 
-export async function removeModerator(email) {
+export async function removeModerator(name, email, username, id, token) {
   return new Promise(resolve => {
     setTimeout(() => {
       mockModerators = mockModerators.filter(mod => mod.email !== email)

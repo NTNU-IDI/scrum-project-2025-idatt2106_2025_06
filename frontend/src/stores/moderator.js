@@ -14,7 +14,7 @@ export const useModeratorStore = defineStore('moderator', () => {
   async function fetchAll(token){
     try {
       const response = await fetchModerators(token)
-      console.error('Expected array', response)
+      console.log('Expected array', response)
       moderators.value = response.map(m => ({
         ...m,
         isCurrentUser: m.email === moderatorEmail.value
@@ -24,18 +24,18 @@ export const useModeratorStore = defineStore('moderator', () => {
     }
   }
 
-  async function add(email, name, username, token) {
+  async function add(name, email, username, token) {
     try {
-      await createModerator(email, name, username, token)
+      await createModerator(name, email, username, token)
       await fetchAll(token)
     } catch (error) {
       console.error('Error adding moderator:', error)
     }
   }
 
-  async function remove(email, id, name, username, token) {
+  async function remove(name, email, id, username, token) {
     try {
-      await removeModerator(email, name, id, username, token)
+      await removeModerator(name, email, id, username, token)
       await fetchAll(token)
     } catch (error) {
       console.error('Error removing moderator:', error)

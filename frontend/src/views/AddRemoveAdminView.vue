@@ -5,9 +5,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { useModeratorStore } from '@/stores/moderator.js'
 
-const moderators = ref([])
+const moderatorStore = useModeratorStore()
 const newName = ref('')
+const newUsername = ref('')
 const newEmail = ref('')
 
 
@@ -15,7 +17,7 @@ const newEmail = ref('')
 
 onMounted(async () => {
   //if (!token) return
-  moderators.value = await fetchModerators(/*token*/)
+  moderatorStore.value = await fetchModerators(/*token*/)
 })
 
 const handleAdd = async () => {
@@ -25,7 +27,7 @@ const handleAdd = async () => {
   }
 
   await createModerator(newName.value, newEmail.value)
-  moderators.value = await fetchModerators()
+  moderatorStore.value = await fetchModerators()
   newName.value = ''
   newEmail.value = ''
   alert('Moderator lagt til!')
@@ -34,7 +36,7 @@ const handleAdd = async () => {
 const handleRemove = async (email) => {
   //if (!token) return
   await removeModerator(email, /*token*/)
-  moderators.value = await fetchModerators()
+  moderatorStore.value = await fetchModerators()
   alert('Moderator fjernet!')
 }
 
@@ -52,6 +54,11 @@ const handleRemove = async (email) => {
       </div>
 
       <div class="flex items-center gap-2">
+        <Label for="username" class="w-24">Brukernavn:</Label>
+        <Input id="username" v-model="newUsername" placeholder="Brukernavn" class="flex-1" />
+      </div>
+
+      <div class="flex items-center gap-2">
         <Label for="email" class="w-24">E-post:</Label>
         <Input id="email" v-model="newEmail" placeholder="eksempel@hotmail.com" class="flex-1" />
         <Button @click="handleAdd">Legg til</Button>
@@ -60,13 +67,14 @@ const handleRemove = async (email) => {
       <div class="mt-4">
         <h3 class="font-semibold mb-2">Moderatorer</h3>
         <ul class="flex flex-col gap-2">
-          <li v-for="mod in moderators" :key="mod.id">
+          <li v-for="mod in moderatorStore.moderators" :key="mod.id">
             <div class="flex justify-between items-center border rounded p-4">
               <div class="flex flex-col text-left">
                 <span><strong>Navn:</strong> {{ mod.name }}</span>
+                <span><strong>Brukernavn:</strong> {{ mod.username }}</span>
                 <span><strong>E-post:</strong> {{ mod.email }}</span>
               </div>
-              <Button variant="destructive" @click="handleRemove(mod.email)">Fjern</Button>
+              <Button variant="destructive" @click="handleRemove(mod)">Fjern</Button>
             </div>
           </li>
         </ul>
