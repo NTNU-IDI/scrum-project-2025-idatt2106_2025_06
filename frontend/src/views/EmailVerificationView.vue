@@ -1,11 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import axios from 'axios';
+import { useRoute } from 'vue-router';
+import api from '@/config/api.js';
 
 const verificationStatus = ref('');
 const isLoading = ref(true);
-const router = useRouter();
 const route = useRoute();
 
 onMounted(async () => {
@@ -18,7 +17,7 @@ onMounted(async () => {
   }
 
   try {
-    const response = await axios.get(`http://localhost:8080/api/auth/email-verification/${token}`, {}, {
+    const response = await api.get(`/auth/email-verification/${token}`, {}, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -29,14 +28,11 @@ onMounted(async () => {
     verificationStatus.value = 'E-posten din er bekreftet! Du kan nå logge inn.';
   } catch (error) {
     verificationStatus.value = 'Bekreftelse feilet. Lenken kan være utløpt eller ugyldig.';
+    console.error("Error: ", error);
   } finally {
     isLoading.value = false;
   }
 });
-
-const goToLogin = () => {
-  router.push('/login');
-};
 </script>
 
 <template>
@@ -44,7 +40,7 @@ const goToLogin = () => {
     <div v-if="isLoading" class="text-lg font-bold">Verifiserer...</div>
     <div v-else class="text-center">
       <p class="text-lg font-bold">{{ verificationStatus }}</p>
-      <Button v-if="!isLoading" class="mt-4" @click="goToLogin">Gå til innlogging</Button>
+      <RouterLink v-if="!isLoading" class="mt-4" to="/login">Gå til innlogging</RouterLink>
     </div>
   </div>
 </template>
