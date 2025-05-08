@@ -25,6 +25,8 @@ const storages = computed(() => storageStore.storages)
 const activeStorageId = ref();
 const activeStorageName = ref();
 
+const userLoggedIn = computed(() => sessionStore.token);
+
 const percentage = 74;
 
 const data = [
@@ -130,19 +132,42 @@ watch(() => activeStorageId.value, async (newId) => {
   await fetchReadiness();
 })
 
+const startupFinished = ref(false);
+
+
 onMounted(async () => {
   if (sessionStore.isAuthenticated) {
+    try {
+      await storageStore.fetchAll(sessionStore.token)
+    } catch (error) {
+      console.error("Klarte ikke hente husstander:", error)
+    }
+
     activeStorageId.value = storages.value[0].id;
     activeStorageName.value = storages.value[0].name;
 
     await inventoryStore.getExpiresSoonItems(activeStorageId.value);
   }
 
+  startupFinished.value = true;
 });
 </script>
 
 <template>
-  <div class="flex items-center w-full h-[25rem]">
+  <div v-if="!userLoggedIn" class="flex flex-col h-[20rem] gap-3 justify-center">
+    <p class="text-lg text-center font-bold">Du må være innlogget for å se beredskap og utgår snart.</p>
+    <RouterLink to="/login" class="mx-auto">
+      <Button>Logg inn</Button>
+    </RouterLink>
+  </div>
+  <div v-else-if="startupFinished && storages.length === 0" class="flex flex-col h-[20rem] gap-3 justify-center">
+    <p class="text-lg font-bold text-center"> Finner ingen husstander </p>
+    <p class="text-center">For å se lager må du være med i en husstand eller opprett en egen.</p>
+    <RouterLink to="/profile" class="mx-auto">
+      <Button>Bli med i husstand</Button>
+    </RouterLink>
+  </div>
+  <div v-else-if="startupFinished && storages.length > 0" class="flex items-center w-full h-[25rem]">
     <div class="w-1/3 h-full flex flex-col justify-between">
       <p class="font-medium text-base">Beredskapsgrad</p>
       <div>

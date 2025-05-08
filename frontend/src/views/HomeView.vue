@@ -3,30 +3,6 @@ import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
 import AlertCard from '@/components/AlertCard.vue'
 import ExpiringSoon from '@/components/ExpiringSoon.vue'
 import { ArrowRightIcon } from 'lucide-vue-next'
-import { useSessionStore } from '@/stores/session.js'
-import { computed, onMounted, ref } from 'vue'
-import { Button } from '@/components/ui/button/index.js'
-import { useStorageStore } from '@/stores/storage.js'
-
-const sessionStore = useSessionStore();
-const storageStore = useStorageStore();
-
-const userLoggedIn = computed(() => sessionStore.token);
-const storages = computed(() => storageStore.storages);
-
-const startupFinished = ref(false);
-
-onMounted(async () => {
-  if (sessionStore.isAuthenticated) {
-    try {
-      await storageStore.fetchAll(sessionStore.token)
-    } catch (error) {
-      console.error("Klarte ikke hente husstander:", error)
-    }
-  }
-
-  startupFinished.value = true;
-})
 </script>
 
 <template>
@@ -79,24 +55,7 @@ onMounted(async () => {
       </BentoCardCustom>
 
       <BentoCardCustom customClass="col-span-3 min-h-[30rem] w-[45rem]" class="cursor-default" name="Beredskap">
-        <div>
-          <div v-if="!userLoggedIn" class="flex flex-col h-[20rem] gap-3 justify-center">
-            <p class="text-lg text-center font-bold">Du må være innlogget for å se beredskap og utgår snart.</p>
-            <RouterLink to="/login" class="mx-auto">
-              <Button>Logg inn</Button>
-            </RouterLink>
-          </div>
-          <div v-else-if="startupFinished && storages.length === 0" class="flex flex-col h-[20rem] gap-3 justify-center">
-            <p class="text-lg font-bold text-center"> Finner ingen husstander </p>
-            <p class="text-center">For å se lager må du være med i en husstand eller opprett en egen.</p>
-            <RouterLink to="/profile" class="mx-auto">
-              <Button>Bli med i husstand</Button>
-            </RouterLink>
-          </div>
-          <div v-else-if="startupFinished && storages.length > 0">
-            <ExpiringSoon/>
-          </div>
-        </div>
+        <ExpiringSoon/>
       </BentoCardCustom>
     </BentoGrid>
   </div>
