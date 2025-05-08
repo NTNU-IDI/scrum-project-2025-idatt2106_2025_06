@@ -20,14 +20,16 @@ const severityColors = {
 const props = defineProps({
   variant: { type: String, default: 'user' },
 
-  eventId: { type: [String, Number] },
-  name: { type: String },
-  description: { type: String },
-  type: { type: String },
+  // Obligatoriske props
+  eventId: { type: [String, Number], required: true },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  type: { type: String, required: true },
   severity: { type: String, default: 'low' },
-  status: { type: String },
-  updatedAt: { type: [String, Object] },
+  status: { type: String, required: true },
+  updatedAt: { type: [String, Object], required: true },
 
+  // Ikke obligatoriske props
   content: { type: String, default: '' },
   startTime: { type: [String, Object], default: null },
   endTime: { type: [String, Object], default: null },
@@ -118,7 +120,7 @@ const handleEdit = () => {
             </h1>
           </div>
 
-          <p class="text-neutral-500 text-sm">{{ formattedDate() }}</p>
+          <p class="flex flex-end text-neutral-500 text-sm">{{ formattedDate() }}</p>
         </div>
 
         <p
