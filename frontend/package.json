@@ -19,6 +19,8 @@
     "@radix-icons/vue": "^1.0.0",
     "@radix-ui/react-slot": "^1.2.0",
     "@stomp/stompjs": "^7.1.1",
+    "@unovis/ts": "^1.5.1",
+    "@unovis/vue": "^1.5.1",
     "@vueuse/core": "^13.1.0",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
