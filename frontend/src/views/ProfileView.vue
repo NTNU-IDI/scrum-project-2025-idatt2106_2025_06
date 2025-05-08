@@ -40,6 +40,7 @@ import axios from 'axios'
 
 const username = ref('');
 const email = ref('');
+const trackingDeleted = ref(false)
 
 const householdName = ref('');
 const address = ref('');
@@ -203,6 +204,15 @@ async function loadAddresses() {
   }
 }
 
+async function deleteTrackingHistory() {
+  const success = await sessionStore.updateDeletedLocationHistory()
+  if (success) {
+    trackingDeleted.value = true
+  } else {
+    console.error('Could not delete tracking history')
+  }
+}
+
 onMounted(async () => {
   if (!sessionStore.isAuthenticated) {
     router.push('/login')
@@ -213,10 +223,14 @@ onMounted(async () => {
     email.value = user.value.email
   }
 
+  if (trackingDeleted.value === true) {
+    trackingDeleted.value = false
+    console.log('Tracking deleted value ved oppstart:', trackingDeleted.value)
+  }
+
   try {
     await storageStore.fetchAll(sessionStore.token)
     await loadAddresses()
-
   } catch (error) {
     console.error("Could not fetch storages and members:", error)
   }
@@ -358,11 +372,29 @@ onMounted(async () => {
           <Label class="text-xl">Personvern:</Label>
           <CardDescription>
             <div class="flex flex-col items-center text-center gap-4">
-              <span>
-                <p>Ønsker du å slette din lokasjonshistorikk?</p>
-              <p>Trykk på knappen under for å slette all lokasjonshistorikk.</p>
-              </span>
+              <div v-if="trackingPreference === true" class="flex flex-col items-center gap-4">
+                <div class="text-left">
+                  <Label>Du deler lokasjonen din med Krisefikser. Ønsker du å skru av stedstjenester?</Label>
+                </div>
+                <Button @click="changeTrackingPreference" class="w-48">Skru av</Button>
+              </div>
 
+              <div v-if="trackingPreference === false" class="flex flex-col items-center gap-4">
+                <div class="text-left">
+                  <Label>Du deler ikke lokasjonen din med Krisefikser. Ønsker du å skru på stedstjenester?</Label>
+                </div>
+                <Button @click="changeTrackingPreference" class="w-48">Skru på</Button>
+              </div>
+            </div>
+          </CardDescription>
+
+
+          <CardDescription>
+            <div class="flex flex-col items-center text-center gap-4">
+              <span class="text-left">
+                <Label>Ønsker du å slette din lokasjonshistorikk?</Label>
+                <Label> Trykk på knappen under for å slette lokasjonshistorikk.</Label>
+              </span>
               <AlertDialog>
                 <AlertDialogTrigger>
                   <Button class="w-48">Slett lokasjonshistorikk</Button>
@@ -371,18 +403,20 @@ onMounted(async () => {
                   <AlertDialogHeader>
                     <AlertDialogTitle class="text-2xl">Slett lokasjonshistorikk</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Er du sikker på at du vil slette all lokasjonshistorikk? Dette kan ikke angres.
+                      Er du sikker på at du vil slette din lokasjonshistorikk? Dette kan ikke angres.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                    <AlertDialogAction class="bg-red-500 text-white">Slett</AlertDialogAction>
+                    <AlertDialogAction @click="deleteTrackingHistory" class="bg-red-500 text-white">Slett</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+              <div>
+                <Label v-if="trackingDeleted === true" class="text-green-600 font-bold">Lokasjonshistorikk slettet!</Label>
+              </div>
             </div>
           </CardDescription>
-
         </div>
       </CardContent>
     </Card>
