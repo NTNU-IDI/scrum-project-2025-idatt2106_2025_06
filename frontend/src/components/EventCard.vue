@@ -30,6 +30,7 @@ const props = defineProps({
   updatedAt: { type: [String, Object], required: true },
 
   // Ikke obligatoriske props
+  createdAt: { type: [String, Object], required: true },
   content: { type: String, default: '' },
   startTime: { type: [String, Object], default: null },
   endTime: { type: [String, Object], default: null },

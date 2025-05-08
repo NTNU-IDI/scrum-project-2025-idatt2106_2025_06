@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router'
 import { fetchEventById } from '@/service/eventService.js'
 import { onMounted, ref } from 'vue'
+import { Button } from '@/components/ui/button/index.js'
 
 const route = useRoute()
 const eventId = route.params.id
@@ -28,8 +29,17 @@ async function getEvent(id) {
 <template>
   <div class="m-auto mt-4">
     <div v-if="!isLoading && event" class="my-auto">
-      <h1 class="font-bold text-4xl">{{ event.name }}</h1>
+      <div class="flex">
+        <h1 class="font-bold text-4xl">{{ event.name }}</h1>
+        <div class="flex-1"></div>
+        <Button>Tilbake</Button>
+      </div>
+      <p>Publisert: {{ event.createdAt }}</p>
+      <p>Sist oppdatert: {{ event.updatedAt }}</p>
+
       <p>{{ event.description }}</p>
+      <p>{{ event.content }}</p>
     </div>
   </div>
 </template>
+

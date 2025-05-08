@@ -43,6 +43,7 @@ const events = webSocketStore.events
                 :status="event.status"
                 :type="event.type"
                 :updatedAt="event.time"
+                :createdAt="event.created"
                 variant="default"
               />
             </RouterLink>
