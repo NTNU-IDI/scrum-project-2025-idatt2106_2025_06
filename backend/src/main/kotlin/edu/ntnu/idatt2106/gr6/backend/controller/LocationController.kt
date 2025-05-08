@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.security.Principal
 import java.util.UUID
 
 @RestController
@@ -24,7 +27,7 @@ class LocationController(
 ) {
     private val logger = org.slf4j.LoggerFactory.getLogger(LocationController::class.java)
 
-
+    //REMOVE THIS ENDPOINT!!!!!!
     @GetMapping("/{userId}")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')") //!!!!!!!!
     @Operation(summary = "Get coordinates of a user")
@@ -40,18 +43,11 @@ class LocationController(
         return locationService.getUserLocation(userId)
     }
 
-    @PostMapping("/update")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')")        //!!!!!!!!
+    @MessageMapping("private/location/update")
     @Operation(summary = "Update coordinates of a user")
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Location updated"),
-            ApiResponse(responseCode = "404", description = "User not found"),
-            ApiResponse(responseCode = "500", description = "Internal server error")
-        ]
-    )
-    fun updateLocation(@Parameter @RequestBody updateUserLocationRequest: UserDTOs.UpdateUserLocationRequest) {
+    fun updateLocation(@Payload updateUserLocationRequest: UserDTOs.UpdateUserLocationRequest, principal: Principal) {
         logger.info("Received request to update location")
-        return locationService.updateUserLocation(updateUserLocationRequest)
+        val userid = principal.name
+        locationService.updateUserLocation(updateUserLocationRequest, principal)
     }
 }
