@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Button } from '@/components/ui/button/index.js';
 import { Input } from '@/components/ui/input/index.js';
 import { Card } from '@/components/ui/card/index.js';
@@ -14,8 +14,8 @@ import {
 } from '@/components/ui/select/index.js'
 import { createMarker } from '@/service/markerService.js'
 
-const sharedOpeningHours = ref('')
-const selectedDays = ref([])
+const sharedOpeningHours = ref('');
+const selectedDays = ref([]);
 const daysOfWeek = [
   { key: 'monday', label: 'Mandag' },
   { key: 'tuesday', label: 'Tirsdag' },
@@ -24,24 +24,30 @@ const daysOfWeek = [
   { key: 'friday', label: 'Fredag' },
   { key: 'saturday', label: 'Lørdag' },
   { key: 'sunday', label: 'Søndag' }
-]
+];
 
-const title = ref('')
-const latitude = ref('64.232321')
-const longitude = ref('10.422132')
-const type = ref('General')
-const description = ref('')
+const title = ref('');
+const latitude = ref('64.232321');
+const longitude = ref('10.422132');
+const type = ref('General');
+const description = ref('');
 const contactInfo = ref({
   name: '',
   email: '',
   phone: ''
-})
-const openingHours = daysOfWeek.reduce((acc, day) => {
-  acc[day.key] = selectedDays.value.includes(day.key)
-    ? sharedOpeningHours.value
-    : null
-  return acc
-}, {})
+});
+
+// Reactive computed openingHours
+const openingHours = computed(() => {
+  return daysOfWeek.reduce((acc, day) => {
+    if (selectedDays.value.includes(day.key)) {
+      acc[day.key] = sharedOpeningHours.value;
+    } else {
+      acc[day.key] = null;
+    }
+    return acc;
+  }, {});
+});
 
 async function handleSubmit() {
   try {
@@ -53,19 +59,21 @@ async function handleSubmit() {
         latitude: parseFloat(latitude.value),
         longitude: parseFloat(longitude.value)
       },
-      openingHours: openingHours.value
-        ? { monday: openingHours.value }
-        : null,
+      openingHours: Object.keys(openingHours.value).reduce((acc, dayKey) => {
+        if (openingHours.value[dayKey]) {
+          acc[dayKey] = openingHours.value[dayKey];
+        }
+        return acc;
+      }, {}),
       contactInfo: contactInfo.value,
-    }
+    };
 
-    console.log('Sending marker:', requestBody)
-    await createMarker(requestBody)
+    console.log('Sending marker:', requestBody);
+    await createMarker(requestBody);
   } catch (error) {
-    console.error('Failed to create marker', error)
+    console.error('Failed to create marker', error);
   }
 }
-
 </script>
 
 <template>
