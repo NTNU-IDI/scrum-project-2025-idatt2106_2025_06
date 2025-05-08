@@ -2,7 +2,6 @@
 import { DateFormatter, getLocalTimeZone } from '@internationalized/date'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -11,7 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog/index.js'
 import { Calendar } from '@/components/ui/calendar/index.js'
-import { CalendarIcon, Plus } from 'lucide-vue-next'
+import { CalendarIcon } from 'lucide-vue-next'
 import {
   Select,
   SelectContent,
@@ -24,23 +23,24 @@ import { Label } from '@/components/ui/label/index.js'
 import { Input } from '@/components/ui/input/index.js'
 import { Button } from '@/components/ui/button/index.js'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover/index.js'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import {
   Combobox,
   ComboboxAnchor,
-  ComboboxEmpty,
   ComboboxGroup,
   ComboboxInput,
   ComboboxItem,
   ComboboxItemIndicator,
   ComboboxList,
-  ComboboxTrigger,
 } from '@/components/ui/combobox'
-import { Check, ChevronsUpDown, Search } from 'lucide-vue-next'
+import { Check, Search, X } from 'lucide-vue-next'
+import { useInventoryStore } from '@/stores/inventory.js'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip/index.js'
 
 const props = defineProps({
   typeId: { type: Number, required: true },
+  storageId: { type: String, required: true },
 })
 
 const dateFormat = new DateFormatter('nb-NO', {
@@ -49,104 +49,8 @@ const dateFormat = new DateFormatter('nb-NO', {
 
 const expirationDate = ref()
 
-const registeredItems = ref([
-  {
-    id: 1,
-    name: 'Hermetisk kjøtt',
-    type: 1,
-    unit: 2,
-  },
-  {
-    id: 2,
-    name: 'Drikkevann',
-    type: 1,
-    unit: 3,
-  },
-  {
-    id: 3,
-    name: 'Tørrmelk',
-    type: 1,
-    unit: 2,
-  },
-  {
-    id: 4,
-    name: 'Knekkebrød',
-    type: 1,
-    unit: 1,
-  },
-  {
-    id: 5,
-    name: 'Lommelykt',
-    type: 2,
-    unit: 1,
-  },
-  {
-    id: 6,
-    name: 'Stearinlys',
-    type: 2,
-    unit: 1,
-  },
-  {
-    id: 7,
-    name: 'Batterier',
-    type: 2,
-    unit: 1,
-  },
-  {
-    id: 8,
-    name: 'Vedkubber',
-    type: 2,
-    unit: 1,
-  },
-  {
-    id: 9,
-    name: 'Nødradio',
-    type: 3,
-    unit: 1,
-  },
-  {
-    id: 10,
-    name: 'Brosjyre med nødinfo',
-    type: 3,
-    unit: 1,
-  },
-  {
-    id: 11,
-    name: 'Førstehjelpsskrin',
-    type: 4,
-    unit: 1,
-  },
-  {
-    id: 12,
-    name: 'Smertestillende tabletter',
-    type: 4,
-    unit: 1,
-  },
-  {
-    id: 13,
-    name: 'Såpe',
-    type: 4,
-    unit: 3,
-  },
-  {
-    id: 14,
-    name: 'Desinfeksjonsmiddel',
-    type: 4,
-    unit: 3,
-  },
-  {
-    id: 15,
-    name: 'Kontanter',
-    type: 5,
-    unit: 1,
-  },
-  {
-    id: 16,
-    name: 'Lighter',
-    type: 5,
-    unit: 1,
-  },
-])
+const inventoryStore = useInventoryStore();
+const registeredItems = computed(() => inventoryStore.registeredItems);
 
 const isNewItemDialogOpen = ref();
 
@@ -159,15 +63,14 @@ const selectedItemUnit = ref()
 
 const isCustomItemSelected = ref(false)
 const onItemSelected = (item) => {
-  console.log(item.name)
   if (item.id === -1) {
     isCustomItemSelected.value = true
     selectedItemUnit.value = ''
     selectedItemType.value = props.typeId
   } else {
     isCustomItemSelected.value = false
-    selectedItemUnit.value = item.unit
-    selectedItemType.value = item.type
+    selectedItemUnit.value = item.unitId
+    selectedItemType.value = item.typeId
   }
   selectedItemName.value = item.name
   selectedItemId.value = item.id
@@ -181,13 +84,13 @@ const refreshFields = () => {
 }
 
 const handleSubmit = () => {
-  console.log('item id: ' + selectedItemId.value)
-  console.log('item name: ' + selectedItemName.value)
-  console.log('item type: ' + selectedItemType.value)
-  console.log('item unit: ' + selectedItemUnit.value)
-  console.log('item amount: ' + itemAmount.value)
-  console.log('item date: ' + expirationDate.value)
+  let formattedExpDate;
+  if (expirationDate.value) {
+    formattedExpDate = new Date(expirationDate.value).toISOString().split('T')[0]
+  }
 
+  inventoryStore.addNew(selectedItemName.value, selectedItemType.value, selectedItemUnit.value,
+    props.storageId, itemAmount.value, formattedExpDate, props.typeId);
   refreshFields();
   isNewItemDialogOpen.value = false;
 }
@@ -219,6 +122,7 @@ watch(
 )
 
 onMounted(() => {
+  inventoryStore.getAllRegisteredItems();
   selectedItemType.value = props.typeId
 })
 </script>
@@ -231,8 +135,7 @@ onMounted(() => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Legg til ny vare</DialogTitle>
-          <DialogDescription>
-          </DialogDescription>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <form @submit.prevent="handleSubmit" class="contents">
 
@@ -332,27 +235,48 @@ onMounted(() => {
           </SelectContent>
         </Select>
         <Label>Utløpsdato</Label>
-        <Popover>
-          <PopoverTrigger as-child :disabled="!selectedItemName">
-            <Button
-              type="button"
-              variant="outline"
-              :class="['justify-start font-normal', { 'text-muted-foreground': !expirationDate }]"
-            >
-              <CalendarIcon />
-              {{
-                expirationDate
-                  ? dateFormat.format(expirationDate.toDate(getLocalTimeZone()))
-                  : 'Velg dato'
-              }}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <Calendar v-model="expirationDate" initial-focus />
-          </PopoverContent>
-        </Popover>
+        <div class="flex gap-3 content justify-between">
+          <div class="w-full">
+            <Popover>
+              <PopoverTrigger as-child :disabled="!selectedItemName">
+                <Button
+                  type="button"
+                  variant="outline"
+                  class="w-full justify-start font-normal"
+                  :class="{ 'text-muted-foreground': !expirationDate }"
+                >
+                  <CalendarIcon />
+                  {{
+                    expirationDate
+                      ? dateFormat.format(expirationDate.toDate(getLocalTimeZone()))
+                      : 'Velg dato'
+                  }}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <Calendar v-model="expirationDate" initial-focus />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div>
+            <TooltipProvider :disabled="!selectedItemName">
+              <Tooltip>
+                <TooltipTrigger :disabled="!selectedItemName">
+                  <Button type="button" @click.prevent="expirationDate = ''" variant="outline" :disabled="!selectedItemName">
+                    <X />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Fjern dato</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
         <DialogFooter>
-          <Button type="submit">Legg til</Button>
+          <Button type="submit" :disabled="!newItemName || !itemAmount || !selectedItemUnit || !selectedItemType">
+            Legg til
+          </Button>
         </DialogFooter>
         </form>
       </DialogContent>
