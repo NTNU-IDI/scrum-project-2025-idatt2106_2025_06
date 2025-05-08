@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, watch, onMounted } from 'vue'
+import { ref, defineProps, watch } from 'vue'
 import { useEventStore } from '@/stores/event.js'
 import { Card} from '@/components/ui/card/index.js';
 import {Button} from '@/components/ui/button';
@@ -56,7 +56,66 @@ defineExpose({
   eventFormRefresh,
 });
 
+const errors = ref({
+  title: false,
+  description: false,
+  latitude: false,
+  longitude: false,
+  severity: false,
+  eventType: false,
+});
+
+const validateForm = () => {
+  errors.value = {
+    title: false,
+    description: false,
+    latitude: false,
+    longitude: false,
+    severity: false,
+    eventType: false,
+  };
+
+  let hasError = false;
+
+  if (!title.value.trim()) {
+    errors.value.title = true;
+    hasError = true;
+  }
+
+  if (!description.value.trim()) {
+    errors.value.description = true;
+    hasError = true;
+  }
+
+  if ((latitude.value.trim() || longitude.value.trim()) &&
+    (!latitude.value.trim() || !longitude.value.trim() || isNaN(parseFloat(latitude.value)) || isNaN(parseFloat(longitude.value)))) {
+    errors.value.latitude = true;
+    errors.value.longitude = true;
+    hasError = true;
+  }
+
+
+  if (!selectedSeverity.value) {
+    errors.value.severity = true;
+    hasError = true;
+  }
+
+  if (!eventType.value) {
+    errors.value.eventType = true;
+    hasError = true;
+  }
+
+  return hasError;
+};
+
+
+
 async function handleSubmit() {
+  const hasError = validateForm();
+  if (hasError) {
+    return;
+  }
+
   console.log('Handling submit for mode:', props.mode)
   const now = new Date().toISOString();
 
@@ -122,23 +181,26 @@ watch(() => props.eventData, async (newData) => {
     <div class="flex items-center">
       <Label class="m-2" for="title">Tittel</Label>
       <Input
-        :class="['border w-full', !title ? 'border-blue-500' : '']"
+        :class="['border w-full', errors.title ? 'border-red-500' : '']"
         id="title"
         placeholder="Navn på hendelse"
         v-model="title"
       />
-
     </div>
 
-    <div class="flex items-center">
-      <Label class="m-2" for="description">Beskrivelse</Label>
-      <Input class="border w-full" id="description" placeholder="Kort beskrivelse av hendelsen" v-model="description" />
-    </div>
+    <Input
+      :class="['border w-full', errors.description ? 'border-red-500' : '']"
+      id="description"
+      placeholder="Kort beskrivelse av hendelsen"
+      v-model="description"
+    />
 
     <div class="flex align-middle items-center">
       <Label class="m-2" for="severity">Beredskapsnivå</Label>
       <div class="flex gap-2 items-center">
-        <Select v-model="selectedSeverity">
+        <Select
+          v-model="selectedSeverity"
+          :class="errors.severity ? 'border-red-500' : ''">
           <SelectTrigger class="w-[180px]">
             <SelectValue placeholder="Velg beredskapsnivå" />
           </SelectTrigger>
@@ -171,7 +233,9 @@ watch(() => props.eventData, async (newData) => {
     <div class="flex align-middle items-center">
       <Label class="m-2" for="eventType">Hendelse</Label>
       <div class="flex gap-2 items-center">
-        <Select v-model="eventType">
+        <Select
+          v-model="eventType"
+          :class="errors.eventType ? 'border-red-500' : ''">
           <SelectTrigger class="w-[180px]">
             <SelectValue placeholder="Velg type hendelse" />
           </SelectTrigger>
@@ -190,12 +254,22 @@ watch(() => props.eventData, async (newData) => {
       <Label class="m-2" for="latitude">Posisjon</Label>
       <div class="flex flex-col ">
         <Label class="m-2" for="latitude">Breddegrad</Label>
-        <Input class="border w-full" id="latitude" placeholder="eks: 64.232321" v-model="latitude" />
+        <Input
+          :class="['border w-full', errors.latitude ? 'border-red-500' : '']"
+          id="latitude"
+          placeholder="eks: 64.232321"
+          v-model="latitude"
+        />
       </div>
 
       <div class="flex flex-col ">
         <Label class="m-2" for="longitude">Lengdegrad</Label>
-        <Input class="border w-full" id="longitude" placeholder="eks: 10.422132" v-model="longitude" />
+        <Input
+          :class="['border w-full', errors.longitude ? 'border-red-500' : '']"
+          id="longitude"
+          placeholder="eks: 10.422132"
+          v-model="longitude"
+        />
       </div>
     </div>
 
