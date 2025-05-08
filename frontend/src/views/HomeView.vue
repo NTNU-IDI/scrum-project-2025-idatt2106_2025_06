@@ -5,6 +5,8 @@ import { RouterLink } from 'vue-router'
 import { useWebSocketStore } from '@/stores/websocket.js'
 const webSocketStore = useWebSocketStore();
 const alerts = webSocketStore.alerts;
+import ExpiringSoon from '@/components/ExpiringSoon.vue'
+import { ArrowRightIcon } from 'lucide-vue-next'
 </script>
 
 <template>
@@ -49,9 +51,8 @@ const alerts = webSocketStore.alerts;
         </div>
       </BentoCardCustom>
 
-      <!-- TODO legge til beredskapslager her -->
-      <BentoCardCustom customClass="col-span-3 min-h-[30rem]" href="/inventory" name="Utgår snart">
-        <div>TBA</div>
+      <BentoCardCustom customClass="col-span-3 min-h-[30rem] w-[45rem]" class="cursor-default" name="Beredskap">
+        <ExpiringSoon/>
       </BentoCardCustom>
     </BentoGrid>
   </div>

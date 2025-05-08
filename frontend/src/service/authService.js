@@ -40,10 +40,29 @@ export async function changePassword(oldPassword, newPassword) {
         'Content-Type': 'application/json'
       }
     })
-    console.log(response.data)
     return response.data
   } catch (error) {
     console.error('Change password error:', error)
+    throw error
+  }
+}
+
+export async function changeLocationTracking(locationTracking) {
+  try {
+    await api.post('/user/privacy-policy/change-location-tracking', { "trackingEnabled": locationTracking })
+    return true
+  } catch (error) {
+    console.error('Change location tracking error:', error)
+    return false
+  }
+}
+
+export async function deleteLocationHistory() {
+  try {
+    const response = await api.post('/user/privacy-policy/delete-location-history')
+    return response.data
+  } catch (error) {
+    console.error('Delete location history error:', error)
     throw error
   }
 }
