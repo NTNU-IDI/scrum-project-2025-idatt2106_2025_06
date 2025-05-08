@@ -3,9 +3,19 @@ import DeleteModerator from '@/components/DeleteModerator.vue'
 import ResetPasswordLink from '@/components/ResetPasswordLink.vue'
 import AddModerator from '@/components/AddModerator.vue'
 import { Button } from '@/components/ui/button/index.js'
-import { ref } from 'vue'
+import router from '@/router/router.js'
+import { useSessionStore } from '@/stores/session.js'
+const session = useSessionStore()
+const isAdmin = ['ROLE_ADMIN'].includes(session.user?.role)
 
-const isAdmin = ref(true)
+const handleLogout = async () => {
+  try {
+    session.logout()
+    router.push('/login')
+  } catch (error) {
+    console.error('Logout failed:',error)
+  }
+}
 </script>
 
 <template>
@@ -21,7 +31,7 @@ const isAdmin = ref(true)
         <DeleteModerator v-if="isAdmin"/>
         <ResetPasswordLink v-if="isAdmin"/>
       </div>
-      <Button variant="destructive">Logg ut</Button>
+      <Button variant="destructive" @click="handleLogout">Logg ut</Button>
     </div>
 
   </nav>

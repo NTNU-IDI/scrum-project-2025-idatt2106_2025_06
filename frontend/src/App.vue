@@ -1,16 +1,28 @@
 <script setup>
+import { computed, watch } from 'vue'
 import { RouterView } from 'vue-router'
-import Navbar from '@/components/NavBar.vue'
 import { useSessionStore } from '@/stores/session.js'
+import Navbar from '@/components/NavBar.vue'
 import NavBarAdmin from '@/components/NavBarAdmin.vue'
 
 const session = useSessionStore()
-const admin = ['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role)
+
+const isModOrAdmin = computed(() => ['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role))
+
+watch(
+  () => session.user,
+  (newUser) => {
+    if (newUser) {
+      console.log('User session updated', newUser)
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <main class="h-screen flex flex-col w-full">
-    <Navbar v-if="!admin" />
+    <Navbar v-if="!isModOrAdmin" />
     <NavBarAdmin v-else />
     <RouterView class="max-w-6xl" />
   </main>
