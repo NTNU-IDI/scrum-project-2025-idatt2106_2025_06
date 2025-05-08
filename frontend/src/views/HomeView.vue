@@ -1,6 +1,10 @@
 <script setup>
 import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
 import AlertCard from '@/components/AlertCard.vue'
+import { RouterLink } from 'vue-router'
+import { useWebSocketStore } from '@/stores/websocket.js'
+const webSocketStore = useWebSocketStore();
+const alerts = webSocketStore.alerts;
 </script>
 
 <template>
@@ -27,28 +31,21 @@ import AlertCard from '@/components/AlertCard.vue'
 
       <BentoCardCustom
         customClass="col-span-1 min-h-[30rem] group hover:group-hover:bg-transparent"
-        href="/alerts"
-        name="Nyheter"
+        name="Varslinger"
+        url="/"
       >
-        <div class="h-[25rem] overflow-y-auto flex flex-col gap-2">
-          <!-- TODO: Implementere dynamisk generering av alerts fra databasen -->
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
-          <AlertCard description="lolololol" severity="red" time="Nå" title="lol" variant="short" />
+        <div class="flex flex-col gap-2">
+          <template v-for="(alert, index) in alerts" :key="index">
+            <RouterLink :to="'alerts/'" class="relative">
+              <AlertCard
+                :description="alert.description"
+                :severity="alert.severity"
+                :time="alert.time"
+                :title="alert.title"
+                variant="short"
+              />
+            </RouterLink>
+          </template>
         </div>
       </BentoCardCustom>
 
