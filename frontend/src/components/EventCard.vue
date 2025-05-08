@@ -20,21 +20,20 @@ const severityColors = {
 const props = defineProps({
   variant: { type: String, default: 'user' },
 
-  // Obligatoriske props
-  eventId: { type: [String, Number], required: true },
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  type: { type: String, required: true },
+  eventId: { type: [String, Number] },
+  name: { type: String },
+  description: { type: String },
+  type: { type: String },
   severity: { type: String, default: 'low' },
-  status: { type: String, required: true },
+  status: { type: String },
   updatedAt: { type: [String, Object] },
 
-  // Ikke obligatoriske props
   content: { type: String, default: '' },
   startTime: { type: [String, Object], default: null },
   endTime: { type: [String, Object], default: null },
   location: { type: Object, default: null },
 })
+
 
 
 const handleDelete = async () => {
@@ -131,7 +130,7 @@ const handleEdit = () => {
           {{ props.description || props.content }}
         </p>
       </div>
-      <!-- TODO Fjern når les mer-funksjonalitet er på plass
+      <!-- TODO Legg til når les mer-funksjonalitet er på plass
       <div v-if="variant !== 'admin'" class="mt-4 flex-shrink-0">
         <p>Les mer</p>
       </div>-->
