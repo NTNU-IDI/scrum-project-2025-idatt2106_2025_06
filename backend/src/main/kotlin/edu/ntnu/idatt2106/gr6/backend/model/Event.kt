@@ -3,6 +3,9 @@ package edu.ntnu.idatt2106.gr6.backend.model
 import edu.ntnu.idatt2106.gr6.backend.DTOs.Location
 import java.time.Instant
 
+/**
+ * Represents event types. Used to categorize events based on their nature.
+ */
 
 sealed class EventType {
     object NaturalDisaster : EventType()
@@ -34,6 +37,9 @@ sealed class EventType {
     }
 }
 
+/**
+ * Represents the severity of an event. Used to indicate the threat level of an event.
+ */
 sealed class Severity {
     object Low : Severity()
     object Medium : Severity()
@@ -58,6 +64,9 @@ sealed class Severity {
     }
 }
 
+/**
+ * Represents the status of an event. Used to indicate the current state of an event.
+ */
 sealed class Status {
     object Planned: Status()
     object Ongoing: Status()
@@ -85,6 +94,26 @@ sealed class Status {
     }
 }
 
+/**
+ * data class representing an emergency event. Used to store information about an event.
+ * Events have various properties describing their content, location, impact area, time and status
+ *
+ * @property id The unique identifier of the event.
+ * @property name The name of the event.
+ * @property description A description of the event.
+ * @property content The content of the event.
+ * @property location The location of the event.
+ * @property type The type of the event.
+ * @property impactAreaRadiusKm The radius of the impact area in kilometers.
+ * @property mandatoryEvacuationAreaRadiusKm The radius of the mandatory evacuation area in kilometers.
+ * @property recommendedEvacuationAreaRadiusKm The radius of the recommended evacuation area in kilometers.
+ * @property startDate The start date of the event.
+ * @property endDate The end date of the event.
+ * @property severity The severity of the event.
+ * @property status The status of the event.
+ * @property createdAt The date the event was created.
+ * @property updatedAt The date the event was last updated.
+ */
 data class Event (
     val id: String,
     val name: String? = null,
