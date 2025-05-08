@@ -51,16 +51,17 @@ class UserRepository (
         return null
     }
 
-    fun updateUser(userId: UUID, newName: String, newEmail: String): Boolean {
+    fun updateUser(userId: UUID, newName: String, newEmail: String, verified: Boolean): Boolean {
         val sql = """
-        UPDATE users SET name = ?, email = ? WHERE id = ?
+        UPDATE users SET name = ?, email = ?, verified = ?  WHERE id = ?
     """.trimIndent()
 
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, newName)
                 stmt.setString(2, newEmail)
-                stmt.setString(3, userId.toString())
+                stmt.setBoolean(3, verified)
+                stmt.setString(4, userId.toString())
 
                 return stmt.executeUpdate() > 0
             }
@@ -136,6 +137,34 @@ class UserRepository (
         }
     }
 
+    fun saveEmailVerificationToken(id: String,userId: UUID, token: String): Boolean {
+        val sql = "INSERT INTO email_verification (id, user_id, token, expires_at) VALUES (?, ?, ?,?)"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, id)
+                stmt.setString(2, userId.toString())
+                stmt.setString(3, token)
+                stmt.setTimestamp(4, java.sql.Timestamp(System.currentTimeMillis() + 600000)) // 1 hour expiration
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+    fun findEmailVerificationToken(userid: String): String? {
+        val sql = "SELECT token FROM email_verification WHERE user_id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userid)
+                stmt.executeQuery().use { rows ->
+                    if (rows.next()) {
+                        return rows.getString("token")
+                    }
+                }
+            }
+        }
+        return null
+    }
+
 
     fun findByEmail(email: String): User? {
         dataSource.connection.use { conn ->
@@ -170,6 +199,7 @@ class UserRepository (
                 permissions = fetchPermissions(rs.getInt("role_id")),
             ),
             passwordHashed = rs.getString("password"),
+            trackingEnabled = rs.getBoolean("tracking_enabled"),
         )
 
     fun fetchPermissions(roleId: Int): Set<Permission> {

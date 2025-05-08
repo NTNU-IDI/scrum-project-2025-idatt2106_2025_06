@@ -37,6 +37,7 @@ export const useSessionStore = defineStore('session', () => {
       name: response.name,
       joinedAt: response.joinedAt,
       admin: response.admin,
+      verified: response.verified,
       role: response.role,
       permissions: response.permissions
     }

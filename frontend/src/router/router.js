@@ -14,6 +14,7 @@ import DuringView from "@/views/DuringView.vue";
 import AfterView from "@/views/AfterView.vue";
 import AdminView from "@/views/AdminView.vue";
 import AdminMap from "@/views/AdminMapView.vue";
+import EmailVerificationView from "@/views/EmailVerificationView.vue";
 import { useSessionStore } from '@/stores/session.js'
 
 
@@ -31,7 +32,9 @@ const routes = [
   {path: '/during', component: DuringView, name: 'during'},
   {path: '/after', component: AfterView, name: 'after'},
   {path: '/admin/map', component: AdminMap, name: 'admin-map', meta: { requiresAdminAccess: true }, },
-  {path: '/admin', component: AdminView, name: 'admin', meta: { requiresAdminAccess: true }, }
+  {path: '/admin', component: AdminView, name: 'admin', meta: { requiresAdminAccess: true }, },
+  { path: '/email-verification/:token', component: EmailVerificationView, meta: { requiresAuth: false }
+  },
 ]
 
 const router = createRouter({
