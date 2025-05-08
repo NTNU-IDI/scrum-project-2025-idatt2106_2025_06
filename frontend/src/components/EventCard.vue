@@ -27,10 +27,10 @@ const props = defineProps({
   type: { type: String, required: true },
   severity: { type: String, default: 'low' },
   status: { type: String, required: true },
-  updatedAt: { type: [String, Object], required: true },
+  content: { type: String, default: '' },
 
   // Ikke obligatoriske props
-  content: { type: String, default: '' },
+  updatedAt: { type: [String, Object]},
   startTime: { type: [String, Object], default: null },
   endTime: { type: [String, Object], default: null },
   location: { type: Object, default: null },
