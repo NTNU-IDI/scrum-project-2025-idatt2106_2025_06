@@ -1,44 +1,91 @@
 <script setup>
 import { Pencil, Trash, Info, OctagonAlert, TriangleAlert, Shield } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button/index.js'
+import { useEventStore } from '@/stores/event.js'
+import { useSessionStore } from '@/stores/session'
+
+const eventStore = useEventStore()
+const sessionStore = useSessionStore()
+
+import { defineEmits } from 'vue'
+const emit = defineEmits(['edit'])
 
 const severityColors = {
   info: 'bg-blue-200',
-  red: 'bg-red-500',
-  yellow: 'bg-yellow-400',
-  green: 'bg-green-400',
+  high: 'bg-red-500',
+  medium: 'bg-yellow-400',
+  low: 'bg-green-400',
 }
 
 const props = defineProps({
-  title: String,
-  description: String,
-  time: String,
-  date: String,
-  position: String,
-  severity: { type: String, default: 'info' },
-  variant: String,
+  variant: { type: String, default: 'user' },
+
+  // Obligatoriske props
+  eventId: { type: [String, Number], required: true },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  type: { type: String, required: true },
+  severity: { type: String, default: 'low' },
+  status: { type: String, required: true },
+  updatedAt: { type: [String, Object], required: true },
+
+  // Ikke obligatoriske props
+  content: { type: String, default: '' },
+  startTime: { type: [String, Object], default: null },
+  endTime: { type: [String, Object], default: null },
+  location: { type: Object, default: null },
 })
 
-const isToday = () => {
-  const today = new Date()
-  const inputDate = new Date(props.date)
-  return (
-    today.getFullYear() === inputDate.getFullYear() &&
-    today.getMonth() === inputDate.getMonth() &&
-    today.getDate() === inputDate.getDate()
-  )
+
+
+const handleDelete = async () => {
+  try {
+    await eventStore.deleteEventById(props.eventId, sessionStore.token)
+  } catch (error) {
+    console.error('Kunne ikke slette event:', error)
+  }
 }
 
-const formatDate = () => {
-  const dateObj = new Date(props.date)
-  const today = new Date()
-
-  // Skjul årstall hvis datoen er fra i år
-  if (dateObj.getFullYear() === today.getFullYear()) {
-    return dateObj.toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })
+const formattedDate = () => {
+  if (!props.updatedAt) {
+    console.warn(`updatedDate mangler for eventId: ${props.eventId}`);
+    return 'Ukjent dato';
   }
-  // Vis årstall hvis datoen er fra et annet år
-  return dateObj.toLocaleDateString('no-NO', { year: 'numeric', month: 'short', day: 'numeric' })
+
+  const dateObj = new Date(props.updatedAt);
+  dateObj.setHours(dateObj.getHours() + 2); //Added because date somehow saves as CEST
+
+  const today = new Date();
+
+  const isSameDay =
+    today.getFullYear() === dateObj.getFullYear() &&
+    today.getMonth() === dateObj.getMonth() &&
+    today.getDate() === dateObj.getDate();
+
+  if (isSameDay) {
+    return dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+  } else if (today.getFullYear() === dateObj.getFullYear()) {
+    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) +
+      ' ' +
+      dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+  } else {
+    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+}
+
+const handleEdit = () => {
+  emit('edit', {
+    eventId: props.eventId,
+    name: props.name,
+    description: props.description,
+    content: props.content,
+    severity: props.severity,
+    type: props.type,
+    status: props.status,
+    location: props.location,
+    startTime: props.startTime,
+    endTime: props.endTime,
+  })
 }
 </script>
 
@@ -58,23 +105,22 @@ const formatDate = () => {
             <div
               :class="[
                 'shrink-0 flex items-center justify-center rounded-full w-6 h-6',
-                severityColors[props.severity] || severityColors['info'],
+                severityColors[props.severity] || severityColors['low'],
               ]"
             >
               <!-- Velg ikon basert på severity -->
               <Info v-if="props.severity === 'info'" class="w-4 h-4 text-white" />
-              <OctagonAlert v-if="props.severity === 'red'" class="w-4 h-4 text-white" />
-              <TriangleAlert v-if="props.severity === 'yellow'" class="w-4 h-4 text-white" />
-              <Shield v-if="props.severity === 'green'" class="w-4 h-4 text-white" />
+              <OctagonAlert v-if="props.severity === 'high'" class="w-4 h-4 text-white" />
+              <TriangleAlert v-if="props.severity === 'medium'" class="w-4 h-4 text-white" />
+              <Shield v-if="props.severity === 'low'" class="w-4 h-4 text-white" />
             </div>
 
             <h1 :class="['font-bold', variant === 'admin' ? 'text-md' : 'text-2xl']">
-              {{ props.title }}
+              {{ props.name }}
             </h1>
           </div>
 
-          <p v-if="isToday()" class="text-neutral-500 text-sm">{{ props.time }}</p>
-          <p v-if="!isToday()" class="text-neutral-500 text-sm">{{ formatDate() }}</p>
+          <p class="flex flex-end text-neutral-500 text-sm">{{ formattedDate() }}</p>
         </div>
 
         <p
@@ -83,21 +129,25 @@ const formatDate = () => {
             variant === 'admin' ? 'truncate' : '',
           ]"
         >
-          {{ props.description }}
+          {{ props.description || props.content }}
         </p>
-        <p class="text-sm text-neutral-400 mt-1">{{ props.position }}</p>
       </div>
+      <!-- TODO Legg til når les mer-funksjonalitet er på plass
       <div v-if="variant !== 'admin'" class="mt-4 flex-shrink-0">
         <p>Les mer</p>
-      </div>
+      </div>-->
     </div>
 
     <div v-if="props.variant === 'admin'" class="flex items-center gap-2">
-      <Button class="p-2" variant="outline">
+      <Button class="p-2" variant="outline" @click="handleEdit">
         <Pencil />
       </Button>
-      <Button class="p-2 bg-red-600 text-white hover:bg-red-700 hover:text-white" variant="outline">
-        <Trash />
+      <Button
+        class="p-2 bg-red-600 text-white hover:bg-red-700 hover:text-white"
+        variant="outline"
+        @click="handleDelete"
+      >
+      <Trash />
       </Button>
     </div>
   </div>

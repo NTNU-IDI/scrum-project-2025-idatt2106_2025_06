@@ -38,7 +38,6 @@ import {
   watch,
 } from 'vue'
 import {
-  Archive,
   HeartPulse,
   Hospital,
   MapPin,
@@ -46,8 +45,10 @@ import {
   Plus,
   Shield,
   Vault,
+  Warehouse,
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button/index.js'
+import { getClosestMarkerId } from '@/service/markerService.js'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -78,7 +79,23 @@ function flyToUser() {
   map.flyTo({ center: [lng, lat], zoom: 14, essential: true })
 }
 
-defineExpose({ statusMessage, flyToUser })
+async function flyToNearest(type) {
+  const closestMarkerId = await getClosestMarkerId(routeStart, type)
+
+  if (closestMarkerId != null) {
+    const closestMarker = props.markers.find((m) => m.id === closestMarkerId)
+    if (!closestMarker) {
+      return
+    }
+    const coords = [closestMarker.location.longitude, closestMarker.location.latitude]
+    map.flyTo({ center: coords, zoom: 14, essential: true })
+    fetchAndAnimateRoute(routeStart, coords).catch((err) => {
+      console.error('Rutevisning feilet:', err)
+    })
+  }
+}
+
+defineExpose({ statusMessage, flyToUser, flyToNearest })
 
 const mapContainer = ref(null)
 const propsOverlay = ref(null)
@@ -114,7 +131,7 @@ const typeConfig = {
   PoliceStation: { icon: Shield, bg: '#e314a1' },
   Pharmacy: { icon: Plus, bg: '#14a114' },
   General: { icon: MapPin, bg: '#a1a114' },
-  storage: { icon: Archive, bg: '#8e4ef3' },
+  storage: { icon: Warehouse, bg: '#8e4ef3' },
 }
 
 onMounted(() => {
@@ -209,13 +226,13 @@ function redrawAll() {
   for (const m of props.markers) {
     const { type, location, name, description, capacity } = m
     if (
-      (type === 'shelter' && !s.showShelters) ||
-      (type === 'defibrillator' && !s.showDefibrillators) ||
-      (type === 'emergencyClinic' && !s.showEmergencyClinics) ||
-      (type === 'distributionPoint' && !s.showDistributionPoints) ||
-      (type === 'policeStation' && !s.showPoliceStations) ||
-      (type === 'pharmacy' && !s.showPharmacies) ||
-      (type === 'general' && !s.showGeneral)
+      (type === 'Shelter' && !s.showShelters) ||
+      (type === 'Defibrillator' && !s.showDefibrillators) ||
+      (type === 'EmergencyClinic' && !s.showEmergencyClinics) ||
+      (type === 'DistributionPoint' && !s.showDistributionPoints) ||
+      (type === 'PoliceStation' && !s.showPoliceStations) ||
+      (type === 'Pharmacy' && !s.showPharmacies) ||
+      (type === 'General' && !s.showGeneral)
     )
       continue
     if (capacity != null && capacity < s.minCapacity) continue

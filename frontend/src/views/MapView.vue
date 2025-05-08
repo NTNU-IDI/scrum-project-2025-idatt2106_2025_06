@@ -1,15 +1,15 @@
 <template>
-  <div class="m-auto flex relative flex-1 w-full py-10 gap-6">
+  <div class="m-auto flex relative flex-1 w-full h-full py-10 gap-6 items-stretch min-h-0">
     <aside
-      class="w-72 p-4 bg-white rounded-lg shadow space-y-4"
+      class="w-72 h-full p-4 bg-white rounded-lg shadow space-y-4 overflow-auto"
       style="position: relative; z-index: 10"
     >
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm font-semibold mb-1">Din posisjon</p>
-          <p class="text-neutral-500">{{ $refs.mapRef?.statusMessage }}</p>
+          <p class="text-neutral-500">{{ mapRef?.statusMessage }}</p>
         </div>
-        <Button variant="outline" @click="$refs.mapRef.flyToUser()">
+        <Button variant="outline" @click="mapRef.flyToUser()">
           <Navigation />
         </Button>
       </div>
@@ -30,103 +30,282 @@
         </Select>
       </div>
 
-      <div class="flex flex-col gap-6">
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="flex items-center gap-2 text-sm font-semibold">
-              <MapPin class="size-5" />
-              Dine markører
-            </label>
-            <Checkbox v-model="settings.showMarkers" />
-          </div>
-          <div v-if="settings.showMarkers" class="flex flex-col gap-2">
-            <input
-              v-model="settings.searchQuery"
-              class="w-full border rounded px-2 py-1"
-              placeholder="Søk..."
-            />
-            <Button>
-              <MapPinPlus />
-              Legg til ny markør
-            </Button>
-          </div>
-        </div>
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="flex items-center gap-2 text-sm font-semibold">
-              <Vault class="size-5" />
-              Tilfluktsrom
-            </label>
-            <Checkbox v-model="settings.showShelters" />
-          </div>
-          <div v-if="settings.showShelters" class="flex flex-col gap-2">
-            <input
-              v-model="settings.searchQuery"
-              class="w-full border rounded px-2 py-1"
-              placeholder="Søk..."
-            />
-            <Button variant="outline">
-              <Milestone />
-              Vis rute til nærmeste tilfluktsrom
-            </Button>
-          </div>
-        </div>
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="flex items-center gap-2 text-sm font-semibold">
-              <HeartPulse class="size-5" />
-              Hjertestartere
-            </label>
-            <Checkbox v-model="settings.showDefibrillators" />
-          </div>
-          <div v-if="settings.showDefibrillators" class="flex flex-col gap-2">
-            <input
-              v-model="settings.searchQuery"
-              class="w-full border rounded px-2 py-1"
-              placeholder="Søk..."
-            />
-            <Button variant="outline">
-              <Milestone />
-              Vis rute til nærmeste hjertestarter
-            </Button>
-          </div>
-        </div>
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="flex items-center gap-2 text-sm font-semibold">
-              <CookingPot class="size-5" />
-              Matstasjoner
-            </label>
-            <Checkbox v-model="settings.showFoodStations" />
-          </div>
-          <div v-if="settings.showFoodStations" class="flex flex-col gap-2">
-            <input
-              v-model="settings.searchQuery"
-              class="w-full border rounded px-2 py-1"
-              placeholder="Søk..."
-            />
-            <Button variant="outline">
-              <Milestone />
-              Vis rute til nærmeste matstasjon
-            </Button>
-          </div>
-        </div>
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="flex items-center gap-2 text-sm font-semibold">
-              <MapPin class="size-5" />
-              Lagre lokasjoner
-            </label>
-            <Checkbox v-model="settings.showStorages" />
-          </div>
-          <div v-if="settings.showStorages" class="flex flex-col gap-2">
-            <input
-              v-model="settings.searchQuery"
-              class="w-full border rounded px-2 py-1"
-              placeholder="Søk..."
-            />
-          </div>
-        </div>
+      <div class="mb-6">
+        <input
+          v-model="settings.searchQuery"
+          class="w-full border rounded px-2 py-1"
+          placeholder="Søk etter markør..."
+          type="text"
+        />
+      </div>
+
+      <div class="flex flex-col">
+        <Tabs v-model="activeTab" class="w-full">
+          <TabsList class="grid w-full grid-cols-2">
+            <TabsTrigger value="event">Hendelser</TabsTrigger>
+            <TabsTrigger value="marker">Markører</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="event"></TabsContent>
+
+          <TabsContent value="marker">
+            <div class="flex flex-col gap-4">
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showStorages,
+                  }"
+                >
+                  <Warehouse class="size-5" />
+                  Dine lagre ({{ counts.storages }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :variant="settings.showStorages ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showStorages = !settings.showStorages"
+                  >
+                    <Eye v-if="settings.showStorages" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showPersonal,
+                  }"
+                >
+                  <MapPin class="size-5" />
+                  Dine markører ({{ counts.personal }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :variant="settings.showPersonal ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showPersonal = !settings.showPersonal"
+                  >
+                    <Eye v-if="settings.showPersonal" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showShelters,
+                  }"
+                >
+                  <Vault class="size-5" />
+                  Tilfluktsrom ({{ counts.shelter }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :disabled="!settings.showShelters"
+                    size="icon"
+                    variant="outline"
+                    @click="mapRef.flyToNearest('Shelter')"
+                  >
+                    <Navigation class="size-5" />
+                  </Button>
+                  <Button
+                    :variant="settings.showShelters ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showShelters = !settings.showShelters"
+                  >
+                    <Eye v-if="settings.showShelters" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showDefibrillators,
+                  }"
+                >
+                  <HeartPulse class="size-5" />
+                  Hjertestartere ({{ counts.defibrillator }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :disabled="!settings.showDefibrillators"
+                    size="icon"
+                    variant="outline"
+                    @click="mapRef.flyToNearest('Defibrillator')"
+                  >
+                    <Navigation class="size-5" />
+                  </Button>
+                  <Button
+                    :variant="settings.showDefibrillators ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showDefibrillators = !settings.showDefibrillators"
+                  >
+                    <Eye v-if="settings.showDefibrillators" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showEmergencyClinics,
+                  }"
+                >
+                  <Hospital class="size-5" />
+                  Akuttmottak ({{ counts.emergencyClinic }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :disabled="!settings.showEmergencyClinics"
+                    size="icon"
+                    variant="outline"
+                    @click="mapRef.flyToNearest('EmergencyClinic')"
+                  >
+                    <Navigation class="size-5" />
+                  </Button>
+                  <Button
+                    :variant="settings.showEmergencyClinics ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showEmergencyClinics = !settings.showEmergencyClinics"
+                  >
+                    <Eye v-if="settings.showEmergencyClinics" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showDistributionPoints,
+                  }"
+                >
+                  <Package class="size-5" />
+                  Distribusjonspunkt ({{ counts.distributionPoint }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :disabled="!settings.showDistributionPoints"
+                    size="icon"
+                    variant="outline"
+                    @click="mapRef.flyToNearest('DistributionPoint')"
+                  >
+                    <Navigation class="size-5" />
+                  </Button>
+                  <Button
+                    :variant="settings.showDistributionPoints ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showDistributionPoints = !settings.showDistributionPoints"
+                  >
+                    <Eye v-if="settings.showDistributionPoints" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showPoliceStations,
+                  }"
+                >
+                  <Shield class="size-5" />
+                  Politistasjoner ({{ counts.policeStation }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :disabled="!settings.showPoliceStations"
+                    size="icon"
+                    variant="outline"
+                    @click="mapRef.flyToNearest('PoliceStation')"
+                  >
+                    <Navigation class="size-5" />
+                  </Button>
+                  <Button
+                    :variant="settings.showPoliceStations ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showPoliceStations = !settings.showPoliceStations"
+                  >
+                    <Eye v-if="settings.showPoliceStations" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showPharmacies,
+                  }"
+                >
+                  <Plus class="size-5" />
+                  Apotek ({{ counts.pharmacy }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :disabled="!settings.showPharmacies"
+                    size="icon"
+                    variant="outline"
+                    @click="mapRef.flyToNearest('Pharmacy')"
+                  >
+                    <Navigation class="size-5" />
+                  </Button>
+                  <Button
+                    :variant="settings.showPharmacies ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showPharmacies = !settings.showPharmacies"
+                  >
+                    <Eye v-if="settings.showPharmacies" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  :class="{
+                    'flex items-center gap-2 text-sm font-semibold': true,
+                    'text-neutral-400': !settings.showGeneral,
+                  }"
+                >
+                  <MapPin class="size-5" />
+                  Andre markører ({{ counts.general }})
+                </label>
+                <div class="flex items-center gap-2">
+                  <Button
+                    :disabled="!settings.showGeneral"
+                    size="icon"
+                    variant="outline"
+                    @click="mapRef.flyToNearest('General')"
+                  >
+                    <Navigation class="size-5" />
+                  </Button>
+                  <Button
+                    :variant="settings.showGeneral ? 'default' : 'outline'"
+                    size="icon"
+                    @click="settings.showGeneral = !settings.showGeneral"
+                  >
+                    <Eye v-if="settings.showGeneral" class="size-5" />
+                    <EyeOff v-else class="size-5 text-neutral-500" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </aside>
 
@@ -137,7 +316,7 @@
       :settings="settings"
       :start-selection="startSelection"
       :storages="storages"
-      class="flex-1"
+      class="flex-1 h-full min-h-0"
     />
   </div>
 </template>
@@ -147,17 +326,21 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { getAllMarkers } from '@/service/markerService'
 import { fetchStorages } from '@/service/storageService'
 import Map from '@/components/Map.vue'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import {
-  CookingPot,
+  Eye,
+  EyeOff,
   HeartPulse,
+  Hospital,
   MapPin,
-  MapPinPlus,
-  Milestone,
   Navigation,
+  Package,
+  Plus,
+  Shield,
   Vault,
+  Warehouse,
 } from 'lucide-vue-next'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Select,
   SelectContent,
@@ -165,30 +348,26 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select/index.js'
+} from '@/components/ui/select'
 
-const location = reactive({
-  lng: 10.40574,
-  lat: 63.41754,
-  bearing: 0,
-  pitch: 0,
-  zoom: 12,
-})
-
+const activeTab = ref('event')
+const mapRef = ref(null)
+const location = reactive({ lng: 10.40574, lat: 63.41754, bearing: 0, pitch: 0, zoom: 12 })
 const settings = reactive({
-  searchQuery: '',
-  showMarkers: true,
+  showPersonal: true,
+  showGeneral: true,
   showShelters: true,
   showDefibrillators: true,
-  showFoodStations: true,
+  showEmergencyClinics: true,
+  showDistributionPoints: true,
+  showPoliceStations: true,
+  showPharmacies: true,
   showStorages: true,
+  searchQuery: '',
   minCapacity: 0,
-  geoLocationEnabled: true,
 })
-
 const markers = ref([])
 const storages = ref([])
-
 const startSelection = ref('current')
 
 const startOptions = computed(() => {
@@ -200,6 +379,18 @@ const startOptions = computed(() => {
   }
   return opts
 })
+
+const counts = computed(() => ({
+  personal: markers.value.filter((m) => m.type === 'Personal').length,
+  general: markers.value.filter((m) => m.type === 'General').length,
+  shelter: markers.value.filter((m) => m.type === 'Shelter').length,
+  defibrillator: markers.value.filter((m) => m.type === 'Defibrillator').length,
+  emergencyClinic: markers.value.filter((m) => m.type === 'EmergencyClinic').length,
+  distributionPoint: markers.value.filter((m) => m.type === 'DistributionPoint').length,
+  policeStation: markers.value.filter((m) => m.type === 'PoliceStation').length,
+  pharmacy: markers.value.filter((m) => m.type === 'Pharmacy').length,
+  storages: storages.value.length,
+}))
 
 onMounted(async () => {
   markers.value = await getAllMarkers()

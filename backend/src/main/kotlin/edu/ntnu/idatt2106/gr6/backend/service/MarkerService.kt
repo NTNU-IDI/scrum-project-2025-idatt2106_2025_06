@@ -1,6 +1,8 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs
+import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.ClosestMarkerResponse
+import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.ClosestMarkerRequest
 import edu.ntnu.idatt2106.gr6.backend.repository.MarkerRepository
 import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.CreateMarkerRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.MarkerDTOs.CreateMarkerResponse
@@ -133,6 +135,13 @@ class MarkerService(
             }
     }
 
+    fun getClosestMarker(request: ClosestMarkerRequest): ClosestMarkerResponse? {
+        val markerId = markerRepository.findClosestMarkerIdByType(
+            location = request.startLocation,
+            type = request.type.toString()
+        )
+        return markerId?.let { ClosestMarkerResponse(it)}
+    }
 
     internal fun Marker.toResponse(): CreateMarkerResponse {
         return CreateMarkerResponse(
