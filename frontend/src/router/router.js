@@ -20,6 +20,7 @@ import EventView from '@/views/EventView.vue'
 import ScenarioDetailView from '@/views/ScenarioDetailView.vue'
 import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
+import AddRemoveAdminView from '@/views/AddRemoveAdminView.vue'
 
 
 const routes = [
@@ -36,6 +37,7 @@ const routes = [
   { path: '/before', component: BeforeView, name: 'before' },
   { path: '/during', component: DuringView, name: 'during' },
   { path: '/after', component: AfterView, name: 'after' },
+  { path: '/admin/addremove', component: AddRemoveAdminView, name: 'addremove', meta: { requiresAdminAccess: true }},
   { path: '/privacy-policy', component: PrivacyPolicyView, name: 'privacy-policy' },
   { path: '/about-us', component: AboutUsView, name: 'about-us' },
   {
