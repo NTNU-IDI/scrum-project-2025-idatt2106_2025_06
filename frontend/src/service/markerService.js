@@ -26,7 +26,9 @@ export async function getAllMarkers() {
 
 export async function getClosestMarkerId(startLocation, type) {
   try {
+    console.log('Startlocation: ', startLocation, 'Type: ', type)
     console.log('Fetching closest marker..')
+
     const response = await api.post('/markers/closest', {
       startLocation,
       type,
