@@ -9,6 +9,11 @@ import org.springframework.web.socket.WebSocketHandler
 import org.springframework.web.socket.server.HandshakeInterceptor
 import kotlin.collections.forEach
 
+/**
+ * Interceptor for WebSocket handshake requests that extracts the user ID from the JWT token in the Authorization header.
+ *
+ */
+
 @Component
 class JwtHandshakeInterceptor(
     private val jwtService: JwtService,
@@ -18,19 +23,17 @@ class JwtHandshakeInterceptor(
     override fun beforeHandshake(
         request: ServerHttpRequest,
         response: ServerHttpResponse,
-        wsHandler: org.springframework.web.socket.WebSocketHandler,
+        wsHandler: WebSocketHandler,
         attributes: MutableMap<String, Any>
     ): Boolean {
         logger.info("Handshake request: {}", request)
         val headers = request.headers
         val authHeader = headers.getFirst("Authorization")
-        logger.info("Handshake request Authorization: $authHeader")
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             val token = authHeader.substring(7)
             val id = jwtService.extractUserIdFromToken(token)
             attributes["id"] = id!!
-            logger.info("Extracted email from token: $id")
         }
 
         return true

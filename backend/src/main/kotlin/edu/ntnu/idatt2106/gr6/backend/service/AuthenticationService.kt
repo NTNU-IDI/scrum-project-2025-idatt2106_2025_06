@@ -50,7 +50,12 @@ class AuthenticationService(
 
     /**
      * Signs up a new user to the service. it checks if user already exits before proceeding.
-     * Request is validated and mapped to a User object. User is saved to the database.
+     * Request is validated and mapped to a User object. User is saved to the database. a verification
+     * code is then generated and sent to the user via email. the saved user object is then returned.
+     *
+     * @param name The name of the user.
+     * @param email The email of the user.
+     * @param password The password of the user.
      */
 
         @Transactional
@@ -62,8 +67,6 @@ class AuthenticationService(
         if (userRepository.findByEmail(email) != null) {
             throw UserAlreadyExistsException.forEmail(email)
         }
-
-            logger.info("adasddasdas")
 
         val userToSave = User(
             name = name,
@@ -86,6 +89,12 @@ class AuthenticationService(
         return savedUser
     }
 
+    /**
+     * Logs in a user to the service. It checks if the user exists and if the credentials are valid.
+     * If the credentials are valid and the user has verified their email, the user is authenticated
+     * and a JWT token is generated.
+     */
+
     fun loginUser(request: LoginUserRequest) : UserResponse {
         val email = request.email
         val password = request.password
@@ -94,7 +103,6 @@ class AuthenticationService(
             throw InvalidCredentialsException.forEmail(email)
         }
 
-        logger.info("Authenticating user with email: $email")
         try {
             authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(
@@ -107,7 +115,6 @@ class AuthenticationService(
             throw AuthenticationException.forEmail(email)
         }
 
-        logger.info("User $email authenticated successfully.")
 
         val user = userRepository.findByEmail(email)
             ?: throw UserNotFoundException.forEmail(email)
@@ -120,6 +127,12 @@ class AuthenticationService(
             ?: throw UserNotFoundException.forEmail(email)
     }
 
+    /**
+     * Generates a unique verification ID for the user to verify using email. It checks if the ID already exists in the database
+     * and generates a new one if it does. It will try to generate a new ID up to 10 times before throwing an exception.
+     *
+     * @return A unique verification ID.
+     */
 
     private fun generateVerificationId(): String {
         var id: String = ""
@@ -134,6 +147,13 @@ class AuthenticationService(
         return id
     }
 
+    /**
+     * Verifies the user using the verification code sent to their email. It checks if the token is valid and if the user exists.
+     * If the token is valid, the user is updated in the database and their email is marked as verified.
+     *
+     * @param verificationCode The verification code sent to the user's email.
+     */
+
     fun verifyUser(verificationCode: String): Boolean {
         // check if token already exists if not generate a new one
         logger.info("verify user with code: $verificationCode")
@@ -146,37 +166,26 @@ class AuthenticationService(
         var token: String? = userRepository.findEmailVerificationToken(userId)
 
         if (token == null) {
-            logger.info("token is null")
             throw TokenIncorrectlyFormattedException.forToken(verificationCode)
         }
-        logger.info("verified: $token")
-        logger.info("verified:ssssss $verificationCode")
 
         if (token == null || token.isBlank()) {
             token = generateVerificationId()
             userRepository.saveEmailVerificationToken(token, UUID.fromString(userId), email)
         }
 
-        logger.info("verified2: $verificationCode")
-
         val user = userRepository.findById(UUID.fromString(userId))
             ?: throw UserNotFoundException.forUserId(userId)
         val fetchUserId = user.id?.toString()
             ?: throw UserNotFoundException.forUserId(userId)
 
-        logger.info("verified2.5: $fetchUserId")
-
         if(!jwtService.isVerificationTokenValid(verificationCode)) {
             throw TokenInvalidException.forToken(verificationCode)
         }
 
-        logger.info("verified3: $verificationCode")
-
         if(user.email != email) {
             throw TokenInvalidException.forToken(verificationCode)
         }
-
-        logger.info("verified4: $verificationCode")
 
         userRepository.updateUser(UUID.fromString(fetchUserId), user.name, email, true)
         return true

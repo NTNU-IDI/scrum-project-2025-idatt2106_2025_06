@@ -26,7 +26,7 @@ class LocationController(
 
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')") //!!!!!!!!
+    @PreAuthorize("hasAuthority('CREATE_STORAGE')")
     @Operation(summary = "Get coordinates of a user")
     @ApiResponses(
         value = [
@@ -41,7 +41,7 @@ class LocationController(
     }
 
     @PostMapping("/update")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')")        //!!!!!!!!
+    @PreAuthorize("hasAuthority('CREATE_STORAGE')")
     @Operation(summary = "Update coordinates of a user")
     @ApiResponses(
         value = [

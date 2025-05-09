@@ -6,6 +6,9 @@ import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import javax.annotation.PostConstruct
 
+/**
+ * Configuration class to load environment variables from a .env file.
+ */
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class EnvConfig {
