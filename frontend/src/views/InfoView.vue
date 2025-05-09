@@ -4,7 +4,7 @@ import BentoCard from "@/components/ui/bento/BentoCard.vue";
 </script>
 
 <template>
-  <div class="m-auto mt-10">
+  <div class="m-4 mt-10 xl:mx-auto">
       <Card class="mx-auto w-full items-center flex flex-col max-w-2xl p-6 shadow-md rounded-2xl">
         <CardHeader>
           <CardTitle class="text-xl font-bold">
@@ -26,7 +26,7 @@ import BentoCard from "@/components/ui/bento/BentoCard.vue";
         </CardContent>
       </Card>
 
-    <div class="w-full max-w-2xl mx-auto mt-10 px-4">
+    <div class="w-full max-w-2xl mx-auto mt-10 px-1">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <BentoCard
           name="Før"
