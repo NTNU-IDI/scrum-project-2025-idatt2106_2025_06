@@ -1,6 +1,8 @@
 <script setup>
 import { BentoCard, BentoCardCustom, BentoGrid } from '@/components/ui/bento'
 import AlertCard from '@/components/AlertCard.vue'
+import ExpiringSoon from '@/components/ExpiringSoon.vue'
+import { ArrowRightIcon } from 'lucide-vue-next'
 </script>
 
 <template>
@@ -52,9 +54,8 @@ import AlertCard from '@/components/AlertCard.vue'
         </div>
       </BentoCardCustom>
 
-      <!-- TODO legge til beredskapslager her -->
-      <BentoCardCustom customClass="col-span-3 min-h-[30rem]" href="/inventory" name="Utgår snart">
-        <div>TBA</div>
+      <BentoCardCustom customClass="col-span-3 min-h-[30rem] w-[45rem]" class="cursor-default" name="Beredskap">
+        <ExpiringSoon/>
       </BentoCardCustom>
     </BentoGrid>
   </div>

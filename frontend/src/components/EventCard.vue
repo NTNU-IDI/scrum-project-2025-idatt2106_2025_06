@@ -1,13 +1,13 @@
 <script setup>
-import { Pencil, Trash, Info, OctagonAlert, TriangleAlert, Shield } from 'lucide-vue-next'
+import { Info, OctagonAlert, Pencil, Shield, Trash, TriangleAlert } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button/index.js'
 import { useEventStore } from '@/stores/event.js'
 import { useSessionStore } from '@/stores/session'
+import { defineEmits } from 'vue'
 
 const eventStore = useEventStore()
 const sessionStore = useSessionStore()
 
-import { defineEmits } from 'vue'
 const emit = defineEmits(['edit'])
 
 const severityColors = {
@@ -37,8 +37,6 @@ const props = defineProps({
   location: { type: Object, default: null },
 })
 
-
-
 const handleDelete = async () => {
   try {
     await eventStore.deleteEventById(props.eventId, sessionStore.token)
@@ -49,28 +47,30 @@ const handleDelete = async () => {
 
 const formattedDate = () => {
   if (!props.updatedAt) {
-    console.warn(`updatedDate mangler for eventId: ${props.eventId}`);
-    return 'Ukjent dato';
+    console.warn(`updatedDate mangler for eventId: ${props.eventId}`)
+    return 'Ukjent dato'
   }
 
-  const dateObj = new Date(props.updatedAt);
-  dateObj.setHours(dateObj.getHours() + 2); //Added because date somehow saves as CEST
+  const dateObj = new Date(props.updatedAt)
+  dateObj.setHours(dateObj.getHours() + 2) //Added because date somehow saves as CEST
 
-  const today = new Date();
+  const today = new Date()
 
   const isSameDay =
     today.getFullYear() === dateObj.getFullYear() &&
     today.getMonth() === dateObj.getMonth() &&
-    today.getDate() === dateObj.getDate();
+    today.getDate() === dateObj.getDate()
 
   if (isSameDay) {
-    return dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+    return dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
   } else if (today.getFullYear() === dateObj.getFullYear()) {
-    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) +
+    return (
+      dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) +
       ' ' +
-      dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+      dateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
+    )
   } else {
-    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+    return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 }
 
@@ -102,7 +102,7 @@ const handleEdit = () => {
     <div class="flex flex-col min-w-0 flex-grow">
       <div class="flex flex-col flex-grow min-h-0">
         <div class="flex justify-between items-start">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 min-w-0">
             <div
               :class="[
                 'shrink-0 flex items-center justify-center rounded-full w-6 h-6',
@@ -116,18 +116,29 @@ const handleEdit = () => {
               <Shield v-if="props.severity === 'low'" class="w-4 h-4 text-white" />
             </div>
 
-            <h1 :class="['font-bold', variant === 'admin' ? 'text-md' : 'text-2xl']">
+            <h1
+              :class="[
+                'font-bold',
+                variant === 'admin' || variant === 'map' ? 'text-md' : 'text-2xl',
+                variant === 'map' ? 'truncate overflow-hidden w-full min-w-0' : '',
+              ]"
+            >
               {{ props.name }}
             </h1>
           </div>
 
-          <p class="flex flex-end text-neutral-500 text-sm">{{ formattedDate() }}</p>
+          <p
+            v-if="variant !== 'map'"
+            class="flex flex-end shrink-0 text-neutral-500 text-sm text-right"
+          >
+            {{ formattedDate() }}
+          </p>
         </div>
 
         <p
           :class="[
             'text-md text-neutral-600 overflow-hidden',
-            variant === 'admin' ? 'truncate' : '',
+            variant === 'admin' || variant === 'map' ? 'truncate' : '',
           ]"
         >
           {{ props.description || props.content }}
@@ -148,7 +159,7 @@ const handleEdit = () => {
         variant="outline"
         @click="handleDelete"
       >
-      <Trash />
+        <Trash />
       </Button>
     </div>
   </div>
