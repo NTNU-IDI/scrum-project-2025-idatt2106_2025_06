@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card/index.js'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -171,7 +172,7 @@ watch(
       placeholder="Kort beskrivelse"
     />
     <div class="flex items-center">
-      <Label class="m-2" for="severity">Beredskapsnivå</Label>
+      <Label class="m-2" for="severity">Farenivå</Label>
       <Select v-model="selectedSeverity" :class="errors.severity ? 'border-red-500' : ''">
         <SelectTrigger class="w-[180px]">
           <SelectValue placeholder="Velg nivå" />
@@ -262,9 +263,9 @@ watch(
         />
       </div>
     </div>
-    <div class="flex items-center">
-      <Label class="m-2" for="content">Mer info</Label>
-      <Input
+    <div class="flex">
+      <Label class="m-2" for="content">Innhold</Label>
+      <Textarea
         id="content"
         v-model="content"
         class="border w-full"
