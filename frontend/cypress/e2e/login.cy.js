@@ -2,14 +2,8 @@
 
 // cypress/e2e/user.cy.ts
 
-beforeEach(() => {
-  cy.visit('/login');
-
-  cy.get('form').invoke('removeAttr', 'novalidate');
-});
-
-describe('Form Submission Test', () => {
-  it('should get correct response from server when invalid data is submitted', () => {
+describe('Login and register Submission Test', () => {
+  it('should get no response when invalid data is submitted', () => {
     cy.visit('http://localhost:5173');
     cy.contains('button', 'Logg inn').click();
     cy.url().should('include', '/login');
@@ -17,6 +11,10 @@ describe('Form Submission Test', () => {
     cy.intercept('POST', 'http://localhost:3000/login').as('loginRequest');
 
     cy.get('#email').clear().type('pierbattista.pizzaballa@mail.com');
+    cy.get('button[type="submit"]').click();
+
+    cy.get('#email').clear();
+    cy.get('#password').clear().type('wordpass');
     cy.get('button[type="submit"]').click();
 
     cy.url().should('include', '/login');
@@ -52,12 +50,34 @@ describe('Form Submission Test', () => {
     });
   });
 
-  it('should get correct response from server when valid admin data is submitted', () => {
+  it('Should go to signup page and be able to make new user', () => {
     cy.visit('http://localhost:5173/login');
 
-    cy.get('button[type="underline"]').click();
+    cy.get('#signup-link').click();
 
     cy.intercept('POST', 'http://localhost:3000/signup', (req) => {
+      req.reply((res) => {
+        expect(res.statusCode).to.equal(200);
+        expect(res.body).to.have.property('Success', true);
+      });
+    });
+
+    cy.get('.g-recaptcha').should('be.visible');
+
+    cy.get('#name').clear().type('Ola Normann');
+    cy.get('#email').clear().type('ola@normann.no');
+    cy.get('#password').clear().type('wordpass');
+    cy.get('#confirmpassword').clear().type('wordpass');
+
+    cy.window().then((win) => {
+      win.handleRecaptchaResponse('dummy-recaptcha-token');
+    });
+
+
+    cy.get('button[type="submit"]').click();
+
+
+    cy.intercept('POST', 'http://localhost:3000/login', (req) => {
       req.reply((res) => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.have.property('Success', true);
