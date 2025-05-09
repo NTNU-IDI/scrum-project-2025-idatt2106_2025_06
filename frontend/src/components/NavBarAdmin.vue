@@ -25,7 +25,7 @@ const handleLogout = async () => {
       </router-link>
       <div
         class="gap-10 hidden sm:flex h-10 items-center">
-        <router-link to="/addremove">
+        <router-link to="/admin/addremove">
           <Button variant="default" v-if="isAdmin">Administrer moderatorer</Button>
         </router-link>
         <ResetPasswordLink variant="default" v-if="isAdmin"/>
