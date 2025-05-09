@@ -11,7 +11,7 @@ const hamburgerMenu = ref(false);
 </script>
 
 <template>
-  <nav class="sticky top-0 z-50 w-full py-2 shadow backdrop-blur-lg bg-white/75">
+  <nav class="sticky top-0 z-50 w-full py-2 shadow backdrop-blur-lg bg-white/75 px-5">
     <div class="flex items-center justify-between max-w-6xl m-auto pl-3">
       <router-link class="flex min-w-40 h-10 gap-2 items-center hover:scale-110 transition" to="/">
         <img alt="logo" height="32" src="/krisefikserLogo.svg" width="32" />
