@@ -30,7 +30,6 @@ const handleLogout = async () => {
         </router-link>
         <ResetPasswordLink variant="default" v-if="isAdmin"/>
       </div>
-      <Button variant="destructive" @click="handleLogout">Logg ut</Button>
       <router-link to="/profile">
         <Button @click="handleLogout">Logg ut</Button>
       </router-link>
