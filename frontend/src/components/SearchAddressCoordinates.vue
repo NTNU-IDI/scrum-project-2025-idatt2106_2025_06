@@ -1,17 +1,11 @@
 <script setup>
-
-import { Button } from '@/components/ui/button/index.js'
 import { Input } from '@/components/ui/input/index.js'
 </script>
 
 <template>
   <div class="flex items-center justify-center">
-    <Input class="bg-white" placeholder="Søk i kartet" />
-    <Button>
-      Search
-    </Button>
+    <Input v-model="" class="bg-white" placeholder="Søk i kartet" />
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
