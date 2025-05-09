@@ -30,7 +30,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="max-w-4xl mx-auto p-6">
+    <div class="max-w-4xl m-10 p-6">
       <div v-if="scenario">
         <h1 class="text-3xl font-bold mb-4">{{ scenario.title }}</h1>
         <p>Opprettet: {{ formatDate(scenario.updatedAt) }}</p>
