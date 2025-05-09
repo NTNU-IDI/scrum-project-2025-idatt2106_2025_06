@@ -38,7 +38,6 @@ describe('AppView', () => {
         },
       },
     })
-
     session = useSessionStore()  // Access the store here
   })
 
