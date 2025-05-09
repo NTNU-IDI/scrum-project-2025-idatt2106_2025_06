@@ -1,0 +1,79 @@
+package edu.ntnu.idatt2106.gr6.backend.repository
+
+import edu.ntnu.idatt2106.gr6.backend.model.Checkpoint
+import org.springframework.stereotype.Repository
+import javax.sql.DataSource
+
+@Repository
+class CheckpointRepository(private val dataSource: DataSource) {
+
+    fun getAllCheckpoints(): List<Checkpoint> {
+        val sql = "SELECT id, name, description FROM checkpoint_list"
+        val checkpoints = mutableListOf<Checkpoint>()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.executeQuery().use { rs ->
+                    while (rs.next()) {
+                        checkpoints.add(
+                            Checkpoint(
+                                id = rs.getString("id"),
+                                name = rs.getString("name"),
+                                description = rs.getString("description")
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        return checkpoints
+    }
+
+    fun getCheckpointsByUserId(userId: String): List<Checkpoint> {
+        val sql = """
+        SELECT c.id, c.name, c.description
+        FROM user_checkpoint_list ucl
+        JOIN checkpoint_list c ON ucl.checkpoint_list_id = c.id
+        WHERE ucl.user_id = ?
+    """.trimIndent()
+
+        val checkpoints = mutableListOf<Checkpoint>()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userId)
+                stmt.executeQuery().use { rs ->
+                    while (rs.next()) {
+                        checkpoints.add(
+                            Checkpoint(
+                                id = rs.getString("id"),
+                                name = rs.getString("name"),
+                                description = rs.getString("description")
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        return checkpoints
+    }
+
+    fun assignCheckpointToUser(id: String, userId: String, checkpointId: String): Boolean {
+        val sql = """
+        INSERT INTO user_checkpoint_list (id, user_id, checkpoint_list_id)
+        VALUES (?, ?, ?)
+    """.trimIndent()
+
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, id)
+                stmt.setString(2, userId)
+                stmt.setString(3, checkpointId)
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
+}
