@@ -17,9 +17,10 @@ import AdminMap from '@/views/AdminMapView.vue'
 import EmailVerificationView from '@/views/EmailVerificationView.vue'
 import { useSessionStore } from '@/stores/session.js'
 import EventView from '@/views/EventView.vue'
+import ScenarioDetailView from '@/views/ScenarioDetailView.vue'
 import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
-import ScenarioDetailView from '@/views/ScenarioDetailView.vue'
+
 
 const routes = [
   { path: '/', component: HomeView, name: 'home' },
