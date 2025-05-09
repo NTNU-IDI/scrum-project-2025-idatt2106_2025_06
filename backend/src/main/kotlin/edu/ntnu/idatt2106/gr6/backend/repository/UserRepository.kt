@@ -9,10 +9,24 @@ import java.sql.Statement
 import java.util.UUID
 import javax.sql.DataSource
 
+/**
+ * Repository for managing user data and operations related to authentication, profile updates,
+ * email verification, and tracking preferences.
+ *
+ * Uses JDBC and raw SQL to interact with the `users`, `roles`, `permissions`, and `email_verification` tables.
+ */
 @Repository
 class UserRepository (
     private val dataSource: DataSource
 ) {
+
+    /**
+     * Saves a new user in the database.
+     *
+     * @param user The User object to be saved.
+     * @return The same User object, with a generated UUID assigned to the `id` field.
+     * @throws RuntimeException if no rows were affected.
+     */
     fun save(user: User): User {
         val userId = UUID.randomUUID()
         val email = user.email
@@ -35,6 +49,13 @@ class UserRepository (
         return user.copy(id = userId)
     }
 
+    /**
+     * Logs in a user by matching email and password.
+     *
+     * @param email The user's email.
+     * @param password The hashed password.
+     * @return The matching User object or `null` if credentials are invalid.
+     */
     fun loginUser(email: String, password: String): User? {
         dataSource.connection.use { conn ->
             val sql = "SELECT * FROM users WHERE email = ? AND password = ?"
@@ -51,6 +72,15 @@ class UserRepository (
         return null
     }
 
+    /**
+     * Updates a user's name, email, and verification status.
+     *
+     * @param userId The user's UUID.
+     * @param newName New name to set.
+     * @param newEmail New email to set.
+     * @param verified New verification status.
+     * @return `true` if the update was successful, `false` otherwise.
+     */
     fun updateUser(userId: UUID, newName: String, newEmail: String, verified: Boolean): Boolean {
         val sql = """
         UPDATE users SET name = ?, email = ?, verified = ?  WHERE id = ?
@@ -68,6 +98,13 @@ class UserRepository (
         }
     }
 
+    /**
+     * Updates a user's password.
+     *
+     * @param userId The user's UUID.
+     * @param hashedPassword The new hashed password.
+     * @return `true` if the password was updated successfully.
+     */
     fun updatePassword(userId: UUID, hashedPassword: String): Boolean {
         dataSource.connection.use { conn ->
             val sql = "UPDATE users SET password = ? WHERE id = ?"
@@ -79,6 +116,12 @@ class UserRepository (
         }
     }
 
+    /**
+     * Retrieves a user by ID, including role and permissions.
+     *
+     * @param userId UUID of the user.
+     * @return The User object or `null` if not found.
+     */
     fun findById(userId: UUID): User? {
         val sql = """
         SELECT u.*, r.role_name AS role_name 
@@ -100,6 +143,13 @@ class UserRepository (
         return null
     }
 
+    /**
+     * Enables or disables tracking for a user.
+     *
+     * @param userId UUID of the user.
+     * @param trackingEnabled `true` to enable, `false` to disable.
+     * @return `true` if the preference was updated.
+     */
     fun updateUserTrackingPreferences(userId: UUID, trackingEnabled: Boolean): Boolean {
         val sql = "UPDATE users SET tracking_enabled = ? WHERE id = ?"
         dataSource.connection.use { conn ->
@@ -111,6 +161,12 @@ class UserRepository (
         }
     }
 
+    /**
+     * Retrieves whether tracking is enabled for a user.
+     *
+     * @param userId UUID of the user.
+     * @return `true` if tracking is enabled, `false` otherwise.
+     */
     fun getUserTrackingPreferences(userId: UUID): Boolean {
         val sql = "SELECT tracking_enabled FROM users WHERE id = ?"
         dataSource.connection.use { conn ->
@@ -126,6 +182,12 @@ class UserRepository (
         return false
     }
 
+    /**
+     * Deletes a user's location data (used for tracking history).
+     *
+     * @param userId UUID of the user.
+     * @return `true` if the update was successful.
+     */
     fun deleteUserTrackingHistory(userId: UUID): Boolean {
         val sql = "UPDATE users SET location = ? WHERE id = ?"
         dataSource.connection.use { conn ->
@@ -137,6 +199,14 @@ class UserRepository (
         }
     }
 
+    /**
+     * Saves a token used for email verification.
+     *
+     * @param id Token entry ID.
+     * @param userId UUID of the user.
+     * @param token The token string.
+     * @return `true` if the token was saved.
+     */
     fun saveEmailVerificationToken(id: String,userId: UUID, token: String): Boolean {
         val sql = "INSERT INTO email_verification (id, user_id, token, expires_at) VALUES (?, ?, ?,?)"
         dataSource.connection.use { conn ->
@@ -150,6 +220,12 @@ class UserRepository (
         }
     }
 
+    /**
+     * Retrieves the email verification token for a user.
+     *
+     * @param userid The user's ID as a String.
+     * @return The token string or `null` if not found.
+     */
     fun findEmailVerificationToken(userid: String): String? {
         val sql = "SELECT token FROM email_verification WHERE user_id = ?"
         dataSource.connection.use { conn ->
@@ -165,7 +241,12 @@ class UserRepository (
         return null
     }
 
-
+    /**
+     * Finds a user by email, including their role and permissions.
+     *
+     * @param email The user's email.
+     * @return The User object or `null` if not found.
+     */
     fun findByEmail(email: String): User? {
         dataSource.connection.use { conn ->
             val sql = """
@@ -186,6 +267,12 @@ class UserRepository (
         return null
     }
 
+    /**
+     * Maps a SQL result row to a full User object, including nested Role and permissions.
+     *
+     * @param rs The ResultSet with user data.
+     * @return A fully populated User object.
+     */
      fun mapRowToUser(rs: ResultSet): User =
         User(
             id = UUID.fromString(rs.getString("id")),
@@ -202,6 +289,12 @@ class UserRepository (
             trackingEnabled = rs.getBoolean("tracking_enabled"),
         )
 
+    /**
+     * Fetches all permissions associated with a given role.
+     *
+     * @param roleId ID of the role.
+     * @return A set of Permission objects.
+     */
     fun fetchPermissions(roleId: Int): Set<Permission> {
         val permissions = mutableSetOf<Permission>()
 
