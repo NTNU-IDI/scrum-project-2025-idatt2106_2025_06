@@ -24,11 +24,4 @@ describe('User-userstories', () => {
     cy.url().should('not.include', '/admin/map');
     cy.url().should('include', '/');
   });
-
-  it('user should not go to admin map page', () => {
-    cy.wait(2000);
-
-    cy.visit('http://localhost:5173/inventory');
-
-  });
 });
