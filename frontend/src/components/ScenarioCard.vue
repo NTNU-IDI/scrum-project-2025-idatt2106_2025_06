@@ -14,9 +14,7 @@ const showDialog = ref(false)
 const editingScenario = ref(null)
 
 onMounted(async () => {
-  if (sessionStore.token) {
-    await scenarioStore.fetchScenarios(sessionStore.token)
-  }
+    await scenarioStore.fetchScenarios()
 })
 
 const handleCreate = () => {

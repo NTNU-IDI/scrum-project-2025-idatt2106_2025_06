@@ -2,11 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useScenarioStore } from '@/stores/scenario'
-import { useSessionStore } from '@/stores/session'
 
 const route = useRoute()
 const scenarioStore = useScenarioStore()
-const sessionStore = useSessionStore()
 const scenario = ref(null)
 
 const formatDate = (isoDate) => {
@@ -22,7 +20,7 @@ const formatDate = (isoDate) => {
 
 onMounted(async () => {
   if (!scenarioStore.scenarios.length) {
-    await scenarioStore.fetchScenarios(sessionStore.token)
+    await scenarioStore.fetchScenarios()
   }
   scenario.value = scenarioStore.scenarios.find(s => s.id === route.params.id)
 })

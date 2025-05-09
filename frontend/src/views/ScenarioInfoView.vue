@@ -3,16 +3,14 @@
 import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
 import { ArrowRightIcon } from 'lucide-vue-next'
 import { useScenarioStore } from '@/stores/scenario'
-import { useSessionStore } from '@/stores/session'
 import { onMounted, computed } from 'vue'
 
 const scenarioStore = useScenarioStore()
-const sessionStore = useSessionStore()
 const displayedScenarios = computed(() => scenarioStore.scenarios)
 
 onMounted(async () => {
   try {
-    await scenarioStore.fetchScenarios(sessionStore.token || null)
+    await scenarioStore.fetchScenarios()
     console.log(scenarioStore.scenarios)
   }
   catch (error) {
