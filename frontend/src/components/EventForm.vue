@@ -210,10 +210,10 @@ watch(() => props.eventData, async (newData) => {
       <Input class="border w-full" id="content" placeholder="Lengre beskrivelse av hendelsen" v-model="content" />
     </div>
 
-    <Button class="flex-1" @click="handleSubmit">
+    <Button id="submitButton" class="flex-1" @click="handleSubmit">
       {{ props.mode === 'new' ? 'Publiser ny hendelse' : 'Oppdater hendelse' }}
     </Button>
 
-    <Button variant="outline" class="flex-1">Avbryt</Button>
+    <Button id="clearButton" variant="outline" class="flex-1" @click="eventFormRefresh">Avbryt</Button>
   </Card>
 </template>
