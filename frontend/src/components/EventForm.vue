@@ -22,7 +22,9 @@ const props = defineProps({
   eventData: Object,
 })
 
-// form state
+const emit = defineEmits(['saved', 'cancel'])
+
+// local state & refs
 const mode = ref(props.mode)
 const id = ref(null)
 const title = ref('')
@@ -37,7 +39,7 @@ const eventType = ref('other')
 const eventStatus = ref('ongoing')
 const selectedSeverity = ref('low')
 
-// expose refresh to parent
+// clear / cancel
 function eventFormRefresh() {
   id.value = null
   title.value = ''
@@ -52,9 +54,8 @@ function eventFormRefresh() {
   eventStatus.value = 'ongoing'
   selectedSeverity.value = 'low'
   mode.value = 'new'
+  emit('cancel')
 }
-
-defineExpose({ eventFormRefresh })
 
 // validation
 const errors = ref({
@@ -110,28 +111,45 @@ async function handleSubmit() {
     description: description.value,
     content: content.value,
     status: eventStatus.value,
-    location: { latitude: parseFloat(latitude.value), longitude: parseFloat(longitude.value) },
-    impactAreaRadiusKm: parseFloat(impactAreaRadius.value),
-    recommendedEvacuationAreaRadiusKm: parseFloat(recommendedEvacuationRadius.value),
-    mandatoryEvacuationAreaRadiusKm: parseFloat(mandatoryEvacuationRadius.value),
+    location: {
+      latitude: parseFloat(latitude.value),
+      longitude: parseFloat(longitude.value),
+    },
+    impact_area_radius_km: parseFloat(impactAreaRadius.value),
+    recommended_evacuation_area_radius_km: parseFloat(recommendedEvacuationRadius.value),
+    mandatory_evacuation_area_radius_km: parseFloat(mandatoryEvacuationRadius.value),
     type: eventType.value,
     severity: selectedSeverity.value,
     startTime: now,
     endTime: now,
   }
+
   try {
-    const token = props.token
     if (mode.value === 'new') {
-      await eventStore.createNewEvent(payload, token)
+      await eventStore.createNewEvent(payload, props.token)
     } else {
-      await eventStore.updateExistingEvent(id.value, payload, token)
+      await eventStore.updateExistingEvent(id.value, payload, props.token)
     }
+    emit('saved')
     eventFormRefresh()
   } catch (err) {
     console.error('Error submitting event:', err)
   }
 }
 
+async function handleDelete() {
+  if (mode.value === 'edit' && id.value != null) {
+    try {
+      await eventStore.deleteEventById(id.value, props.token)
+      emit('saved')
+      eventFormRefresh()
+    } catch (err) {
+      console.error('Error deleting event:', err)
+    }
+  }
+}
+
+// seed form on edit
 watch(
   () => props.eventData,
   (ev) => {
@@ -141,87 +159,52 @@ watch(
       title.value = ev.name
       description.value = ev.description
       content.value = ev.content
-      latitude.value = ev.location?.latitude || ''
-      longitude.value = ev.location?.longitude || ''
-      impactAreaRadius.value = ev.impactAreaRadiusKm || 0
-      recommendedEvacuationRadius.value = ev.recommendedEvacuationAreaRadiusKm || 0
-      mandatoryEvacuationRadius.value = ev.mandatoryEvacuationAreaRadiusKm || 0
+      latitude.value = ev.location?.latitude?.toString() || ''
+      longitude.value = ev.location?.longitude?.toString() || ''
+      impactAreaRadius.value = ev.impact_area_radius_km || 0
+      recommendedEvacuationRadius.value = ev.recommended_evacuation_area_radius_km || 0
+      mandatoryEvacuationRadius.value = ev.mandatory_evacuation_area_radius_km || 0
       eventType.value = ev.type || 'other'
       eventStatus.value = ev.status || 'ongoing'
       selectedSeverity.value = ev.severity || 'low'
     }
   },
+  { immediate: true },
 )
 </script>
 
 <template>
-  <Card class="flex flex-col gap-2 p-5">
-    <div class="flex items-center">
-      <Label class="m-2" for="title">Tittel</Label>
-      <Input
-        id="title"
-        v-model="title"
-        :class="['border w-full', errors.title ? 'border-red-500' : '']"
-        placeholder="Navn på hendelse"
-      />
+  <Card class="flex flex-col p-5">
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center">
+        <Label class="m-2" for="title">Tittel</Label>
+        <Input
+          id="title"
+          v-model="title"
+          :class="['border w-full', errors.title ? 'border-red-500' : '']"
+          placeholder="Navn på hendelse"
+        />
+      </div>
+      <div class="flex items-center">
+        <Label class="m-2" for="description">Beskrivelse</Label>
+        <Input
+          id="description"
+          v-model="description"
+          :class="['border w-full', errors.description ? 'border-red-500' : '']"
+          placeholder="Kort beskrivelse"
+        />
+      </div>
     </div>
-    <Input
-      id="description"
-      v-model="description"
-      :class="['border w-full', errors.description ? 'border-red-500' : '']"
-      placeholder="Kort beskrivelse"
-    />
-    <div class="flex items-center">
-      <Label class="m-2" for="severity">Farenivå</Label>
-      <Select v-model="selectedSeverity" :class="errors.severity ? 'border-red-500' : ''">
-        <SelectTrigger class="w-[180px]">
-          <SelectValue placeholder="Velg nivå" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="low">Lav</SelectItem>
-          <SelectItem value="medium">Middels</SelectItem>
-          <SelectItem value="high">Høy</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-    <div class="flex items-center">
-      <Label class="m-2" for="eventStatus">Status</Label>
-      <Select v-model="eventStatus">
-        <SelectTrigger class="w-[180px]">
-          <SelectValue placeholder="Velg status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="planned">Planlagt</SelectItem>
-          <SelectItem value="ongoing">Pågår</SelectItem>
-          <SelectItem value="finished">Ferdig</SelectItem>
-          <SelectItem value="cancelled">Avbrutt</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-    <div class="flex items-center">
-      <Label class="m-2" for="eventType">Hendelse</Label>
-      <Select v-model="eventType" :class="errors.eventType ? 'border-red-500' : ''">
-        <SelectTrigger class="w-[180px]">
-          <SelectValue placeholder="Velg type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="natural_disaster">Naturkatastrofe</SelectItem>
-          <SelectItem value="nuclear_attack">Atomangrep</SelectItem>
-          <SelectItem value="terror_attack">Terrorangrep</SelectItem>
-          <SelectItem value="pandemic">Pandemi</SelectItem>
-          <SelectItem value="other">Annet</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+
     <div class="flex items-center">
       <Label class="m-2">Posisjon</Label>
-      <div class="flex flex-col">
+      <div class="flex flex-col mr-2">
         <Label class="m-2" for="latitude">Breddegrad</Label>
         <Input
           id="latitude"
           v-model="latitude"
           :class="['border', errors.latitude ? 'border-red-500' : '']"
-          placeholder="eks: 64.23"
+          placeholder="eks: 64.232321"
         />
       </div>
       <div class="flex flex-col">
@@ -230,14 +213,58 @@ watch(
           id="longitude"
           v-model="longitude"
           :class="['border', errors.longitude ? 'border-red-500' : '']"
-          placeholder="eks: 10.42"
+          placeholder="eks: 10.422132"
         />
       </div>
     </div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col mt-2 gap-2">
+      <div class="flex items-center">
+        <Label class="m-2" for="severity">Farenivå</Label>
+        <Select v-model="selectedSeverity" :class="errors.severity ? 'border-red-500' : ''">
+          <SelectTrigger class="w-[180px]">
+            <SelectValue placeholder="Velg nivå" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="low">Lav</SelectItem>
+            <SelectItem value="medium">Middels</SelectItem>
+            <SelectItem value="high">Høy</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div class="flex items-center">
+        <Label class="m-2" for="eventStatus">Status</Label>
+        <Select v-model="eventStatus">
+          <SelectTrigger class="w-[180px]">
+            <SelectValue placeholder="Velg status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="planned">Planlagt</SelectItem>
+            <SelectItem value="ongoing">Pågår</SelectItem>
+            <SelectItem value="finished">Ferdig</SelectItem>
+            <SelectItem value="cancelled">Avbrutt</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div class="flex items-center">
+        <Label class="m-2" for="eventType">Hendelse</Label>
+        <Select v-model="eventType" :class="errors.eventType ? 'border-red-500' : ''">
+          <SelectTrigger class="w-[180px]">
+            <SelectValue placeholder="Velg type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="natural_disaster">Naturkatastrofe</SelectItem>
+            <SelectItem value="nuclear_attack">Atomangrep</SelectItem>
+            <SelectItem value="terror_attack">Terrorangrep</SelectItem>
+            <SelectItem value="pandemic">Pandemi</SelectItem>
+            <SelectItem value="other">Annet</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+    <div class="flex flex-col gap-2 mt-2">
       <div class="flex items-center gap-2">
-        <Label class="m-2" for="impactAreaRadius">Treff radius (km)</Label>
-        <input
+        <Label class="m-2" for="impactAreaRadius">Impact radius (km)</Label>
+        <Input
           id="impactAreaRadius"
           v-model.number="impactAreaRadius"
           class="border rounded px-2 py-1 w-24"
@@ -245,25 +272,26 @@ watch(
         />
       </div>
       <div class="flex items-center gap-2">
-        <Label class="m-2" for="mandatoryEvacuationRadius">Oblig.ev.r. (km)</Label>
-        <input
-          id="mandatoryEvacuationRadius"
-          v-model.number="mandatoryEvacuationRadius"
-          class="border rounded px-2 py-1 w-24"
-          type="number"
-        />
-      </div>
-      <div class="flex items-center gap-2">
         <Label class="m-2" for="recommendedEvacuationRadius">Anbefalt evak.r. (km)</Label>
-        <input
+        <Input
           id="recommendedEvacuationRadius"
           v-model.number="recommendedEvacuationRadius"
           class="border rounded px-2 py-1 w-24"
           type="number"
         />
       </div>
+      <div class="flex items-center gap-2">
+        <Label class="m-2" for="mandatoryEvacuationRadius">Oblig.ev.r. (km)</Label>
+        <Input
+          id="mandatoryEvacuationRadius"
+          v-model.number="mandatoryEvacuationRadius"
+          class="border rounded px-2 py-1 w-24"
+          type="number"
+        />
+      </div>
     </div>
-    <div class="flex">
+
+    <div class="flex mt-4">
       <Label class="m-2" for="content">Innhold</Label>
       <Textarea
         id="content"
@@ -272,11 +300,22 @@ watch(
         placeholder="Ytterligere detaljer"
       />
     </div>
+
     <div class="flex gap-2 mt-4">
       <Button class="flex-1" @click="handleSubmit">
-        {{ mode.value === 'new' ? 'Publiser ny hendelse' : 'Oppdater hendelse' }}
+        {{ mode === 'new' ? 'Publiser ny hendelse' : 'Oppdater hendelse' }}
       </Button>
-      <Button class="flex-1" variant="outline" @click="eventFormRefresh">Avbryt</Button>
+      <Button
+        v-if="mode === 'edit'"
+        class="flex-1 bg-red-600 text-white hover:bg-red-700"
+        variant="outline"
+        @click="handleDelete"
+      >
+        Slett hendelse
+      </Button>
+      <Button v-if="mode === 'edit'" class="flex-1" variant="outline" @click="eventFormRefresh">
+        Avbryt
+      </Button>
     </div>
   </Card>
 </template>
