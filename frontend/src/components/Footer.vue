@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Onboarding from '@/components/Onboarding.vue'
 </script>
 
 <template>
@@ -23,7 +24,8 @@
           </div>
 
           <div>
-            <router-link class="opacity-60 hover:opacity-100" to="/inventory"> Beredskapslager
+            <router-link class="opacity-60 hover:opacity-100" to="/inventory">
+              Beredskapslager
             </router-link>
           </div>
 
@@ -37,12 +39,13 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <h3 class="font-bold text-lg">Personvern</h3>
+          <h3 class="font-bold text-lg">Personvern og info</h3>
           <div>
             <router-link class="opacity-60 hover:opacity-100" to="/privacy-policy">
               Personvernerklæring
             </router-link>
           </div>
+          <Onboarding />
         </div>
 
         <div class="flex flex-col gap-2">
@@ -51,7 +54,6 @@
             <router-link class="opacity-60 hover:opacity-100" to="/about-us"> Om oss</router-link>
           </div>
         </div>
-
 
         <!--
         <div class="flex flex-col gap-2">
@@ -70,7 +72,6 @@
         </div>
         -->
       </div>
-
 
       <h3>2025 Developed by Group 06</h3>
     </div>
