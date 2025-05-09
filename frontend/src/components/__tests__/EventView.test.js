@@ -29,7 +29,7 @@ describe('EventDetail.vue', () => {
     fetchEventById.mockReset()
   })
 
-  it('henter og viser event-data', async () => {
+  it('gets and shows event-data', async () => {
     fetchEventById.mockResolvedValueOnce(mockEvent)
 
     const wrapper = mount(EventDetail)
@@ -50,7 +50,7 @@ describe('EventDetail.vue', () => {
     expect(wrapper.text()).toContain('Sist oppdatert: 5. mai 2024')
   })
 
-  it('håndterer fetch-feil', async () => {
+  it('handles fetch-error', async () => {
     fetchEventById.mockRejectedValueOnce(new Error('Network error'))
 
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})

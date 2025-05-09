@@ -2,7 +2,7 @@
 
 // cypress/e2e/user.cy.ts
 
-describe('Login and register Submission Test', () => {
+describe('Login and register Submission Tests', () => {
   it('should get no response when invalid data is submitted', () => {
     cy.visit('http://localhost:5173');
     cy.contains('button', 'Logg inn').click();
@@ -23,16 +23,17 @@ describe('Login and register Submission Test', () => {
   it('should get correct response from server when valid user data is submitted', () => {
     cy.visit('http://localhost:5173/login');
 
-    cy.get('#email').clear().type('pierbattista.pizzaballa@mail.com');
-    cy.get('#password').clear().type('wordpass');
-    cy.get('button[type="submit"]').click();
-
     cy.intercept('POST', 'http://localhost:3000/Status', (req) => {
       req.reply((res) => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.have.property('Success', true);
       });
     });
+
+    cy.get('#email').clear().type('pierbattista.pizzaballa@mail.com');
+    cy.get('#password').clear().type('wordpass');
+    cy.get('button[type="submit"]').click();
+
   });
 
   it('should get correct response from server when valid admin data is submitted', () => {
@@ -73,9 +74,7 @@ describe('Login and register Submission Test', () => {
       win.handleRecaptchaResponse('dummy-recaptcha-token');
     });
 
-
     cy.get('button[type="submit"]').click();
-
 
     cy.intercept('POST', 'http://localhost:3000/login', (req) => {
       req.reply((res) => {
