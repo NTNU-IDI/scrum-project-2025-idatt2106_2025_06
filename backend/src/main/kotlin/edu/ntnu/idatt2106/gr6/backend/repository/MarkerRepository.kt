@@ -11,12 +11,23 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 import kotlin.collections.get
 
+/**
+ * Repository class responsible for database queries related to marker management
+ *
+ * @property dataSource The data source for database connections
+ */
 @Repository
 class MarkerRepository(
     private val dataSource: DataSource
 ) {
     private val logger = org.slf4j.LoggerFactory.getLogger(MarkerRepository::class.java)
 
+    /**
+     * Creates a new marker in the database
+     *
+     * @param marker The marker to be created
+     * @return The created marker
+     */
     fun createMarker(marker: Marker): Marker {
         val sql = """
      INSERT INTO marker (
@@ -55,6 +66,13 @@ class MarkerRepository(
         }
     }
 
+    /**
+     * Retrieves a marker by its ID
+     *
+     * @param id The ID of the marker to be retrieved
+     * @return The marker with the specified ID, or null if not found
+     */
+
     fun findMarkerById(id: String): Marker? {
         val sql = """SELECT id, event_id, name, ST_AsText(location) AS location,
             description, contact_info, opening_hours, image_id, type FROM marker WHERE id = ?
@@ -71,6 +89,12 @@ class MarkerRepository(
         }
         return null
     }
+
+    /**
+     * Retrieves all markers from the database
+     *
+     * @return A list of rows and maps them to Marker objects
+     */
 
 
     fun findAllMarkers(): List<Marker> {
@@ -90,6 +114,12 @@ class MarkerRepository(
         return markers
     }
 
+    /**
+     * Updates an existing marker in the database
+     *
+     * @param marker The marker to be updated
+     * @return The updated marker
+     */
 
     fun updateMarker(marker: Marker): Marker {
         val sql = """
@@ -124,6 +154,13 @@ class MarkerRepository(
         }
     }
 
+    /**
+     * Deletes a marker by its ID
+     *
+     * @param id The ID of the marker to be deleted
+     * @return True if the marker was deleted successfully, false otherwise
+     */
+
     fun deleteMarkerById(id: String): Boolean {
         val sql = "DELETE FROM marker WHERE id = ?"
         dataSource.connection.use { conn ->
@@ -140,33 +177,6 @@ class MarkerRepository(
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, type)
-                stmt.executeQuery().use { rs ->
-                    while (rs.next()) {
-                        markers.add(mapRowToMarker(rs))
-                    }
-                }
-            }
-        }
-        return markers
-    }
-
-    fun findMarkersByDistance(
-        latitude: Double,
-        longitude: Double,
-        distance: Double
-    ): List<Marker> {
-        val sql = """
-            SELECT *, ST_Distance(location, ST_PointFromText(?, 4326)) AS distance 
-            FROM markers 
-            WHERE ST_Distance(location, ST_PointFromText(?, 4326)) <= ?
-        """.trimIndent()
-
-        val markers = mutableListOf<Marker>()
-        dataSource.connection.use { conn ->
-            conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, "POINT($longitude $latitude)")
-                stmt.setString(2, "POINT($longitude $latitude)")
-                stmt.setDouble(3, distance)
                 stmt.executeQuery().use { rs ->
                     while (rs.next()) {
                         markers.add(mapRowToMarker(rs))
