@@ -139,12 +139,12 @@ onMounted(async () => {
   if (sessionStore.isAuthenticated) {
     try {
       await storageStore.fetchAll(sessionStore.token)
+
+      activeStorageId.value = storages.value[0].id;
+      activeStorageName.value = storages.value[0].name;
     } catch (error) {
       console.error("Klarte ikke hente husstander:", error)
     }
-
-    activeStorageId.value = storages.value[0].id;
-    activeStorageName.value = storages.value[0].name;
 
     await inventoryStore.getExpiresSoonItems(activeStorageId.value);
   }
@@ -155,7 +155,7 @@ onMounted(async () => {
 
 <template>
   <div v-if="!userLoggedIn" class="flex flex-col min-h-[20em] gap-3 justify-center">
-    <p class="text-lg text-center font-bold">Du må være innlogget for å se beredskap og utgår snart.</p>
+    <p class="text-lg text-center font-bold">Du må være innlogget for å se beredskapsgrad og beredskapslager.</p>
     <RouterLink to="/login" class="mx-auto">
       <Button>Logg inn</Button>
     </RouterLink>
