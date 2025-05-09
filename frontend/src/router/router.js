@@ -35,7 +35,7 @@ const routes = [
   { path: '/before', component: BeforeView, name: 'before' },
   { path: '/during', component: DuringView, name: 'during' },
   { path: '/after', component: AfterView, name: 'after' },
-  { path: '/addremove', component: AddRemoveAdminView, name: 'addremove', meta: { requiresAdminAccess: true }},
+  { path: '/admin/addremove', component: AddRemoveAdminView, name: 'addremove', meta: { requiresAdminAccess: true }},
   {
     path: '/admin/map',
     component: AdminMap,
