@@ -61,45 +61,64 @@ class CheckpointRepository(private val dataSource: DataSource) {
     }
 
 
-fun replaceCheckpointsForUser(userId: String, entries: List<Pair<String, String>>): Boolean {
-    val deleteSql = "DELETE FROM user_checkpoint_list WHERE user_id = ?"
-    val insertSql = """
+    fun replaceCheckpointsForUser(userId: String, entries: List<Pair<String, String>>): Boolean {
+        val deleteSql = "DELETE FROM user_checkpoint_list WHERE user_id = ?"
+        val insertSql = """
         INSERT INTO user_checkpoint_list (id, user_id, checkpoint_list_id)
         VALUES (?, ?, ?)
     """.trimIndent()
 
-    dataSource.connection.use { conn ->
-        conn.autoCommit = false
+        dataSource.connection.use { conn ->
+            conn.autoCommit = false
 
-        try {
-            conn.prepareStatement(deleteSql).use { stmt ->
-                stmt.setString(1, userId)
-                stmt.executeUpdate()
-            }
-
-            conn.prepareStatement(insertSql).use { stmt ->
-                for ((id, checkpointId) in entries) {
-                    stmt.setString(1, id)
-                    stmt.setString(2, userId)
-                    stmt.setString(3, checkpointId)
-                    stmt.addBatch()
+            try {
+                conn.prepareStatement(deleteSql).use { stmt ->
+                    stmt.setString(1, userId)
+                    stmt.executeUpdate()
                 }
-                stmt.executeBatch()
+
+                conn.prepareStatement(insertSql).use { stmt ->
+                    for ((id, checkpointId) in entries) {
+                        stmt.setString(1, id)
+                        stmt.setString(2, userId)
+                        stmt.setString(3, checkpointId)
+                        stmt.addBatch()
+                    }
+                    stmt.executeBatch()
+                }
+
+                conn.commit()
+                return true
+
+            } catch (e: Exception) {
+                conn.rollback()
+                e.printStackTrace()
+                return false
+            } finally {
+                conn.autoCommit = true
             }
-
-            conn.commit()
-            return true
-
-        } catch (e: Exception) {
-            conn.rollback()
-            e.printStackTrace()
-            return false
-        } finally {
-            conn.autoCommit = true
         }
     }
-}
 
+    fun getUserCheckpointCompletionPercentage(userId: String): Double {
+        val sql = """
+        SELECT 
+            (SELECT COUNT(*) FROM user_checkpoint_list WHERE user_id = ?) * 1.0 /
+            (SELECT COUNT(*) FROM checkpoint_list)
+    """.trimIndent()
 
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, userId)
+                stmt.executeQuery().use { rs ->
+                    return if (rs.next()) {
+                        (rs.getDouble(1) * 100).coerceIn(0.0, 100.0)
+                    } else {
+                        0.0
+                    }
+                }
+            }
+        }
+    }
 
 }

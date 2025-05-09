@@ -9,3 +9,8 @@ data class CheckpointResponse(
 data class AssignCheckpointRequest(
     val checkpointIds: List<String>
 )
+
+data class CheckpointProgressResponse(
+    val checkpoints: List<CheckpointResponse>,
+    val completionPercentage: Double
+)

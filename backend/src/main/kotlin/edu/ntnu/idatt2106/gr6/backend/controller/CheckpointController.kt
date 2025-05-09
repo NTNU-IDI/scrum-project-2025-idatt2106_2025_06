@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.gr6.backend.controller
 
 import edu.ntnu.idatt2106.gr6.backend.DTOs.AssignCheckpointRequest
+import edu.ntnu.idatt2106.gr6.backend.DTOs.CheckpointProgressResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.CheckpointResponse
 import edu.ntnu.idatt2106.gr6.backend.service.CheckpointService
 import org.springframework.http.ResponseEntity
@@ -20,9 +21,9 @@ class CheckpointController(private val checkpointService: CheckpointService) {
 
     @GetMapping("/my-checkpoints")
     @PreAuthorize("hasAuthority('CREATE_STORAGE')") // Optional permission
-    fun getMyCheckpoints(): ResponseEntity<List<CheckpointResponse>> {
-        val checkpoints = checkpointService.getCheckpointsForCurrentUser()
-        return ResponseEntity.ok(checkpoints)
+    fun getMyCheckpointsWithProgress(): ResponseEntity<CheckpointProgressResponse> {
+        val result = checkpointService.getCheckpointsWithProgressForCurrentUser()
+        return ResponseEntity.ok(result)
     }
 
     @PostMapping("/assign")
