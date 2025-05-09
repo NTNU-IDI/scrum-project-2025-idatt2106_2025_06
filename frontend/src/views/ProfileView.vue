@@ -331,7 +331,9 @@ onMounted(async () => {
               <div v-for="s in storages" :key="s.id" class="flex flex-col gap-4 w-full">
                 <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
                   <h3 class="text-xl font-bold">{{ s.name }}</h3>
-                  <p>Husstandsnummer: {{ s.token }}</p>
+                  <div v-if="user.id === s.storageOwner">
+                    <p>Husstandsnummer: {{ s.token }}</p>
+                  </div>
                   <p>Lokasjon: {{ resolvedAddresses[s.id] || 'Ikke angitt.' }}</p>
                   <h4 class="mt-2 font-semibold">Medlemmer:</h4>
                   <ul v-if="membersByStorageId[s.id]">
