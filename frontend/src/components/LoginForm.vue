@@ -44,7 +44,7 @@ async function login() {
 </script>
 
 <template>
-  <Card class="mx-auto max-w-sm">
+  <Card class="mx-auto max-w-sm mx-5">
     <CardHeader>
       <CardTitle class="text-2xl"> Logg inn</CardTitle>
 

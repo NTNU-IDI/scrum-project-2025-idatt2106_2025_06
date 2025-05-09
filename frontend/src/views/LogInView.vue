@@ -4,7 +4,7 @@ import LoginForm from "@/components/LoginForm.vue";
 </script>
 
 <template>
-  <div class="m-auto">
+  <div class="m-auto mt-5 mx-5">
     <LoginForm/>
   </div>
 </template>
