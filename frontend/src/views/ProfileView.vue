@@ -117,6 +117,9 @@ async function joinStorage() {
   } else {
     console.error('Could not join storage')
   }
+
+  await storageStore.fetchAll(sessionStore.token)
+  await loadAddresses()
 }
 
 function openEditProfile() {
@@ -321,7 +324,7 @@ onMounted(async () => {
                   <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
                     <h3 class="text-xl font-bold">{{ s.name }}</h3>
                     <p>Husstandsnummer: {{ s.token }}</p>
-                    <p>Lokasjon: {{ resolvedAddresses[s.id] || 'Laster...' }}</p>
+                    <p>Lokasjon: {{ resolvedAddresses[s.id] || 'Ikke angitt.' }}</p>
                     <h4 class="mt-2 font-semibold">Medlemmer:</h4>
                     <ul v-if="membersByStorageId[s.id]">
                       <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
@@ -369,13 +372,11 @@ onMounted(async () => {
                     placeholder="Husstandsnavn"
                     type="text"
                   />
-
                   <Input
                     v-model="address"
                     placeholder="Adresse (valgfritt)"
                     type="text"
                   />
-
                   <DialogClose>
                     <Button @click="createNewStorage()" class="w-48">Opprett</Button>
                   </DialogClose>

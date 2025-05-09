@@ -91,6 +91,19 @@ async function removeUser(userId) {
     console.error('Feil ved fjerning:', e)
   }
 }
+
+async function deleteStorage(userId) {
+  try {
+    const success = await storageStore.deleteStorage(userId, props.storage.id, sessionStore.token)
+    if (success) {
+      emit('updated')
+    } else {
+      console.error('Klarte ikke slette lager')
+    }
+  } catch (e) {
+    console.error('Feil ved sletting:', e)
+  }
+}
 </script>
 
 <template>
@@ -166,7 +179,9 @@ async function removeUser(userId) {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Nei</AlertDialogCancel>
-                  <AlertDialogAction @click="">Ja</AlertDialogAction>
+                  <AlertDialogAction as-child>
+                    <Button @click="deleteStorage">Ja</Button>
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
