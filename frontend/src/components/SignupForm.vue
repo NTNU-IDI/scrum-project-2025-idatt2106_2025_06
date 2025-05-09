@@ -24,6 +24,10 @@ const recaptchaToken = ref('');
 const errorMessage = ref("");
 const isDialogOpen = ref(false);
 
+const privacyAccepted = ref(false);
+const showPrivacyDialog = ref(false);
+const privacyText = ref('');
+
 const router = useRouter();
 
 
@@ -38,6 +42,10 @@ const registerUser = async () => {
     return;
   }
 
+  if (!privacyAccepted.value) {
+    errorMessage.value = "Du må godta personvernerklæringen.";
+    return;
+  }
 
   try {
     const response = await axios.post("http://localhost:8080/api/auth/signup", {
@@ -79,12 +87,20 @@ const loadRecaptcha = () => {
   document.body.appendChild(script);
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.handleRecaptchaResponse = (token) => {
     recaptchaToken.value = token
   }
 
   loadRecaptcha();
+
+  try {
+    const response = await fetch('/personvern.txt')
+    privacyText.value = await response.text()
+  } catch (err) {
+    console.error('Klarte ikke laste personvernerklæring:', err)
+    privacyText.value = 'Kunne ikke laste personvernerklæring.'
+  }
 });
 </script>
 
@@ -117,6 +133,25 @@ onMounted(() => {
               data-callback="handleRecaptchaResponse"
             ></div>
 
+            <div class="flex items-start gap-2 mt-2">
+              <input
+                id="privacy"
+                type="checkbox"
+                v-model="privacyAccepted"
+                class="accent-blue-600 mt-1"
+              />
+              <label for="privacy" class="text-sm">
+                Jeg godtar
+                <button
+                  type="button"
+                  class="underline text-blue-600 hover:text-blue-800"
+                  @click="showPrivacyDialog = true"
+                >
+                  personvernerklæringen
+                </button>.
+              </label>
+            </div>
+
             <Button class="w-full" type="submit">Registrer</Button>
             <p>
               <span v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</span>
@@ -140,6 +175,19 @@ onMounted(() => {
         </DialogDescription>
       </DialogHeader>
       <Button class="mt-4" @click="closeDialog">OK</Button>
+    </DialogContent>
+  </Dialog>
+
+  <Dialog :open="showPrivacyDialog" @update:open="showPrivacyDialog = $event">
+    <DialogContent class="max-w-lg">
+      <DialogHeader>
+        <DialogTitle>Personvernerklæring</DialogTitle>
+        <DialogDescription>
+          <div class="max-h-64 overflow-y-auto text-sm whitespace-pre-line mt-2">
+            {{ privacyText }}
+          </div>
+        </DialogDescription>
+      </DialogHeader>
     </DialogContent>
   </Dialog>
 </template>
