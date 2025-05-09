@@ -5,31 +5,74 @@ import { Button } from '@/components/ui/button/index.js'
 import { Checkbox } from '@/components/ui/checkbox/index.js'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible/index.js'
 import { ChevronDown, ChevronRight } from 'lucide-vue-next'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useSessionStore } from '@/stores/session.js'
+import { useChecklistStore } from '@/stores/checklist.js'
+import { DonutChart } from '@/components/ui/chart-donut/index.js'
 
-const checkpointList = [
-  { id: 'a9120ad81', name: 'Drikkevann', description: 'Rent drikkevann lagret på dunker eller flasker.' },
-  { id: 'dde4ace9', name: 'Mat', description: 'Mat som tåler å bli lagret i romtemperatur.' },
-  { id: '9d3c66d3', name: 'Grill, kokeapparat eller stormkjøkken', description: 'Grill, kokeapparat eller stormkjøkken.' },
-  { id: '3457f6fd', name: 'Gassbeholder eller brennstoff', description: 'Ekstra gassbeholder eller brennstoff.' },
-  { id: 'de2aeb6a', name: 'Kontanter', description: 'Litt kontanter og flere betalingskort.' },
-  { id: '34a88ec2', name: 'Varme klær', description: 'Varme klær og pledd, dyner eller soveposer.' },
-  { id: '2b2500e5', name: 'Fyrstikker og stearinlys', description: 'Fyrstikker og stearinlys.' },
-  { id: '769efb16', name: 'Ved', description: 'Ved - Dersom du har vedovn eller peis.' },
-  { id: '4ca2ff28', name: 'Gass- eller parafinovn', description: 'Gass- eller parafinovn som er beregnet til innendørs bruk.' },
-  { id: '97220168', name: 'Lomme- eller hodelykt', description: 'Lommelykter eller hodelykter som går på batteri, sveiv eller solceller.' },
-  { id: '54b56812', name: 'DAB-radio', description: 'DAB-radio som går på batteri, sveiv eller solceller.' },
-  { id: 'b8f8cfc7', name: 'Batteri og mobilbank', description: 'Batteri og oppladet batteribank.' },
-  { id: 'ef9dc91d', name: 'Liste med viktige telfonnummere', description: 'Liste på papir med viktige telefonnummer og nummeret til legevakt, vetrinær, familie, venner og naboer.' },
-  { id: 'e9d304cf', name: 'Legemiddel og førstehjelpsutstyr', description: 'Legemiddel og førstehjelpsutstyr' },
-  { id: '69116743', name: 'Jodtabletter', description: 'Jodtabletter(gjelder barn og voksne under 40 år, gravide og ammende)' },
-  { id: '41e492ff', name: 'Hygiene artikler', description: 'Hygieneartikler i form av våtservietter, håndsprit, bleier, toalettpapir, bind og tamponger.' }
-];
+const sessionStore = useSessionStore();
+const checklistStore = useChecklistStore();
 
+const checklistPoints = computed(() => checklistStore.allCheckpoints);
+const selectedChecklistPoints = ref(new Set());
 
+const startupFinished = ref(false);
+
+const percentage = ref();
+
+const data = computed(() => {
+  if (percentage.value === undefined) {
+    return [];
+  } else {
+    return [
+      { name: 'Klar', total: Math.floor(percentage.value) },
+      { name: 'Ikke klar', total: Math.floor(100 - percentage.value) },
+    ];
+  }
+});
+
+const percentageColors = computed(() => {
+  if (percentage.value === 100) {
+    return ['#34D399', '#e5e7eb']
+  } else if (percentage.value >= 50) {
+    return ['#facc15', '#e5e7eb']
+  } else {
+    return ['#ef4444', '#e5e7eb']
+  }
+})
+
+const toggleItem = (id, value) => {
+  if (value) {
+    selectedChecklistPoints.value.add(id);
+  } else {
+    selectedChecklistPoints.value.delete(id);
+  }
+};
+
+const handleUpdate = async () => {
+  await checklistStore.updateChecklist(Array.from(selectedChecklistPoints.value));
+}
+
+watch(() => checklistStore.percentageCompleted, async() => {
+  percentage.value = checklistStore.percentageCompleted;
+})
+
+onMounted(async () => {
+  if (sessionStore.isAuthenticated) {
+    await checklistStore.getChecklist();
+    await checklistStore.getMySelectedChecklist();
+    if (checklistStore.selectedCheckpoints.length > 0) {
+      selectedChecklistPoints.value = new Set(checklistStore.selectedCheckpoints);
+      percentage.value = checklistStore.percentageCompleted;
+    }
+  }
+
+  startupFinished.value = true;
+});
 </script>
 
 <template>
-  <Card class="w-[350px] my-5">
+  <Card class="w-[350px] my-5" v-if="startupFinished">
     <CardHeader>
       <CardTitle class="text-xl">Beredskapsgrad</CardTitle>
       <CardDescription>
@@ -38,10 +81,17 @@ const checkpointList = [
       </CardDescription>
     </CardHeader>
     <CardContent>
-      <div v-for="item in checkpointList" :key="item.id" class="flex-col w-full">
+      <!--<p class="text-base font-bold mb-4">
+        Beredskapsprosent: {{ checklistStore.percentageCompleted ? Math.floor(checklistStore.percentageCompleted) : 0 }}%
+      </p>-->
+      <div class="justify-center mb-6">
+        <DonutChart :category="'total'" index="name" :data="data" :colors="percentageColors" class="h-32"/>
+      </div>
+      <div v-for="item in checklistPoints" :key="item.id" class="flex flex-col w-full">
         <Collapsible v-slot="{ open }" class="w-full">
             <div class="flex items-center justify-start w-full text-left rounded hover:bg-gray-100">
-              <Checkbox class="m-1.5" />
+              <Checkbox class="m-1.5" :model-value="selectedChecklistPoints.has(item.id)"
+                        @update:modelValue="value => toggleItem(item.id, value)"/>
               <CollapsibleTrigger class="w-full flex justify-between items-center">
                 <p class="flex font-semibold leading-none tracking-tight justify-start w-full">
                   {{ item.name }}
@@ -60,7 +110,7 @@ const checkpointList = [
 
     </CardContent>
     <CardFooter>
-      <Button>Oppdater</Button>
+      <Button @click="handleUpdate">Oppdater</Button>
     </CardFooter>
   </Card>
 </template>
