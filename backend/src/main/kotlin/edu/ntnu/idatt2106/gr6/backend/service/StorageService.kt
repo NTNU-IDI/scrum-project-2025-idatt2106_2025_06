@@ -46,21 +46,6 @@ class StorageService(
         return storage.toResponse()
     }
 
-
-    /**
-     * Finds a storage by its ID.
-     *
-     * @param id The ID of the storage.
-     * @return   The storage response, or null if not found.
-     */
-    @Transactional(readOnly = true)
-    fun findStorageById(token: String): StorageResponse? {
-        logger.info("Finding storage with id $token")
-
-        return storageRepository.findStorageByToken(token)
-            ?.toResponse()
-    }
-
     @Transactional
     fun joinStorageByToken(token: String) {
         val userId = userContextService.getCurrentUserId().toString()
@@ -89,6 +74,8 @@ class StorageService(
     @Transactional
     fun getStoragesByUserId(): List<StorageSummary> {
         val userId = userContextService.getCurrentUserId().toString()
+        logger.info("Finding storages by user $userId")
+
         return storageRepository.findStoragesByUserId(userId)
     }
 
