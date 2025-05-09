@@ -1,11 +1,12 @@
 <script setup>
 
 import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
+import { ArrowRightIcon } from 'lucide-vue-next'
 
 </script>
 
 <template>
-  <div class="m-auto">
+  <div class="m-3 mt-5 xl:mx-auto">
   <BentoGrid>
     <BentoCard
       name="Brann"
@@ -13,7 +14,7 @@ import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
       href="/scenario"
       cta="Les mer"
       :Icon="ArrowRightIcon"
-      customClass="col-span-2"
+      customClass="col-span-2 md:col-span-3 lg:col-span-2"
     />
 
     <BentoCard
@@ -22,7 +23,7 @@ import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
       href="/info"
       cta="Les mer"
       :Icon="ArrowRightIcon"
-      customClass="col-span-2"
+      customClass="col-span-2 md:col-span-3 lg:col-span-2"
     />
 
     <BentoCard
@@ -31,7 +32,7 @@ import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
       href="/info"
       cta="Les mer"
       :Icon="ArrowRightIcon"
-      customClass="col-span-2"
+      customClass="col-span-2 md:col-span-3 lg:col-span-2"
     />
 
     <BentoCard
@@ -40,7 +41,7 @@ import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
       href="/info"
       cta="Les mer"
       :Icon="ArrowRightIcon"
-      customClass="col-span-2"
+      customClass="col-span-2 md:col-span-3 lg:col-span-2"
     />
 
     <BentoCard
@@ -49,7 +50,7 @@ import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
       href="/info"
       cta="Les mer"
       :Icon="ArrowRightIcon"
-      customClass="col-span-2"
+      customClass="col-span-2 md:col-span-3 lg:col-span-2"
     />
 
     <BentoCard
@@ -58,7 +59,7 @@ import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
       href="/info"
       cta="Les mer"
       :Icon="ArrowRightIcon"
-      customClass="col-span-2"
+      customClass="col-span-2 md:col-span-3 lg:col-span-2"
     />
   </BentoGrid>
   </div>
