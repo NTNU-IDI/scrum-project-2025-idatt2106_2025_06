@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import EventCard from '@/components/EventCard.vue'
 import { createTestingPinia } from '@pinia/testing'
 import { useEventStore } from '@/stores/event'
@@ -36,7 +36,7 @@ describe('EventCard', () => {
 
   it('emits edit event when edit button is clicked', async () => {
     const buttons = wrapper.findAll('button')
-    const editButton =buttons[0]
+    const editButton = buttons[0]
 
     await editButton.trigger('click')
 
@@ -65,5 +65,4 @@ describe('EventCard', () => {
     const timeText = wrapper.find('p.text-neutral-500').text()
     expect(timeText).toMatch(/\d{2}:\d{2}/)
   })
-
 })
