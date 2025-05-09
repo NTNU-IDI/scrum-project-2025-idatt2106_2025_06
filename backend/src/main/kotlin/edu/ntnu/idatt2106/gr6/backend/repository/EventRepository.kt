@@ -1,6 +1,5 @@
 package edu.ntnu.idatt2106.gr6.backend.repository
 
-import edu.ntnu.idatt2106.gr6.backend.DTOs.Location
 import edu.ntnu.idatt2106.gr6.backend.model.Event
 import edu.ntnu.idatt2106.gr6.backend.model.getEventType
 import edu.ntnu.idatt2106.gr6.backend.model.getLocation
@@ -8,14 +7,28 @@ import edu.ntnu.idatt2106.gr6.backend.model.getSeverity
 import edu.ntnu.idatt2106.gr6.backend.model.getStatus
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
-
 import javax.sql.DataSource
+
+/**
+ * Repository class responsible for database operations related to event management.
+ *
+ *
+ * @property dataSource The data source for database connections.
+ */
 
 @Repository
 class EventRepository(
     private val dataSource: DataSource
 ) {
     private val logger = org.slf4j.LoggerFactory.getLogger(EventRepository::class.java)
+
+    /**
+     * Creates a new event in the database.
+     *
+     * @param event The event to be created.
+     * @return The created event.
+     */
+
     fun createEvent(event: Event): Event {
         val sql = """
             INSERT INTO event (id, name, description, type, impact_area_radius_km, mandatory_evacuation_area_radius_km,
@@ -48,6 +61,13 @@ class EventRepository(
         }
     }
 
+    /**
+     * Deletes an event from the database.
+     *
+     * @param eventId The ID of the event to be deleted.
+     * @return True if the event was deleted, false otherwise.
+     */
+
     fun deleteEvent(eventId: String): Boolean {
         val sql = "DELETE FROM event WHERE id = ?"
         return dataSource.connection.use { conn ->
@@ -57,6 +77,10 @@ class EventRepository(
             }
         }
     }
+
+    /**
+     * Finds all events in the database.
+     */
 
     fun findAllEvents(): List<Event> {
         val sql = """
@@ -79,6 +103,13 @@ class EventRepository(
         }
     }
 
+    /**
+     * Finds an event by its ID.
+     *
+     * @param eventId The ID of the event to be found.
+     * @return The rowmapped event if found, null otherwise.
+     */
+
     fun findEventById(eventId: String): Event? {
         val sql = """
             SELECT id, name, description, type, impact_area_radius_km,
@@ -100,6 +131,10 @@ class EventRepository(
             }
         }
     }
+
+    /**
+     * Updates an existing event in the database. and returns the updated event.
+     */
 
     fun updateEvent(event: Event): Event {
         val sql = """
@@ -135,6 +170,10 @@ class EventRepository(
         }
     }
 
+    /**
+     * Maps a ResultSet row to an Event object.
+     */
+
     fun mapRowToEvent(rs: ResultSet): Event {
         return Event(
             id = rs.getString("id"),
@@ -154,5 +193,4 @@ class EventRepository(
             updatedAt = rs.getTimestamp("updated_at").toInstant()
         )
     }
-
 }
