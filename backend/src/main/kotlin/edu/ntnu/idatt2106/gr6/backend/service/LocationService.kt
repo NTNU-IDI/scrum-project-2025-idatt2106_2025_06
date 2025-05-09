@@ -12,6 +12,7 @@ import edu.ntnu.idatt2106.gr6.backend.util.LocationParser
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.stereotype.Service
+import java.security.Principal
 import java.sql.ResultSet
 import java.util.UUID
 
@@ -24,10 +25,12 @@ class LocationService(
     private val userRepository: UserRepository
 ) {
     private val logger = org.slf4j.LoggerFactory.getLogger(LocationService::class.java)
-    @MessageMapping("/private/location")
-    @SendTo("/topic/private/update")
-    fun updateUserLocation(updateUserLocationRequest: UpdateUserLocationRequest) {
-        val userId: String = userContextService.getCurrentUserId().toString()
+
+    fun updateUserLocation(updateUserLocationRequest: UpdateUserLocationRequest, principal: Principal) {
+        val email = principal.name
+        val user = userRepository.findByEmail(email)
+            ?: throw UserMismatchException.forUser(email)
+        val userId = user.id.toString()
         val trackingEnabled = userRepository.getUserTrackingPreferences(UUID.fromString(userId))
         if (!trackingEnabled) {
             throw UserLocationDisabledException.forUser(userId)
@@ -36,21 +39,17 @@ class LocationService(
             "POINT(${updateUserLocationRequest.location.latitude} ${updateUserLocationRequest.location.longitude})"
         )
         userLocationRepository.saveUserLocation(userId, encryptedLocation)
+        logger.info("User location updated:")
     }
 
     fun getUserLocation(userIds: UUID): Location {
-        val extractedUserId: String = userContextService.getCurrentUserId().toString()
-        if(extractedUserId != userIds.toString()) {
-            throw UserMismatchException.forUser(extractedUserId)
-        }
-
         val trackingEnabled = userRepository.getUserTrackingPreferences(userIds)
         if (!trackingEnabled) {
             throw UserLocationDisabledException.forUser(userIds.toString())
         }
 
-        val encryptedLocation = userLocationRepository.findUserLocation(extractedUserId) ?:
-            throw LocationNotAvailableException.forUser(extractedUserId)
+        val encryptedLocation = userLocationRepository.findUserLocation(userIds.toString()) ?:
+            throw LocationNotAvailableException.forUser(userIds.toString())
 
         val decryptedLocation = locationEncryptionService.decryptLocation(encryptedLocation)
         val parsedLocation: Location = locationParser.parseLocation(decryptedLocation)

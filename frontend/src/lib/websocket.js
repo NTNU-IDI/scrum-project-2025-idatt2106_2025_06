@@ -19,12 +19,12 @@ export const initializeWebSocket = (jwtToken, onMessageCallback) => {
       console.log('WebSocket connected');
       client.subscribe('/topic/public/newsAlerts', (message) => {
         const parsedMessage = JSON.parse(message.body);
-        console.log('[WebSocket EVENT message]', parsedMessage); // ← Add this
+        console.log('[WebSocket EVENT message]', parsedMessage);
         onMessageCallback(parsedMessage, '/topic/public/newsAlerts');
       });
       client.subscribe('/topic/public/events', (message) => {
         const parsedMessage = JSON.parse(message.body);
-        console.log('[WebSocket EVENT message]', parsedMessage); // ← Add this
+        console.log('[WebSocket EVENT message]', parsedMessage);
         onMessageCallback(parsedMessage, '/topic/public/events');
       });
     },
@@ -34,17 +34,23 @@ export const initializeWebSocket = (jwtToken, onMessageCallback) => {
       console.error('Error:', frame.body);
     },
   });
-
   client.activate();
 };
 
-export const sendMessage = (destination, body) => {
+export const sendMessage = (destination, body, jwtToken) => {
+  console.log('[WebSocket EVENT message]', destination, body);
   if (isConnected && client) {
     client.publish({
       destination,
-      body: JSON.stringify(body),
+      body: body,
+      headers: {
+        Authorization: `Bearer ${jwtToken}`
+      }
     });
+    console.log('Message sent:', body);
   } else {
     console.error('WebSocket is not connected.');
   }
 };
+
+

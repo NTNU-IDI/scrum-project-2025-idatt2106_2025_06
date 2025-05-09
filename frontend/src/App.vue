@@ -4,9 +4,14 @@ import Navbar from '@/components/NavBar.vue'
 import { useSessionStore } from '@/stores/session.js'
 import NavBarAdmin from '@/components/NavBarAdmin.vue'
 import Footer from '@/components/footer.vue'
+import { useWebSocketStore } from '@/stores/websocket.js'
+
 
 const session = useSessionStore()
 const admin = ['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role)
+
+const webSocketStore = useWebSocketStore()
+webSocketStore.initialize(session.token)
 </script>
 
 <template>

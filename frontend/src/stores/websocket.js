@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { initializeWebSocket } from '@/lib/websocket.js'
 import { reactive } from 'vue'
+import { useSessionStore } from '@/stores/session.js'
+import { startSendingUserLocation } from '@/service/locationService.js'
 
 export const useWebSocketStore = defineStore('websocket', {
   state: () => reactive({
@@ -42,8 +44,9 @@ export const useWebSocketStore = defineStore('websocket', {
             time: message.updatedAt,
           });
         }})
-
       });
+      const sessionStore = useSessionStore();
+      startSendingUserLocation(sessionStore);
     },
   },
 });

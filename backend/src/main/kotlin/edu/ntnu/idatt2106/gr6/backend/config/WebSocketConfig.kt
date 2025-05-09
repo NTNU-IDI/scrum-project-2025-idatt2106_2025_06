@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.gr6.backend.config
 
+import edu.ntnu.idatt2106.gr6.backend.repository.UserRepository
 import edu.ntnu.idatt2106.gr6.backend.service.JwtService
 import edu.ntnu.idatt2106.gr6.backend.service.NotificationService
 import edu.ntnu.idatt2106.gr6.backend.service.UserDetailsServiceImpl
@@ -24,6 +25,7 @@ import org.springframework.messaging.Message
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.web.socket.messaging.SessionConnectedEvent
 import org.springframework.web.socket.messaging.SessionSubscribeEvent
+import java.util.UUID
 
 
 @Configuration
@@ -33,6 +35,7 @@ class WebsocketConfig(
     private val jwtService: JwtService,
     private val userDetailsService: UserDetailsServiceImpl,
     private val jwtHandshakeInterceptor: JwtHandshakeInterceptor,
+    private val userRepository: UserRepository
 ) : WebSocketMessageBrokerConfigurer {
     private val logger = org.slf4j.LoggerFactory.getLogger(WebsocketConfig::class.java)
 
@@ -60,7 +63,6 @@ class WebsocketConfig(
             override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
                 val accessor: StompHeaderAccessor =
                     MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor::class.java) ?: return message
-                logger.info("Headers: {}", accessor)
 
                 if (StompCommand.CONNECT == accessor?.getCommand()) {
                     return message
@@ -99,22 +101,40 @@ class WebsocketConfig(
 
                 val authorizationHeader: String? = accessor.getFirstNativeHeader("Authorization")
                 if (authorizationHeader.isNullOrBlank() || !authorizationHeader.startsWith("Bearer ")) {
-                    logger.info("Authorization header: $authorizationHeader")
                     throw IllegalArgumentException("Missing or invalid Authorization header")
                 }
 
-                val token = authorizationHeader.substring(7)
-                logger.info("Extracted token from websocket: $token")
 
-                val username = jwtService.extractEmailFromToken(token)
-                    ?: throw IllegalArgumentException("Invalid token")
-                val userDetails = userDetailsService!!.loadUserByUsername(username)
+                //allows sending data from user if tracking enabled
+                if (StompCommand.SEND == accessor.command && accessor.destination == "/app/private/location/update") {
+                    val authorizationHeader = accessor.getFirstNativeHeader("Authorization")
 
-                val authToken = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
-                SecurityContextHolder.getContext().authentication = authToken
-                accessor.user = authToken
+                    if(authorizationHeader.isNullOrBlank() || !authorizationHeader.startsWith("Bearer ")) {
+                        throw IllegalArgumentException("Missing or invalid Authorization header")
+                    }
+                    val token: String = authorizationHeader.substring(7)
 
-                return message
+                    val claims = jwtService.getAllClaimsFromToken(token)
+                    val email = claims.get("email") as String
+                    val userId = claims.subject
+                    val userDetails = userDetailsService.loadUserByUsername(email)
+
+                    if(jwtService.isTokenValid(token, userDetails)) {
+                        val userDetails = userDetailsService.loadUserByUsername(email)
+                        val authToken = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+                        SecurityContextHolder.getContext().authentication = authToken
+                        accessor.user = authToken
+                    }
+
+                    if (!userRepository.getUserTrackingPreferences(UUID.fromString(userId))) {
+                        throw IllegalArgumentException("User has disabled tracking or tracking policy could not be fetched")
+                    }
+                        return message
+                    } else {
+                    logger.info("Destination not recognized: ${accessor.destination}")
+                    // This error message was confusing as it's not about tracking being disabled
+                    throw IllegalArgumentException("Invalid destination path")
+                }
             }
         })
     }
