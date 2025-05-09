@@ -6,7 +6,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from '@/components/ui/dialog'
 import {
   Card,
@@ -14,7 +14,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from '@/components/ui/card'
 import {
   AlertDialog,
@@ -25,12 +25,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
-import {Button} from "@/components/ui/button/index.js";
-import {Input} from "@/components/ui/input/index.js";
-import {DialogClose} from "@/components/ui/dialog/index.js";
-import {Label} from "@/components/ui/label/index.js";
+import { Button } from '@/components/ui/button/index.js'
+import { Input } from '@/components/ui/input/index.js'
+import { DialogClose } from '@/components/ui/dialog/index.js'
+import { Label } from '@/components/ui/label/index.js'
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router/router.js'
 import { useSessionStore } from '@/stores/session'
@@ -38,12 +38,12 @@ import { useStorageStore } from '@/stores/storage'
 import EditStorage from '@/components/EditStorage.vue'
 import axios from 'axios'
 
-const username = ref('');
-const email = ref('');
+const username = ref('')
+const email = ref('')
 const trackingDeleted = ref(false)
 
-const householdName = ref('');
-const address = ref('');
+const householdName = ref('')
+const address = ref('')
 const resolvedAddresses = ref({})
 
 const joinToken = ref('')
@@ -64,7 +64,7 @@ const passwordSuccess = ref('')
 async function createNewStorage() {
   const token = sessionStore.token
 
-  let location = null;
+  let location = null
 
   if (address.value.trim()) {
     try {
@@ -75,33 +75,33 @@ async function createNewStorage() {
             q: address.value,
             countrycodes: 'no',
             format: 'json',
-            limit: 1,
+            limit: 1
           },
           headers: {
-            'Accept-Language': 'no',
-          },
+            'Accept-Language': 'no'
+          }
         }
-      );
+      )
 
-      const result = response.data[0];
+      const result = response.data[0]
       if (result) {
         location = {
           latitude: parseFloat(result.lat),
-          longitude: parseFloat(result.lon),
-        };
+          longitude: parseFloat(result.lon)
+        }
       } else {
-        console.warn('Fant ingen lokasjon for adressen');
+        console.warn('Fant ingen lokasjon for adressen')
       }
     } catch (error) {
-      console.error('Feil ved henting av koordinater:', error);
+      console.error('Feil ved henting av koordinater:', error)
     }
   }
 
-  const response = await storageStore.create(householdName.value, token, location);
+  const response = await storageStore.create(householdName.value, token, location)
 
   if (response) {
-    householdName.value = '';
-    address.value = '';
+    householdName.value = ''
+    address.value = ''
   }
 
   await storageStore.fetchAll(token)
@@ -124,8 +124,8 @@ async function joinStorage() {
 
 function openEditProfile() {
   if (user.value) {
-    username.value = user.value.name;
-    email.value = user.value.email;
+    username.value = user.value.name
+    email.value = user.value.email
   }
 }
 
@@ -179,19 +179,18 @@ async function resolveAddressFromLocation(location) {
   const latitude = location.latitude
   const longitude = location.longitude
 
-    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`, {
-  });
+  const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`, {})
 
   if (response.data.error) throw new Error(response.data.error)
 
-  const address = response.data.address;
+  const address = response.data.address
 
-  const road = address.road || 'Ukjent gate';
-  const houseNumber = address.house_number || 'ukjent nummer';
-  const postcode = address.postcode || 'ukjent postnummer';
-  const city = address.city || address.town || address.village || 'ukjent sted';
+  const road = address.road || 'Ukjent gate'
+  const houseNumber = address.house_number || 'ukjent nummer'
+  const postcode = address.postcode || 'ukjent postnummer'
+  const city = address.city || address.town || address.village || 'ukjent sted'
 
-  return `${road} ${houseNumber}, ${postcode} ${city}`;
+  return `${road} ${houseNumber}, ${postcode} ${city}`
 }
 
 async function loadAddresses() {
@@ -209,7 +208,7 @@ async function loadAddresses() {
 
 async function changeLocationTracking() {
   if (!user.value) {
-    console.warn("Bruker er ikke innlogget – kan ikke endre tracking")
+    console.warn('Bruker er ikke innlogget – kan ikke endre tracking')
     return
   }
   const current = user.value.trackingEnabled
@@ -219,7 +218,7 @@ async function changeLocationTracking() {
       user.value.trackingEnabled = !current
     }
   } else {
-    console.error("Kunne ikke oppdatere tracking-preference")
+    console.error('Kunne ikke oppdatere tracking-preference')
   }
 }
 
@@ -255,9 +254,9 @@ onMounted(async () => {
     await storageStore.fetchAll(sessionStore.token)
     await loadAddresses()
   } catch (error) {
-    console.error("Could not fetch storages and members:", error)
+    console.error('Could not fetch storages and members:', error)
   }
-});
+})
 </script>
 
 <template>
@@ -273,18 +272,24 @@ onMounted(async () => {
           </Label>
           <CardDescription>
             <p v-if="user && user.name">Brukernavn: {{ user.name }}</p>
-            <p v-if="user && user.email">Epostadresse: {{ user.email }}</p><br/>
+            <p v-if="user && user.email">Epostadresse: {{ user.email }}</p><br />
           </CardDescription>
           <Dialog>
             <DialogTrigger @click="openEditProfile">
-              <Button class="w-48">Rediger personalia</Button>
+              <Button class="w-48" data-testid="edit-profile-btn"
+                      test>Rediger personalia
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle class="text-2xl">Rediger profil</DialogTitle>
-                <Label>Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.</Label>
-                <Input v-model="username" placeholder="Navn" type="text" />
-                <Input v-model="email" placeholder="Epostadresse" type="email" />
+                <DialogDescription>
+                  <Label>Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.</Label>
+                  <Input v-model="username" data-testid="username-input" placeholder="Navn"
+                         type="text" />
+                  <Input v-model="email" data-testid="email-input" placeholder="Epostadresse"
+                         type="email" />
+                </DialogDescription>
               </DialogHeader>
               <DialogFooter class="flex flex-col items-center">
                 <DialogClose>
@@ -295,14 +300,15 @@ onMounted(async () => {
           </Dialog>
           <Dialog>
             <DialogTrigger>
-              <Button class="w-48">Endre passord</Button>
+              <Button class="w-48" data-testid="change-passwd-btn">Endre passord</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle class="text-2xl">Endre passord</DialogTitle>
                 <Input v-model="oldPassword" placeholder="Gammelt passord" type="password" />
                 <Input v-model="newPassword" placeholder="Nytt passord" type="password" />
-                <Input v-model="confirmPassword" placeholder="Gjenta nytt passord" type="password" />
+                <Input v-model="confirmPassword" placeholder="Gjenta nytt passord"
+                       type="password" />
                 <p v-if="passwordError" class="text-red-600 font-bold">{{ passwordError }}</p>
                 <p v-if="passwordSuccess" class="text-green-600 font-bold">{{ passwordSuccess }}</p>
               </DialogHeader>
@@ -316,53 +322,55 @@ onMounted(async () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <br/>
+          <br />
           <Label class="text-xl">Husstander:</Label>
           <div class="flex flex-col items-center gap-2">
-              <CardDescription>
-                <div v-for="s in storages" :key="s.id" class="flex flex-col gap-4 w-full">
-                  <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
-                    <h3 class="text-xl font-bold">{{ s.name }}</h3>
-                    <p>Husstandsnummer: {{ s.token }}</p>
-                    <p>Lokasjon: {{ resolvedAddresses[s.id] || 'Ikke angitt.' }}</p>
-                    <h4 class="mt-2 font-semibold">Medlemmer:</h4>
-                    <ul v-if="membersByStorageId[s.id]">
-                      <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
-                        {{ member.name }}
-                      </li>
-                    </ul>
-                    <p v-else>Laster medlemmer...</p>
-                    <div v-if="user.id === s.storageOwner">
-                      <EditStorage :storage="s" @updated="handleStorageUpdated"/>
-                    </div>
-                    <div v-else class="flex flex-col items-center gap-4">
-                      <AlertDialog>
-                        <AlertDialogTrigger as-child >
-                            <Button class="w-48">Forlat husstand</Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              <Label>
-                                Er du sikker på at du ønsker å forlate husstanden? Dette kan ikke angres.
-                              </Label>
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Nei</AlertDialogCancel>
-                            <AlertDialogAction @click="removeUser(user.id, s.id)">Ja</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+            <CardDescription>
+              <div v-for="s in storages" :key="s.id" class="flex flex-col gap-4 w-full">
+                <div class="border p-4 rounded-md shadow-sm w-96 grid gap-2 mt-4">
+                  <h3 class="text-xl font-bold">{{ s.name }}</h3>
+                  <p>Husstandsnummer: {{ s.token }}</p>
+                  <p>Lokasjon: {{ resolvedAddresses[s.id] || 'Ikke angitt.' }}</p>
+                  <h4 class="mt-2 font-semibold">Medlemmer:</h4>
+                  <ul v-if="membersByStorageId[s.id]">
+                    <li v-for="(member, index) in membersByStorageId[s.id]" :key="index">
+                      {{ member.name }}
+                    </li>
+                  </ul>
+                  <p v-else>Laster medlemmer...</p>
+                  <div v-if="user.id === s.storageOwner">
+                    <EditStorage :storage="s" @updated="handleStorageUpdated" />
+                  </div>
+                  <div v-else class="flex flex-col items-center gap-4">
+                    <AlertDialog>
+                      <AlertDialogTrigger as-child>
+                        <Button class="w-48">Forlat husstand</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            <Label>
+                              Er du sikker på at du ønsker å forlate husstanden? Dette kan ikke
+                              angres.
+                            </Label>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Nei</AlertDialogCancel>
+                          <AlertDialogAction @click="removeUser(user.id, s.id)">Ja
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
-              </CardDescription>
-            <br/>
+              </div>
+            </CardDescription>
+            <br />
             <Dialog>
               <DialogTrigger>
-                <Button class="w-48">Opprett ny husstand</Button>
+                <Button class="w-48" data-testid="create-storage-btn">Opprett ny husstand</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -378,33 +386,37 @@ onMounted(async () => {
                     type="text"
                   />
                   <DialogClose>
-                    <Button @click="createNewStorage()" class="w-48">Opprett</Button>
+                    <Button class="w-48" @click="createNewStorage()">Opprett</Button>
                   </DialogClose>
                 </DialogHeader>
               </DialogContent>
             </Dialog>
             <div class="flex flex-col items-center gap-4 mt-6">
               <Label>Skriv inn husstandsnummer for å bli med i en annen husstand:</Label>
-              <Input v-model="joinToken" placeholder="Husstandsnummer" class="w-48" />
-              <Button class="w-48" @click="joinStorage">Bli med i husstand</Button>
+              <Input v-model="joinToken" class="w-48" placeholder="Husstandsnummer" />
+              <Button class="w-48" data-testid="join-storage-btn" @click="joinStorage">Bli med i
+                husstand
+              </Button>
             </div>
           </div>
-          <br/>
+          <br />
           <Label class="text-xl">Personvern:</Label>
           <CardDescription>
             <div class="flex flex-col items-center text-center gap-4">
               <div v-if="user?.trackingEnabled" class="flex flex-col items-center gap-4">
                 <div class="text-left">
-                  <Label>Du deler lokasjonen din med Krisefikser. Ønsker du å skru av stedstjenester?</Label>
+                  <Label>Du deler lokasjonen din med Krisefikser. Ønsker du å skru av
+                    stedstjenester?</Label>
                 </div>
-                <Button @click="changeLocationTracking" class="w-48">Skru av</Button>
+                <Button class="w-48" @click="changeLocationTracking">Skru av</Button>
               </div>
 
               <div v-else class="flex flex-col items-center gap-4">
                 <div class="text-left">
-                  <Label>Du deler ikke lokasjonen din med Krisefikser. Ønsker du å skru på stedstjenester?</Label>
+                  <Label>Du deler ikke lokasjonen din med Krisefikser. Ønsker du å skru på
+                    stedstjenester?</Label>
                 </div>
-                <Button @click="changeLocationTracking" class="w-48">Skru på</Button>
+                <Button class="w-48" @click="changeLocationTracking">Skru på</Button>
               </div>
             </div>
           </CardDescription>
@@ -418,23 +430,29 @@ onMounted(async () => {
               </span>
               <AlertDialog>
                 <AlertDialogTrigger>
-                  <Button class="w-48">Slett lokasjonshistorikk</Button>
+                  <Button class="w-48" data-testid="delete-location-history-btn">Slett
+                    lokasjonshistorikk
+                  </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle class="text-2xl">Slett lokasjonshistorikk</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Er du sikker på at du vil slette din lokasjonshistorikk? Dette kan ikke angres.
+                      Er du sikker på at du vil slette din lokasjonshistorikk? Dette kan ikke
+                      angres.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                    <AlertDialogAction @click="deleteTrackingHistory" class="bg-red-500 text-white">Slett</AlertDialogAction>
+                    <AlertDialogAction class="bg-red-500 text-white" @click="deleteTrackingHistory">
+                      Slett
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
               <div>
-                <Label v-if="trackingDeleted === true" class="text-green-600 font-bold">Lokasjonshistorikk slettet!</Label>
+                <Label v-if="trackingDeleted === true" class="text-green-600 font-bold">Lokasjonshistorikk
+                  slettet!</Label>
               </div>
             </div>
           </CardDescription>
@@ -442,7 +460,9 @@ onMounted(async () => {
       </CardContent>
     </Card>
     <router-link to="/login">
-      <Button @click="sessionStore.logout" class="w-48" variant="destructive">Logg ut</Button>
+      <Button class="w-48" data-testid="logout-btn" variant="destructive"
+              @click="sessionStore.logout">Logg ut
+      </Button>
     </router-link>
   </div>
 </template>
