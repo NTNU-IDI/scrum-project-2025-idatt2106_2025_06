@@ -1,7 +1,7 @@
 <script lang="ts" setup></script>
 
 <template>
-  <footer class="pt-10">
+  <footer class="pt-10 w-full">
     <div class="p-10 border gap-4 flex flex-col">
       <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-x-12 gap-y-8">
         <div class="col-span-full xl:col-span-2">
