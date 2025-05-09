@@ -18,6 +18,9 @@ import EmailVerificationView from '@/views/EmailVerificationView.vue'
 import { useSessionStore } from '@/stores/session.js'
 import EventView from '@/views/EventView.vue'
 import ScenarioDetailView from '@/views/ScenarioDetailView.vue'
+import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
+import AboutUsView from '@/views/AboutUsView.vue'
+import AddRemoveAdminView from '@/views/AddRemoveAdminView.vue'
 
 
 const routes = [
@@ -34,28 +37,32 @@ const routes = [
   { path: '/before', component: BeforeView, name: 'before' },
   { path: '/during', component: DuringView, name: 'during' },
   { path: '/after', component: AfterView, name: 'after' },
+  { path: '/admin/addremove', component: AddRemoveAdminView, name: 'addremove', meta: { requiresAdminAccess: true }},
+  { path: '/privacy-policy', component: PrivacyPolicyView, name: 'privacy-policy' },
+  { path: '/about-us', component: AboutUsView, name: 'about-us' },
   {
     path: '/admin/map',
     component: AdminMap,
     name: 'admin-map',
-    meta: { requiresAdminAccess: true },
+    meta: { requiresAdminAccess: true }
   },
   { path: '/admin', component: AdminView, name: 'admin', meta: { requiresAdminAccess: true } },
   {
     path: '/email-verification/:token',
     component: EmailVerificationView,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false }
   },
-  {path: '/scenario/:id',
+  {
+    path: '/scenario/:id',
     component: ScenarioDetailView,
     name: 'scenario-detail',
-    props: true,
-  },
+    props: true
+  }
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
+  routes
 })
 
 router.beforeEach((to, from, next) => {

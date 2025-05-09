@@ -1,0 +1,22 @@
+KRISEFIKSER er en webapplikasjon laget i forbindelse med et prosjekt i faget "IDATT2106 Systemutvikling 2 med smidig prosjekt", som en del av bachelorgradstudiet i Data ved NTNU i Trondheim.
+
+
+Utviklingen av applikasjonen har foregått i perioden 22.04.2025 - 09.05.2025, av et team bestående av 7 medlemmer:
+
+  -  Carine Margrethe Rondeel
+  -  Henrik Hausberg Utistog
+  -  Jonas Moe Bjørnbom
+  -  Bård Helge Hansen
+  -  Cathrine Evensen
+  -  Mathias Hølestøl
+  -  Sigrid Hoel
+
+
+Visjonen for webapplikasjonen har vært styrt av to produkteiere fra mastergradstudiet Digital Transformasjon ved NTNU i Trondheim.
+
+  -  Sandra Ochman Odrobinska
+  -  Oline Aamo
+
+
+Ved spørsmål, tilbakemeldinger eller andre henvendelser kan du nå oss på:
+krisefiksern@gmail.com

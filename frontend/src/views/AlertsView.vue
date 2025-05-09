@@ -16,7 +16,7 @@ const events = webSocketStore.events
       class="flex z-10 w-full gap-2 py-4 rounded-lg overflow-x-scroll scroll-smooth scrollbar-hide absolute max-w-6xl"
     >
       <template v-for="(alert, index) in alerts" :key="index">
-        <RouterLink :to="'alerts/' + alert.id" class="relative">
+        <div class="relative">
           <AlertCard
             :description="alert.description"
             :severity="alert.severity"
@@ -24,7 +24,7 @@ const events = webSocketStore.events
             :title="alert.title"
             variant="expand"
           />
-        </RouterLink>
+        </div>
       </template>
     </div>
 
@@ -35,6 +35,7 @@ const events = webSocketStore.events
             <RouterLink :to="'/alerts/' + event.id">
               <EventCard
                 :content="event.content"
+                :createdAt="event.created"
                 :description="event.description"
                 :event-id="event.id"
                 :location="event.location"
@@ -43,7 +44,6 @@ const events = webSocketStore.events
                 :status="event.status"
                 :type="event.type"
                 :updatedAt="event.time"
-                :createdAt="event.created"
                 variant="default"
               />
             </RouterLink>

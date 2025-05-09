@@ -1,65 +1,68 @@
 <template>
-  <Card class="flex flex-col gap-2 p-5">
-    <div class="flex items-center">
-      <Label class="m-2" for="title">Tittel</Label>
-      <Input
-        id="title"
-        v-model="title"
-        :class="['border w-full', errors.title ? 'border-red-500' : '']"
-        placeholder="Navn på markør"
-      />
-    </div>
-
-    <div class="flex items-center">
-      <Label class="m-2" for="description">Beskrivelse</Label>
-      <Input
-        id="description"
-        v-model="description"
-        :class="['border w-full', errors.description ? 'border-red-500' : '']"
-        placeholder="Kort innhold av markør"
-      />
-    </div>
-
-    <div class="flex items-center">
-      <Label class="m-2" for="latitude">Posisjon</Label>
-      <div class="flex flex-col flex-1">
-        <Label class="m-2" for="latitude">Breddegrad</Label>
+  <Card class="flex flex-col p-5">
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center">
+        <Label class="m-2" for="title">Tittel</Label>
         <Input
-          id="latitude"
-          v-model="latitude"
-          :class="['border w-full', errors.latitude ? 'border-red-500' : '']"
-          placeholder="eks: 64.232321"
+          id="title"
+          v-model="title"
+          :class="['border w-full', errors.title ? 'border-red-500' : '']"
+          placeholder="Navn på markør"
         />
       </div>
-      <div class="flex flex-col flex-1">
-        <Label class="m-2" for="longitude">Lengdegrad</Label>
+      <div class="flex items-center">
+        <Label class="m-2" for="description">Beskrivelse</Label>
         <Input
-          id="longitude"
-          v-model="longitude"
-          :class="['border w-full', errors.longitude ? 'border-red-500' : '']"
-          placeholder="eks: 10.422132"
+          id="description"
+          v-model="description"
+          :class="['border w-full', errors.description ? 'border-red-500' : '']"
+          placeholder="Kort innhold av markør"
         />
       </div>
     </div>
 
-    <div class="flex items-center">
-      <Label class="m-2" for="type">Stedstype</Label>
-      <Select v-model="type" class="w-[200px]">
-        <SelectTrigger>
-          <SelectValue placeholder="Velg stedstype" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectItem value="Shelter">Tilfluktsrom</SelectItem>
-            <SelectItem value="Defibrillator">Hjertestarter</SelectItem>
-            <SelectItem value="EmergencyClinic">Legevakt</SelectItem>
-            <SelectItem value="DistributionPoint">Utdelingssted</SelectItem>
-            <SelectItem value="PoliceStation">Politistasjon</SelectItem>
-            <SelectItem value="Pharmacy">Apotek</SelectItem>
-            <SelectItem value="General">Annet</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center">
+        <Label class="m-2" for="latitude">Posisjon</Label>
+        <div class="flex flex-col flex-1 mr-2">
+          <Label class="m-2" for="latitude">Breddegrad</Label>
+          <Input
+            id="latitude"
+            v-model="latitude"
+            :class="['border w-full', errors.latitude ? 'border-red-500' : '']"
+            placeholder="eks: 64.232321"
+          />
+        </div>
+        <div class="flex flex-col flex-1">
+          <Label class="m-2" for="longitude">Lengdegrad</Label>
+          <Input
+            id="longitude"
+            v-model="longitude"
+            :class="['border w-full', errors.longitude ? 'border-red-500' : '']"
+            placeholder="eks: 10.422132"
+          />
+        </div>
+      </div>
+
+      <div class="flex items-center">
+        <Label class="m-2" for="type">Stedstype</Label>
+        <Select v-model="type" class="w-[200px]">
+          <SelectTrigger>
+            <SelectValue placeholder="Velg stedstype" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="Shelter">Tilfluktsrom</SelectItem>
+              <SelectItem value="Defibrillator">Hjertestarter</SelectItem>
+              <SelectItem value="EmergencyClinic">Legevakt</SelectItem>
+              <SelectItem value="DistributionPoint">Utdelingssted</SelectItem>
+              <SelectItem value="PoliceStation">Politistasjon</SelectItem>
+              <SelectItem value="Pharmacy">Apotek</SelectItem>
+              <SelectItem value="General">Annet</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
 
     <div class="flex items-center gap-4 mt-4">
@@ -99,40 +102,55 @@
       </div>
     </div>
 
-    <Label class="m-2" for="contact-info">Kontaktinfo</Label>
-    <div class="flex items-center gap-2">
-      <Label class="m-2 w-24" for="contact-name">Navn</Label>
-      <Input
-        id="contact-name"
-        v-model="contactInfo.name"
-        class="border flex-1"
-        placeholder="Navn på kontaktperson"
-      />
-    </div>
-    <div class="flex items-center gap-2">
-      <Label class="m-2 w-24" for="contact-email">E-post</Label>
-      <Input
-        id="contact-email"
-        v-model="contactInfo.email"
-        class="border flex-1"
-        placeholder="E-postadresse"
-      />
-    </div>
-    <div class="flex items-center gap-2">
-      <Label class="m-2 w-24" for="contact-phone">Telefon</Label>
-      <Input
-        id="contact-phone"
-        v-model="contactInfo.phone"
-        class="border flex-1"
-        placeholder="Telefonnummer"
-      />
+    <div class="flex flex-col gap-2">
+      <Label class="m-2" for="contact-info">Kontaktinfo</Label>
+      <div class="flex items-center gap-2">
+        <Label class="m-2 w-24" for="contact-name">Navn</Label>
+        <Input
+          id="contact-name"
+          v-model="contactInfo.name"
+          class="border flex-1"
+          placeholder="Navn på kontaktperson"
+        />
+      </div>
+      <div class="flex items-center gap-2">
+        <Label class="m-2 w-24" for="contact-email">E-post</Label>
+        <Input
+          id="contact-email"
+          v-model="contactInfo.email"
+          class="border flex-1"
+          placeholder="E-postadresse"
+        />
+      </div>
+      <div class="flex items-center gap-2">
+        <Label class="m-2 w-24" for="contact-phone">Telefon</Label>
+        <Input
+          id="contact-phone"
+          v-model="contactInfo.phone"
+          class="border flex-1"
+          placeholder="Telefonnummer"
+        />
+      </div>
     </div>
 
     <div class="flex gap-2 mt-4">
       <Button class="flex-1" @click="handleSubmit">
         {{ props.mode === 'edit-marker' ? 'Oppdater markør' : 'Plasser markør' }}
       </Button>
-      <Button class="flex-1" variant="outline" @click="handleClear">Avbryt</Button>
+      <Button
+        v-if="props.mode === 'edit-marker'"
+        class="flex-1 bg-red-600 text-white hover:bg-red-700 hover:text-white"
+        variant="outline"
+        @click="handleDelete"
+        >Slett markør
+      </Button>
+      <Button
+        v-if="props.mode === 'edit-marker'"
+        class="flex-1"
+        variant="outline"
+        @click="handleClear"
+        >Avbryt
+      </Button>
     </div>
   </Card>
 </template>
@@ -151,7 +169,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select/index.js'
-import { createMarker, updateMarker } from '@/service/markerService.js'
+import { createMarker, deleteMarker, updateMarker } from '@/service/markerService.js'
 
 const props = defineProps({
   mode: { type: String, default: 'new' }, // 'new' or 'edit-marker'
@@ -167,6 +185,7 @@ const openingStart = ref('')
 const openingEnd = ref('')
 const selectedDays = ref([])
 const contactInfo = ref({ name: '', email: '', phone: '' })
+const mode = ref(props.mode)
 
 const daysOfWeek = [
   { key: 'monday', label: 'Mandag' },
@@ -221,10 +240,19 @@ function handleClear() {
   openingEnd.value = ''
   selectedDays.value = []
   contactInfo.value = { name: '', email: '', phone: '' }
-  props.mode = 'new'
+  mode.value = 'new'
+  emit('cancel')
 }
 
-const emit = defineEmits(['saved'])
+async function handleDelete() {
+  if (props.markerData) {
+    await deleteMarker(props.markerData.id)
+    emit('saved')
+    handleClear()
+  }
+}
+
+const emit = defineEmits(['saved', 'cancel'])
 
 async function handleSubmit() {
   errors.value = {
@@ -288,7 +316,7 @@ async function handleSubmit() {
   }
 
   try {
-    if (props.mode === 'edit-marker') {
+    if (mode.value === 'edit-marker') {
       body.id = props.markerData.id
       await updateMarker(body)
     } else {

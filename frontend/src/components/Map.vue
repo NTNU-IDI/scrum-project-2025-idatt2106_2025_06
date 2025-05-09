@@ -223,7 +223,7 @@ function updateRouteStart() {
   } else {
     const st = props.storages.find((s) => String(s.id) === String(props.startSelection))
     if (st?.location?.longitude != null) {
-      routeStart = { lng: st.location.latitude, lat: st.location.longitude }
+      routeStart = { lng: st.location.longitude, lat: st.location.latitude }
     }
   }
 }
@@ -335,7 +335,7 @@ function redrawAll() {
       const { location, name } = st
       if (q && !`${name}`.toLowerCase().includes(q)) return
       props.storages.forEach((st) => {
-        addHtmlMarker(st, 'storage', [location.latitude, location.longitude])
+        addHtmlMarker(st, 'storage', [location.longitude, location.latitude])
       })
     })
   }
