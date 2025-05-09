@@ -25,7 +25,17 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.web.socket.messaging.SessionConnectedEvent
 import org.springframework.web.socket.messaging.SessionSubscribeEvent
 
-
+/**
+ * WebSocket configuration class that sets up STOMP messaging endpoints and JWT-based
+ * authentication for WebSocket communication.
+ *
+ * This configuration:
+ * - Registers `/ws` endpoints for WebSocket/STOMP communication.
+ * - Enables a simple message broker with `/topic` prefix.
+ * - Intercepts messages to validate JWT tokens from the `Authorization` header.
+ * - Allows unauthenticated access to specific public topics like `/app/public` and `/topic/public`.
+ * - Sends notifications on subscription to certain public topics.
+ */
 @Configuration
 @EnableWebSocketMessageBroker
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
@@ -39,6 +49,13 @@ class WebsocketConfig(
     init {
         logger.info("WebSocketConfig initialized")
     }
+
+    /**
+     * Registers STOMP endpoints with and without SockJS fallback support.
+     * Adds JWT handshake interceptor for validating connections.
+     *
+     * @param registry The endpoint registry.
+     */
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
         registry.addEndpoint("/ws")
             .setAllowedOriginPatterns("*")
@@ -49,11 +66,23 @@ class WebsocketConfig(
             .addInterceptors(jwtHandshakeInterceptor)
     }
 
+    /**
+     * Configures the message broker used to route messages between clients and server.
+     * Sets `/topic` for outgoing messages and `/app` for application-specific destinations.
+     *
+     * @param registry The message broker registry.
+     */
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
         registry.enableSimpleBroker("/topic")
         registry.setApplicationDestinationPrefixes("/app")
     }
 
+    /**
+     * Intercepts all client-bound messages and performs JWT-based authentication.
+     * Allows public access to specific endpoints and throws if token is missing or invalid.
+     *
+     * @param registration The channel registration.
+     */
     override fun configureClientInboundChannel(registration: ChannelRegistration) {
         logger.info("Configuring client inbound channel")
         registration.interceptors(object : ChannelInterceptor {
@@ -119,6 +148,17 @@ class WebsocketConfig(
         })
     }
 
+    /**
+     * Bean that listens for WebSocket `SUBSCRIBE` events and sends the latest
+     * data immediately upon subscription to predefined topics.
+     *
+     * - `/topic/public/newsAlerts`: Sends latest notifications.
+     * - `/topic/public/events`: Sends latest event-related news.
+     *
+     * @param messagingTemplate Template used to send messages to clients.
+     * @param notificationService Service that provides latest updates.
+     * @return An application listener that reacts to subscriptions.
+     */
     @Bean
     fun subscribeEventListener(messagingTemplate: SimpMessagingTemplate, notificationService: NotificationService): ApplicationListener<SessionSubscribeEvent> {
         return ApplicationListener { event ->
