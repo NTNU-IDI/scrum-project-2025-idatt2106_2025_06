@@ -1,7 +1,5 @@
 <script setup>
-import DeleteModerator from '@/components/DeleteModerator.vue'
 import ResetPasswordLink from '@/components/ResetPasswordLink.vue'
-import AddModerator from '@/components/AddModerator.vue'
 import { Button } from '@/components/ui/button/index.js'
 import router from '@/router/router.js'
 import { useSessionStore } from '@/stores/session.js'
@@ -27,11 +25,14 @@ const handleLogout = async () => {
       </router-link>
       <div
         class="gap-10 hidden sm:flex h-10 items-center">
-        <AddModerator v-if="isAdmin"/>
-        <DeleteModerator v-if="isAdmin"/>
-        <ResetPasswordLink v-if="isAdmin"/>
+        <router-link to="/addremove">
+          <Button variant="default" v-if="isAdmin">Administrer moderatorer</Button>
+        </router-link>
+        <ResetPasswordLink variant="default" v-if="isAdmin"/>
       </div>
-      <Button variant="destructive" @click="handleLogout">Logg ut</Button>
+      <router-link to="/profile">
+        <Button @click="handleLogout">Logg ut</Button>
+      </router-link>
     </div>
 
   </nav>
