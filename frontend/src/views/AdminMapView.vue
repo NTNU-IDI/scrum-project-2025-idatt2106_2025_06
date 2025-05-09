@@ -113,7 +113,12 @@ function handleEditMarker(marker) {
         </TabsContent>
 
         <TabsContent value="marker">
-          <MarkerForm :marker-data="selectedMarker" :mode="formMode" @saved="loadMarkers" />
+          <MarkerForm
+            :marker-data="selectedMarker"
+            :mode="formMode"
+            @cancel="() => (formMode = 'new')"
+            @saved="loadMarkers"
+          />
         </TabsContent>
       </Tabs>
     </div>

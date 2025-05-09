@@ -261,7 +261,7 @@ onMounted(async () => {
 
 <template>
   <div class="m-auto flex flex-col items-center gap-4">
-    <Card class="">
+    <Card class="mx-5 mt-5">
       <CardHeader>
         <CardTitle class="text-2xl w-96"> Min side</CardTitle>
       </CardHeader>
