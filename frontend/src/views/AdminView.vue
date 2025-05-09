@@ -127,7 +127,7 @@ const alerts = ref([
         <CardHeader>
           <CardTitle>Rediger scenario informasjon</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2">
           <ScenarioCard />
       </CardContent>
     </Card>
