@@ -62,6 +62,11 @@ class GlobalExceptionHandler {
     fun handleTokenInvalidException(ex: TokenInvalidException): ResponseEntity<String> {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.message)
     }
+
+    @ExceptionHandler(RecaptchaVerificationFailedException::class)
+    fun handleRecaptchaVerificationFailedException(ex: RecaptchaVerificationFailedException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.message)
+    }
     //EVENTS
 
     @ExceptionHandler(EventDoesNotExistException::class)

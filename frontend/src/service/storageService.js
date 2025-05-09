@@ -45,7 +45,8 @@ export async function fetchStorageMembers(storageId) {
 
 export async function updateStorage(id, name, location) {
   try {
-    const response = await api.put(`/storages/${id}`, {
+    const response = await api.put(`/storages/update`, {
+      id,
       name,
       location,
     })
@@ -79,3 +80,12 @@ export async function removeStorageMember(token, userId, storageId) {
   }
 }
 
+export async function removeStorage(id) {
+  try {
+    const response = await api.delete(`/storages/${id}`)
+    return response.data
+  } catch (error) {
+    console.error(`Feil ved sletting av storage ${id}:`, error)
+    throw error
+  }
+}

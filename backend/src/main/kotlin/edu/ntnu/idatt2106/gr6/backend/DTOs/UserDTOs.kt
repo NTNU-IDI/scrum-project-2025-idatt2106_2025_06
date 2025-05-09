@@ -2,6 +2,10 @@ package edu.ntnu.idatt2106.gr6.backend.DTOs
 
 import java.time.Instant
 
+/**
+ * Data Transfer Objects (DTOs) for User-related operations and auth.
+ */
+
 class UserDTOs {
     data class UserResponse(
         val id: String,
@@ -25,6 +29,7 @@ class UserDTOs {
         val name: String,
         val email: String,
         val password: String,
+        val recaptcha: String
     )
 
     data class LoginUserRequest(
@@ -68,5 +73,12 @@ class UserDTOs {
 
     data class ChangeUserTrackingPreferenceRequest(
         val trackingEnabled: Boolean
+    )
+
+    data class RecaptchaResponse(
+        val success: Boolean,
+        val challenge_ts: String? = null,
+        val hostname: String? = null,
+        val errorCodes: List<String>? = null
     )
 }

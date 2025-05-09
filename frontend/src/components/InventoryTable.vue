@@ -170,15 +170,15 @@ onMounted(() => {
 </script>
 
 <template>
-    <Table class="w-full">
+    <Table class="w-[50%] min-w-[335px] s:w-[60%] m-auto md:w-full">
       <TableHeader>
         <TableRow class="bg-gray-100">
           <TableHead class="w-[5%]"></TableHead>
           <TableHead class="w-[35%]">Vare</TableHead>
-          <TableHead class="text-center w-[25%]">Total mengde</TableHead>
-          <TableHead class="text-center w-[25%]">Utløpsdato</TableHead>
-          <TableHead class="w-[5%]"></TableHead>
-          <TableHead class="w-[5%]">
+          <TableHead class="text-center w-[20%]">Total mengde</TableHead>
+          <TableHead class="text-center w-[20%]">Utløpsdato</TableHead>
+          <TableHead class="w-[10%]"></TableHead>
+          <TableHead class="w-[10%]">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -202,11 +202,11 @@ onMounted(() => {
             </CollapsibleTrigger>
           </TableCell>
           <TableCell class="font-medium w-[35%]">{{ item.name }}</TableCell>
-          <TableCell class="text-center w-[25%]">{{ getAmountAndUnit(item.amount, item.unitId) }}</TableCell>
-          <TableCell class="text-center w-[25%]" :class="item.expiryDate ? getExpirationColor(item.expiryDate) : ''">
+          <TableCell class="text-center w-[20%]">{{ getAmountAndUnit(item.amount, item.unitId) }}</TableCell>
+          <TableCell class="text-center w-[20%]" :class="item.expiryDate ? getExpirationColor(item.expiryDate) : ''">
             {{ item.expiryDate ? getDaysLeft(item.expiryDate) : '' }}
           </TableCell>
-          <TableCell class="w-[5%]">
+          <TableCell class="w-[10%]">
             <div v-if="!item.items">
               <TooltipProvider>
                 <Tooltip>
@@ -221,7 +221,7 @@ onMounted(() => {
             </div>
             <Pencil v-else class="invisible"/>
           </TableCell>
-          <TableCell class="w-[5%]">
+          <TableCell class="w-[10%]">
             <Checkbox
               v-if="item.items"
               :model-value="selectedAllSubBoxes(item.items)"
@@ -238,11 +238,11 @@ onMounted(() => {
           <TableRow v-for="item in item.items" :key="item.id" class="bg-gray-50 hover:bg-gray-100">
             <TableCell class="w-[5%]"></TableCell>
             <TableCell class="font-medium w-[35%]"></TableCell>
-            <TableCell class="text-center w-[25%]">{{ getAmountAndUnit(item.amount, item.unitId) }}</TableCell>
-            <TableCell class="text-center w-[25%]" :class="item.expiryDate ? getExpirationColor(item.expiryDate) : ''">
+            <TableCell class="text-center w-[20%]">{{ getAmountAndUnit(item.amount, item.unitId) }}</TableCell>
+            <TableCell class="text-center w-[20%]" :class="item.expiryDate ? getExpirationColor(item.expiryDate) : ''">
               {{ item.expiryDate ? getDaysLeft(item.expiryDate) : '' }}
             </TableCell>
-            <TableCell class="w-[5%]">
+            <TableCell class="w-[10%]">
               <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -254,7 +254,7 @@ onMounted(() => {
               </Tooltip>
               </TooltipProvider>
             </TableCell>
-            <TableCell class="w-[5%]">
+            <TableCell class="w-[10%]">
               <Checkbox
                 :model-value="selectedBoxes.has(item.id)"
                 @update:modelValue="value => toggleItem(item.id, value)"

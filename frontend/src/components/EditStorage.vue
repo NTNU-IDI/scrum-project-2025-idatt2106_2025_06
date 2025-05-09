@@ -21,6 +21,7 @@ import { UserMinus } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import { useStorageStore } from '@/stores/storage'
+import axios from 'axios'
 
 const props = defineProps({
   storage: Object
@@ -33,18 +34,49 @@ const storageStore = useStorageStore()
 const membersByStorageId = computed(() => storageStore.membersByStorageId)
 
 const name = ref(props.storage.name)
-const location = ref(props.storage.location ?? '')
+const addressText = ref('')
+const location = ref(null)
+
+const emit = defineEmits(['updated'])
 
 async function saveChanges() {
-  /*
+  if (addressText.value.trim()) {
+    try {
+      const response = await axios.get(
+        'https://nominatim.openstreetmap.org/search',
+        {
+          params: {
+            q: addressText.value,
+            countrycodes: 'no',
+            format: 'json',
+            limit: 1,
+          },
+          headers: {
+            'Accept-Language': 'no',
+          },
+        }
+      );
+
+      const result = response.data[0];
+      if (result) {
+        location.value = {
+          latitude: parseFloat(result.lat),
+          longitude: parseFloat(result.lon),
+        };
+      } else {
+        console.warn('Fant ingen lokasjon for adressen');
+      }
+    } catch (error) {
+      console.error('Feil ved henting av koordinater:', error);
+    }
+  }
+
   try {
-    await storageStore.editStorage(props.storage.id, name.value, location.value, sessionStore.token)
-    console.log('Husstand oppdatert')
+    await storageStore.edit(props.storage.id, name.value, location.value, sessionStore.token)
+    emit('updated')
   } catch (err) {
     console.error('Feil ved oppdatering av husstand:', err)
   }
-
-   */
 }
 
 async function removeUser(userId) {
@@ -57,6 +89,19 @@ async function removeUser(userId) {
     }
   } catch (e) {
     console.error('Feil ved fjerning:', e)
+  }
+}
+
+async function deleteStorage(userId) {
+  try {
+    const success = await storageStore.deleteStorage(userId, props.storage.id, sessionStore.token)
+    if (success) {
+      emit('updated')
+    } else {
+      console.error('Klarte ikke slette lager')
+    }
+  } catch (e) {
+    console.error('Feil ved sletting:', e)
   }
 }
 </script>
@@ -78,13 +123,11 @@ async function removeUser(userId) {
             placeholder="Husstandsnavn"
             type="text"
           />
-          <!--
           <Input
-            v-model="location"
+            v-model="addressText"
             placeholder="Lokasjon (valgfritt)"
             type="text"
           /><br/>
-          -->
           <DialogTitle>Medlemmer</DialogTitle>
           <div>
             <ul v-if="membersByStorageId[props.storage.id]" class="flex flex-col gap-2">
@@ -136,7 +179,9 @@ async function removeUser(userId) {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Nei</AlertDialogCancel>
-                  <AlertDialogAction @click="">Ja</AlertDialogAction>
+                  <AlertDialogAction as-child>
+                    <Button @click="deleteStorage">Ja</Button>
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

@@ -3,7 +3,6 @@ import api from '@/config/api'
 export async function fetchEvents() {
   try {
     const response = await api.get('/events/all')
-    console.log(response.data)
     return response.data
   } catch (error) {
     console.error('Feil ved henting av hendelser:', error)
@@ -13,7 +12,7 @@ export async function fetchEvents() {
 
 export async function fetchEventById(eventId) {
   try {
-    const response = await api.get(`/events/${eventId}`)
+    const response = await api.get(`/events/get/${eventId}`)
     return response.data
   } catch (error) {
     console.error(`Feil ved henting av hendelse med ID ${eventId}:`, error)

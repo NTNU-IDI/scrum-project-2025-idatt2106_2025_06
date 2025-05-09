@@ -13,7 +13,7 @@ const admin = ['ROLE_ADMIN', 'ROLE_MODERATOR'].includes(session.user?.role)
   <main class="h-screen flex flex-col w-full">
     <Navbar v-if="!admin" />
     <NavBarAdmin v-else />
-    <RouterView class="max-w-6xl min-h-[calc(100vh-3.5rem)]" />
+    <RouterView class="shrink-0 max-w-6xl min-h-[calc(100vh-3.5rem)]" />
     <Footer />
   </main>
 </template>

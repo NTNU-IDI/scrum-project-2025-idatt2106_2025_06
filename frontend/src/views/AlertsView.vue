@@ -3,11 +3,11 @@ import AlertCard from '@/components/AlertCard.vue'
 import EventCard from '@/components/EventCard.vue'
 import { RouterLink } from 'vue-router'
 
-import { useWebSocketStore } from '@/stores/websocket.js';
+import { useWebSocketStore } from '@/stores/websocket.js'
 
-const webSocketStore = useWebSocketStore();
-const alerts = webSocketStore.alerts;
-const events = webSocketStore.events;
+const webSocketStore = useWebSocketStore()
+const alerts = webSocketStore.alerts
+const events = webSocketStore.events
 </script>
 
 <template>
@@ -32,18 +32,21 @@ const events = webSocketStore.events;
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
           <template v-for="event in events" :key="event.id">
+            <RouterLink :to="'/alerts/' + event.id">
               <EventCard
-                :event-id="event.id"
-                :name="event.title"
-                :description="event.description"
                 :content="event.content"
-                :severity="event.severity"
-                :type="event.type"
-                :status="event.status"
+                :description="event.description"
+                :event-id="event.id"
                 :location="event.location"
+                :name="event.title"
+                :severity="event.severity"
+                :status="event.status"
+                :type="event.type"
                 :updatedAt="event.time"
+                :createdAt="event.created"
                 variant="default"
               />
+            </RouterLink>
           </template>
         </div>
       </div>
