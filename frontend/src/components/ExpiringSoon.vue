@@ -154,51 +154,51 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="!userLoggedIn" class="flex flex-col h-[20rem] gap-3 justify-center">
+  <div v-if="!userLoggedIn" class="flex flex-col min-h-[20em] gap-3 justify-center">
     <p class="text-lg text-center font-bold">Du må være innlogget for å se beredskap og utgår snart.</p>
     <RouterLink to="/login" class="mx-auto">
       <Button>Logg inn</Button>
     </RouterLink>
   </div>
-  <div v-else-if="startupFinished && storages.length === 0" class="flex flex-col h-[20rem] gap-3 justify-center">
+  <div v-else-if="startupFinished && storages.length === 0" class="flex flex-col min-h-[20em] gap-3 justify-center">
     <p class="text-lg font-bold text-center"> Finner ingen husstander </p>
     <p class="text-center">For å se lager må du være med i en husstand eller opprett en egen.</p>
     <RouterLink to="/profile" class="mx-auto">
       <Button>Bli med i husstand</Button>
     </RouterLink>
   </div>
-  <div v-else-if="startupFinished && storages.length > 0" class="flex items-center w-full h-[25rem]">
-    <div class="w-1/3 h-full flex flex-col justify-between">
-      <p class="font-medium text-base">Beredskapsgrad</p>
-      <div>
+  <div v-else-if="startupFinished && storages.length > 0" class="flex flex-col md:flex-row items-center md:items-start w-full min-h-full">
+    <div class="grid w-full grid-cols-2 gap-3">
+      <p class="font-medium text-base col-span-2">Beredskapsgrad</p>
+      <div class="col-span-1 md:col-span-2 xl:mt-6">
         <DonutChart :category="'total'" index="name" :data="data" :colors="percentageColors" />
       </div>
-      <div class="mx-auto flex flex-col justify-center w-4/5">
-        <p class="font-medium text-sm mx-auto mb-2">Bytt husstand</p>
-        <Select v-if="activeStorageId" v-model="activeStorageId" class="w-full">
-          <SelectTrigger>
-            <SelectValue placeholder="Velg sted" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem v-for="storage in storages" :key="storage.id" :value="storage.id">
-                {{ storage.name }}
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-      <div class="mx-auto">
-        <RouterLink to="/inventory">
-          <Button>Gå til sjekkliste og lager</Button>
-        </RouterLink>
+      <div class="col-span-1 md:col-span-2  md:mx-auto">
+        <div class="grid w-full grid-cols-1 gap-3 mx-auto justify-items-center">
+          <p class="font-medium text-sm mx-auto col-span-1">Bytt husstand</p>
+          <Select v-if="activeStorageId" v-model="activeStorageId" class="col-span-1">
+            <SelectTrigger>
+              <SelectValue placeholder="Velg sted" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem v-for="storage in storages" :key="storage.id" :value="storage.id">
+                  {{ storage.name }}
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <RouterLink to="/inventory" class="col-span-1 w-full">
+            <Button class="whitespace-normal break-words text-center min-h-[3rem] md:min-h-[auto]">Gå til sjekkliste og lager</Button>
+          </RouterLink>
+        </div>
       </div>
     </div>
 
-    <div class="w-px h-full bg-gray-300 mx-4"></div>
+    <div class="h-px w-full md:w-px md:min-h-[25rem] md:h-auto bg-gray-300 m-[16px] md:my-[auto]"></div>
 
-    <div class="w-2/3 h-full flex flex-col overflow-scroll">
-      <p class="font-medium text-base mb-2">Utgår neste 3 månedene</p>
+    <div class="w-full max-h-[30rem] flex flex-col overflow-y-auto gap-2">
+      <p class="font-medium text-base">Utgår neste 3 månedene</p>
       <Table>
         <TableHeader>
           <TableRow>

@@ -58,3 +58,12 @@ class TokenInvalidException(message: String) : RuntimeException(message) {
         fun forToken(token: String) = TokenInvalidException("Token $token is invalid.")
     }
 }
+
+/**
+ * Custom exception class for when a user could not be verified using Google recaptcha API V2.
+ */
+class RecaptchaVerificationFailedException(message: String) : RuntimeException(message) {
+    companion object {
+        fun forRecaptcha() = RecaptchaVerificationFailedException("Recaptcha verification failed.")
+    }
+}
