@@ -27,7 +27,7 @@ async function login() {
         await router.push('/')
       }
     } else {
-      errorMessage.value = 'Feil e-post eller passord.'
+      errorMessage.value = 'Innlogging feilet. Kontroller e-post, passord og at du har bekreftet eposten din.'
     }
   } catch (error) {
     if (error.response && error.response.status === 403) {
@@ -55,7 +55,7 @@ async function login() {
         <form @submit.prevent="login">
           <div class="grid gap-2">
             <Label for="email">Epost</Label>
-            <Input id="email" v-model="email" placeholder="m@example.com" required type="email" />
+            <Input id="email" v-model="email" required type="email" />
 
             <div class="flex items-center">
               <Label for="password">Passord</Label>

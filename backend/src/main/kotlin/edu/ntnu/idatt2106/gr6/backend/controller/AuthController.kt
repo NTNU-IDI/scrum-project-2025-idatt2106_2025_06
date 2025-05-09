@@ -6,6 +6,7 @@ import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.CreateUserRequest
 
 import edu.ntnu.idatt2106.gr6.backend.service.AuthenticationService
 import edu.ntnu.idatt2106.gr6.backend.service.JwtService
+import edu.ntnu.idatt2106.gr6.backend.service.RecaptchaService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -13,15 +14,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(
     private val authenticationService: AuthenticationService,
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val recaptchaService: RecaptchaService
 ) {
     private val logger = LoggerFactory.getLogger(AuthController::class.java)
 
@@ -41,8 +41,11 @@ class AuthController(
     )
     fun signup(
         @RequestBody request: CreateUserRequest
-    ): ResponseEntity<UserResponse> {
+    ): ResponseEntity<*> {
         logger.info("Received signup request for user: ${request.email}")
+        if (!recaptchaService.verifyRecaptcha(request.recaptcha)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("reCAPTCHA verification failed")
+        }
         val userResponse = authenticationService.signupUser(request.name, request.email, request.password)
         logger.info("User ${request.email} signed up successfully with ID: ${userResponse.id}")
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponse)

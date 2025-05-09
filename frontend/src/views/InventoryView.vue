@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import InventoryTable from '@/components/InventoryTable.vue'
 import { Button } from '@/components/ui/button/index.js'
 import NewItem from '@/components/NewItem.vue'
+import { useWindowSize } from '@vueuse/core'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +38,14 @@ const handleDelete = async() => {
 
 const activeTab = ref('matOgDrikke');
 const currentItems = computed(() => groupItems(inventoryStore.inventory));
+
+const types = [
+  {id: 'matOgDrikke', name: 'Mat og drikke'},
+  {id: 'varmeOgLys', name: 'Varme og lys'},
+  {id: 'informasjon', name: 'Informasjon'},
+  {id: 'legemidOgHygiene', name: 'Legemidler og hygiene'},
+  {id: 'annet', name: 'Annet'},
+];
 
 const typeId = computed(() => {
   switch (activeTab.value) {
@@ -108,6 +117,13 @@ const groupItems = (items) => {
   return result;
 }
 
+const sessionStore = useSessionStore();
+const startupFinished = ref(false);
+const smallerScreenTab = ref("inventory");
+
+const { width: screenWidth } = useWindowSize();
+const isSmallerScreen = computed(() => screenWidth.value < 1280);
+
 watch(() => activeTab.value, async () => {
   selectedBoxIds.value = [];
   await fetchItems();
@@ -120,9 +136,6 @@ watch(() => activeStorageId.value, async (newId) => {
   selectedBoxIds.value = [];
   await fetchItems();
 })
-
-const sessionStore = useSessionStore();
-const startupFinished = ref(false);
 
 onMounted( async () => {
   if (!sessionStore.isAuthenticated) {
@@ -146,15 +159,24 @@ onMounted( async () => {
 </script>
 
 <template>
-  <div class="m-auto flex" v-if="activeStorageId">
-    <div class="mr-10">
+  <div class="mx-auto my-5" v-if="isSmallerScreen && activeStorageId">
+    <Tabs v-model="smallerScreenTab">
+      <TabsList>
+        <TabsTrigger value="inventory">Beredskapslager</TabsTrigger>
+        <TabsTrigger value="checklist">Beredskapsgrad</TabsTrigger>
+      </TabsList>
+    </Tabs>
+  </div>
+  <div class="mx-auto flex" v-if="activeStorageId">
+    <div class="xl:mr-10" v-if="(smallerScreenTab === 'checklist' && isSmallerScreen ) || !isSmallerScreen">
       <Checklist />
     </div>
-  <div class="m-auto mt-6">
-    <div class="flex justify-between pt-2 pb-2 items-center">
+  <div class="mx-auto my-4 xl:mt-6" v-if="(smallerScreenTab === 'inventory' && isSmallerScreen ) || !isSmallerScreen">
+    <div class="flex flex-col md:flex-row justify-between pt-2 pb-2 items-center">
       <p class="text-xl font-bold"> {{ activeStorageName }} sitt beredskapslager</p>
+      <div class="flex flex-row gap-2 mt-2 w-11/12 md:justify-end">
       <Select v-if="activeStorageId" v-model="activeStorageId">
-        <SelectTrigger class="w-2/5">
+        <SelectTrigger class="w-1/2">
           <SelectValue placeholder="Velg sted" />
         </SelectTrigger>
         <SelectContent>
@@ -165,9 +187,22 @@ onMounted( async () => {
           </SelectGroup>
         </SelectContent>
       </Select>
+      <Select v-if="currentItems && allStorages.length > 0 && screenWidth < 768" v-model="activeTab">
+        <SelectTrigger class="w-1/2">
+          <SelectValue placeholder="Velg type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem v-for="type in types" :key="type.id" :value="type.id">
+              {{ type.name }}
+            </SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      </div>
     </div>
 
-    <div class="flex justify-end pt-2 pb-2">
+    <div class="flex justify-center md:justify-end pt-2 pb-2">
       <Button variant="outline" class="mr-2" @click="refreshItems" :disabled="isLoading">
         <RefreshCw :class="isLoading ? 'animate-spin' : '' "/>
       </Button>
@@ -195,7 +230,7 @@ onMounted( async () => {
       </AlertDialog>
     </div>
 
-    <Tabs v-model="activeTab" v-if="currentItems && allStorages.length > 0">
+    <Tabs v-model="activeTab" v-if="currentItems && allStorages.length > 0 && screenWidth >= 768">
       <TabsList>
         <TabsTrigger value="matOgDrikke">Mat og drikke</TabsTrigger>
         <TabsTrigger value="varmeOgLys">Varme og lys</TabsTrigger>
@@ -224,6 +259,10 @@ onMounted( async () => {
         <InventoryTable :newItems="currentItems" :typeId="5" :totItemAmount="totItemAmount" :storageId="activeStorageId" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
     </Tabs>
+
+    <div v-if="screenWidth < 768">
+      <InventoryTable :newItems="currentItems" :typeId="typeId" :totItemAmount="totItemAmount" :storageId="activeStorageId" @selectionChanged="selectedBoxIds = $event"/>
+    </div>
   </div>
   </div>
   <div v-else-if="startupFinished && allStorages.length === 0" class="flex-col m-auto mt-10 justify-center">
