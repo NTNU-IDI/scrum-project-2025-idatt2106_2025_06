@@ -1,0 +1,35 @@
+[Eksempel på personvernerklæring fra ChatGPT]
+
+Personvernerklæring
+Sist oppdatert: 09.05.2025
+Denne applikasjonen er utviklet for å støtte beredskap og sikkerhet, og vi tar ditt personvern på alvor. Her finner du informasjon om hvordan vi behandler personopplysninger, både for registrerte og ikke-registrerte brukere.
+
+1. Hvem gjelder denne erklæringen for?
+Denne erklæringen gjelder for alle brukere av applikasjonen – både de som oppretter en konto (registrerte brukere) og de som bruker tjenestene uten å registrere seg (ikke-registrerte brukere).
+
+2. Hvilke data samles inn?
+For ikke-registrerte brukere:
+    •    Stedstjeneste (kun hvis du aktivt slår det på).
+    •    Midlertidig lagring av adresse (hvis du legger den inn for å se informasjon om området).
+For registrerte brukere (i tillegg til over):
+    •    Navn, e-post eller annen informasjon du oppgir ved registrering.
+    •    Valgt adresse og eventuelle lagrede steder.
+    •    Bruksdata (f.eks. når og hvordan appen brukes).
+
+3. Hvordan brukes dataene?
+ •    For å vise relevant informasjon på kartet.
+ •    For å tilpasse tjenesten til ditt område eller dine lagre.
+ •    For å forbedre funksjonaliteten og sikkerheten i applikasjonen.
+
+4. Deling av data
+Vi deler ikke dine personopplysninger med tredjeparter, med mindre det er:
+    •    Nødvendig for å levere tjenesten (f.eks. karttjenester).
+    •    Påkrevd ved lov eller i nødssituasjoner.
+
+5. Dine valg og kontroll
+ •    Du velger selv om du vil bruke stedstjenesten.
+ •    Du kan når som helst slette opplysninger du har lagt inn.
+ •    Ikke-registrerte brukere forblir anonyme – vi lagrer ikke identifiserende informasjon.
+
+6. Kontakt
+Har du spørsmål om personvern? Kontakt oss på: krisefiksern@gmail.com
