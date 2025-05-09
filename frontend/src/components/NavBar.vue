@@ -21,7 +21,7 @@ const route = useRoute()
         <img alt="logo" height="32" src="/krisefikserLogo.svg" width="32" />
         <p class="font-bold">KRISEFIKSER</p>
       </router-link>
-      <div class="gap-0 hidden sm:flex h-14 items-center">
+      <div class="gap-0 hidden md:flex h-14 items-center">
         <router-link :class="['transition duration-100 h-full align-middle font-normal  min-w-36 px-4 items-center flex justify-center',
         route.path == '/alerts' ? 'bg-gray-100 shadow-inner hover:bg-gray-200 font-semibold' : 'hover:bg-gray-50']"
                      to="/alerts">Varslinger
@@ -36,12 +36,12 @@ const route = useRoute()
         </router-link>
       </div>
       <div class="flex min-w-40 justify-end h-14 pr-3 items-center">
-        <router-link :class="['transition duration-100 h-full align-middle font-normal min-w-36 px-4 items-center flex justify-center',
+        <router-link :class="['transition duration-100 h-full align-middle font-normal min-w-36 px-4 items-center hidden md:flex justify-center',
         route.path == '/profile' ? 'bg-gray-100 shadow-inner hover:bg-gray-200 font-semibold' : 'hover:bg-gray-50']"
                      to="/profile">
           {{ !isLoggedIn ? 'Logg inn' : 'Min profil' }}
         </router-link>
-        <button class="block sm:hidden" @click="hamburgerMenu = !hamburgerMenu">
+        <button class="block md:hidden" @click="hamburgerMenu = !hamburgerMenu">
           <Menu />
         </button>
       </div>

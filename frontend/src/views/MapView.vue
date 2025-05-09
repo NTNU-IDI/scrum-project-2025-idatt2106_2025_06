@@ -55,19 +55,20 @@
                 </div>
               </div>
               <div v-if="settings.showEvents" class="flex flex-col gap-2">
-                <EventCard
-                  v-for="event in events"
-                  :key="event.id"
-                  :content="event.content"
-                  :description="event.description"
-                  :event-id="event.id"
-                  :name="event.name"
-                  :severity="event.severity"
-                  :status="event.status"
-                  :type="event.type"
-                  :updated-at="event.updatedAt"
-                  variant="map"
-                />
+                <RouterLink v-for="event in events" :key="event.id" :to="'alerts/' + event.id">
+                  <EventCard
+                    :key="event.id"
+                    :content="event.content"
+                    :description="event.description"
+                    :event-id="event.id"
+                    :name="event.name"
+                    :severity="event.severity"
+                    :status="event.status"
+                    :type="event.type"
+                    :updated-at="event.updatedAt"
+                    variant="map"
+                  />
+                </RouterLink>
               </div>
             </div>
           </TabsContent>

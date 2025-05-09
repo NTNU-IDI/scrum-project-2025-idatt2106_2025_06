@@ -1,18 +1,37 @@
 <template>
   <div class="relative w-full h-full flex">
     <div ref="mapContainer" class="map-container flex-1 w-full rounded-xl shadow"></div>
-
     <div
       v-if="popup.visible"
-      class="map-overlay-inner bg-white p-4 absolute bottom-4 left-4 mr-40 overflow-auto rounded-md"
+      class="map-overlay-inner bg-white p-4 absolute bottom-4 left-4 mr-40 overflow-auto rounded-md shadow-lg"
     >
-      <h3 class="font-semibold mb-2">{{ popup.item.name }}</h3>
-      <p class="mb-2">{{ popup.item.description }}</p>
-
-      <div class="flex gap-2 mt-2">
-        <Button v-if="!popup.isEvent" class="flex-1" @click="routeToPopup"> Vis rute hit</Button>
-
-        <RouterLink v-if="popup.isEvent" :to="`/alert/${popup.item.id}`" class="flex-1">
+      <h3 class="font-semibold text-lg mb-2">{{ popup.item.name }}</h3>
+      <p class="mb-2 text-sm text-gray-700">{{ popup.item.description }}</p>
+      <div v-if="!popup.isEvent" class="text-sm text-gray-600 space-y-1 mb-3">
+        <p><strong>Stedstype:</strong> {{ popup.item.type }}</p>
+        <p v-if="popup.item.openingHours">
+          <strong>Åpningstider:</strong> {{ formatOpening(popup.item.openingHours) }}
+        </p>
+        <p v-if="popup.item.contactInfo">
+          <strong>Kontakt: </strong>
+          <span v-if="popup.item.contactInfo.name">{{ popup.item.contactInfo.name }}</span>
+          <span v-if="popup.item.contactInfo.email"> ({{ popup.item.contactInfo.email }}) </span>
+          <span v-if="popup.item.contactInfo.phone"> {{ popup.item.contactInfo.phone }}</span>
+        </p>
+      </div>
+      <div v-else class="text-sm text-gray-600 space-y-1 mb-3">
+        <p><strong>Beredskapsnivå:</strong> {{ popup.item.severity }}</p>
+        <p><strong>Status:</strong> {{ popup.item.status }}</p>
+        <p v-if="popup.item.startTime">
+          <strong>Start:</strong> {{ formatDate(popup.item.startTime) }}
+        </p>
+        <p v-if="popup.item.endTime">
+          <strong>Slutt:</strong> {{ formatDate(popup.item.endTime) }}
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <Button v-if="!popup.isEvent" class="flex-1" @click="routeToPopup">Vis rute hit</Button>
+        <RouterLink v-if="popup.isEvent" :to="`/alerts/${popup.item.id}`" class="flex-1">
           <Button>Gå til hendelse</Button>
         </RouterLink>
       </div>
@@ -422,6 +441,22 @@ function addHtmlMarker(item, type, coords, overrideCfg) {
     })
     markerObjs.push({ marker, el })
   }
+}
+
+function formatOpening(openingHours) {
+  const slots = Object.values(openingHours).filter(Boolean)
+  return slots.length ? slots[0].replace(',', ' / ') : '—'
+}
+
+function formatDate(iso) {
+  const d = new Date(iso)
+  return d.toLocaleString('no-NO', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 function clearSelection() {

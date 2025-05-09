@@ -4,7 +4,7 @@ KRISEFIKSER er en webapplikasjon laget i forbindelse med et prosjekt i faget "ID
 Utviklingen av applikasjonen har foregått i perioden 22.04.2025 - 09.05.2025, av et team bestående av 7 medlemmer:
 
   -  Carine Margrethe Rondeel
-  -  Henrik Hausberg Utistog
+  -  Henrik Utistog Hausberg
   -  Jonas Moe Bjørnbom
   -  Bård Helge Hansen
   -  Cathrine Evensen

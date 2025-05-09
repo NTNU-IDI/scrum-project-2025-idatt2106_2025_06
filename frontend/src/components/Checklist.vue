@@ -22,7 +22,10 @@ const percentage = ref();
 
 const data = computed(() => {
   if (percentage.value === undefined) {
-    return [];
+    return [
+      { name: 'Klar', total: 0 },
+      { name: 'Ikke klar', total: 100 },
+    ];
   } else {
     return [
       { name: 'Klar', total: Math.floor(percentage.value) },
@@ -81,9 +84,6 @@ onMounted(async () => {
       </CardDescription>
     </CardHeader>
     <CardContent>
-      <!--<p class="text-base font-bold mb-4">
-        Beredskapsprosent: {{ checklistStore.percentageCompleted ? Math.floor(checklistStore.percentageCompleted) : 0 }}%
-      </p>-->
       <div class="justify-center mb-6">
         <DonutChart :category="'total'" index="name" :data="data" :colors="percentageColors" class="h-32"/>
       </div>

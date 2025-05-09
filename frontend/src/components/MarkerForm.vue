@@ -145,6 +145,7 @@
         >Slett markør
       </Button>
       <Button
+        id="clearButton"
         v-if="props.mode === 'edit-marker'"
         class="flex-1"
         variant="outline"

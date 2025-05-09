@@ -45,36 +45,38 @@ async function login() {
 
 <template>
   <div class="m-auto">
-  <Card class="mx-auto max-w-sm">
-    <CardHeader>
-      <CardTitle class="text-2xl"> Logg inn</CardTitle>
+    <Card class="mx-auto max-w-sm">
+      <CardHeader>
+        <CardTitle class="text-2xl"> Logg inn</CardTitle>
 
-      <CardDescription> Skriv inn epost-adresse og passord for å logge inn </CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div class="grid gap-4">
-        <form @submit.prevent="login">
-          <div class="grid gap-2">
-            <Label for="email">Epost</Label>
-            <Input id="email" v-model="email" required type="email" />
+        <CardDescription> Skriv inn epost-adresse og passord for å logge inn</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="grid gap-4">
+          <form @submit.prevent="login">
+            <div class="grid gap-2">
+              <Label for="email">Epost</Label>
+              <Input id="email" v-model="email" required type="email" />
 
-            <div class="flex items-center">
-              <Label for="password">Passord</Label>
-              <a class="ml-auto inline-block text-sm underline" href="#"> Glemt passord? </a>
+              <div class="flex items-center">
+                <Label for="password">Passord</Label>
+                <!--
+                <a class="ml-auto inline-block text-sm underline" href="#"> Glemt passord? </a>
+                -->
+              </div>
+
+              <Input id="password" v-model="password" required type="password" />
+              <Button class="w-full" type="submit">Logg inn</Button>
+              <p v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</p>
             </div>
+          </form>
+        </div>
 
-            <Input id="password" v-model="password" required type="password" />
-            <Button class="w-full" type="submit">Logg inn</Button>
-            <p v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</p>
-          </div>
-        </form>
-      </div>
-
-      <div class="mt-4 text-center text-sm">
-        Har du ikke bruker?
-        <router-link class="underline" to="/signup"> Registrer her</router-link>
-      </div>
-    </CardContent>
-  </Card>
+        <div class="mt-4 text-center text-sm">
+          Har du ikke bruker?
+          <router-link id="signup-link" class="underline" to="/signup"> Registrer her</router-link>
+        </div>
+      </CardContent>
+    </Card>
   </div>
 </template>

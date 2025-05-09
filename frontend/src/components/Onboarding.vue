@@ -60,16 +60,16 @@ const handleDialogChange = (value) => {
 <template>
   <Dialog :open="isOpen" @update:open="handleDialogChange">
     <DialogTrigger asChild>
-      <Button variant="outline">Onboarding</Button>
+      <p class="text-neutral-500 cursor-pointer hover:text-black">Onboarding</p>
     </DialogTrigger>
 
     <DialogContent class="gap-0 p-0 [&>button:last-child]:text-white">
       <div class="p-2">
         <img
           alt="dialog"
-          class="w-full rounded-lg"
+          class="w-full rounded-lg p-20"
           height="216"
-          src="https://originui.com/dialog-content.png"
+          src="/krisefikserLogo.svg"
           width="382"
         />
       </div>

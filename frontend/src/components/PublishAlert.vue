@@ -74,7 +74,7 @@ onMounted(() => {
 <template>
   <Dialog>
     <DialogTrigger as-child>
-      <Button class="p-2">
+      <Button disabled class="p-2">
         Nytt varsel
       </Button>
     </DialogTrigger>
