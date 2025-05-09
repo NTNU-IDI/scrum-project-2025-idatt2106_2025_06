@@ -36,6 +36,7 @@ data class EventResponse(
     val type: String,
     val severity: String,
     val updatedAt: Instant?,
+    val createdAt: Instant?,
 )
 
 data class UpdateEventRequest(

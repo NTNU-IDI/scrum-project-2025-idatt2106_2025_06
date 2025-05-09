@@ -88,6 +88,7 @@ class EventService(
             status = this.status.toString(),
             severity = this.severity.toString(),
             updatedAt = this.updatedAt,
+            createdAt = this.createdAt,
         )
     }
 
