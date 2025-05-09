@@ -442,8 +442,9 @@ const counts = computed(() => ({
 
 onMounted(async () => {
   markers.value = await getAllMarkers()
-  storages.value = await fetchStorages()
-  console.log('Storages:', storages.value)
+  if (user.value) {
+    storages.value = await fetchStorages()
+  }
   events.value = await fetchEvents()
 })
 </script>
