@@ -71,7 +71,7 @@ async function login() {
 
       <div class="mt-4 text-center text-sm">
         Har du ikke bruker?
-        <router-link class="underline" to="/signup"> Registrer her</router-link>
+        <router-link id="signup-link" class="underline" to="/signup"> Registrer her</router-link>
       </div>
     </CardContent>
   </Card>
