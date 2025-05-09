@@ -193,8 +193,9 @@ onMounted(() => {
         </div>
         <div class="flex gap-3">
           <div class="flex-1">
-            <Label>Mengde</Label>
+            <Label >Mengde</Label>
             <Input
+              id="amount"
               required
               v-model="itemAmount"
               placeholder="Mengde"
@@ -206,13 +207,13 @@ onMounted(() => {
           </div>
           <div class="flex-1">
             <Label>Enhet</Label>
-            <Select required v-model="selectedItemUnit">
-              <SelectTrigger :disabled="!selectedItemName || !isCustomItemSelected">
+            <Select  required v-model="selectedItemUnit">
+              <SelectTrigger id="selectUnit" :disabled="!selectedItemName || !isCustomItemSelected">
                 <SelectValue placeholder="Velg enhet" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem :value="1">stk</SelectItem>
+                  <SelectItem id="stk" :value="1">stk</SelectItem>
                   <SelectItem :value="2">gram</SelectItem>
                   <SelectItem :value="3">liter</SelectItem>
                 </SelectGroup>
@@ -275,7 +276,7 @@ onMounted(() => {
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" :disabled="!newItemName || !itemAmount || !selectedItemUnit || !selectedItemType">
+          <Button id="submitNewItem" :disabled="!newItemName || !itemAmount || !selectedItemUnit || !selectedItemType">
             Legg til
           </Button>
         </DialogFooter>

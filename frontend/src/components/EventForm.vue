@@ -302,7 +302,7 @@ watch(
     </div>
 
     <div class="flex gap-2 mt-4">
-      <Button class="flex-1" @click="handleSubmit">
+      <Button id="submitButton" class="flex-1" @click="handleSubmit">
         {{ mode === 'new' ? 'Publiser ny hendelse' : 'Oppdater hendelse' }}
       </Button>
       <Button
@@ -313,7 +313,7 @@ watch(
       >
         Slett hendelse
       </Button>
-      <Button v-if="mode === 'edit'" class="flex-1" variant="outline" @click="eventFormRefresh">
+      <Button id="clearButton" v-if="mode === 'edit'" class="flex-1" variant="outline" @click="eventFormRefresh">
         Avbryt
       </Button>
     </div>
