@@ -51,7 +51,6 @@ class AuthenticationService(
     /**
      * Signs up a new user to the service. it checks if user already exits before proceeding.
      * Request is validated and mapped to a User object. User is saved to the database.
-     *
      */
 
         @Transactional
