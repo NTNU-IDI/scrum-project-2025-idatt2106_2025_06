@@ -19,6 +19,7 @@ import { useSessionStore } from '@/stores/session.js'
 import EventView from '@/views/EventView.vue'
 import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
+import ScenarioDetailView from '@/views/ScenarioDetailView.vue'
 
 const routes = [
   { path: '/', component: HomeView, name: 'home' },
@@ -47,6 +48,12 @@ const routes = [
     path: '/email-verification/:token',
     component: EmailVerificationView,
     meta: { requiresAuth: false }
+  },
+  {
+    path: '/scenario/:id',
+    component: ScenarioDetailView,
+    name: 'scenario-detail',
+    props: true
   }
 ]
 
