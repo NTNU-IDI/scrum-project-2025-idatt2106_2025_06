@@ -1,12 +1,13 @@
 <script setup>
 import { Button } from '@/components/ui/button/index.js'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.js'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import PublishAlert from '@/components/PublishAlert.vue'
 import AlertCard from '@/components/AlertCard.vue'
 import { onMounted, reactive, ref } from 'vue'
 import Map from '@/components/Map.vue'
 import { getAllMarkers } from '@/service/markerService.js'
 import { fetchStorages } from '@/service/storageService.js'
+import ScenarioCard from '@/components/ScenarioCard.vue'
 
 const alerts = ref([
   {
@@ -148,51 +149,55 @@ onMounted(async () => {
 
 <template>
   <div class="m-auto flex flex-wrap relative w-full py-10 gap-6 items-stretch mt-10">
-    <Card class="flex-1 basis-1/4 min-w-[200px] gap-6 max-h-[650px]">
-      <CardHeader>
-        <CardTitle class="text-2xl">Rediger scenario informasjon</CardTitle>
-      </CardHeader>
-      <CardContent class="flex flex-col gap-2 h-full max-h-[calc(100%-80px)]"> TBA</CardContent>
-    </Card>
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Card>
+        <CardHeader>
+          <CardTitle>Rediger scenario informasjon</CardTitle>
+        </CardHeader>
+        <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2">
+          <ScenarioCard />
+        </CardContent>
+      </Card>
 
-    <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
-      <CardHeader class="grid grid-cols-2 items-center w-full">
-        <CardTitle class="text-2xl">Varslinger</CardTitle>
-        <PublishAlert />
-      </CardHeader>
-      <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2">
-        <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
-        <template v-for="(alert, index) in alerts" :key="index">
-          <AlertCard
-            :date="alert.date"
-            :description="alert.description"
-            :severity="alert.severity"
-            :time="alert.time"
-            :title="alert.title"
-            variant="admin"
+      <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
+        <CardHeader class="grid grid-cols-2 items-center w-full">
+          <CardTitle class="text-2xl">Varslinger</CardTitle>
+          <PublishAlert />
+        </CardHeader>
+        <CardContent class="flex flex-col overflow-y-auto max-h-[500px] gap-2">
+          <!-- TODO Her hentes det egentlig fra databasen, dette er bare for å vise utseende og at man kan scrolle -->
+          <template v-for="(alert, index) in alerts" :key="index">
+            <AlertCard
+              :date="alert.date"
+              :description="alert.description"
+              :severity="alert.severity"
+              :time="alert.time"
+              :title="alert.title"
+              variant="admin"
+            />
+          </template>
+        </CardContent>
+      </Card>
+
+      <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
+        <CardHeader class="grid grid-cols-2 items-center w-full">
+          <CardTitle class="text-2xl whitespace-nowrap">Kart og hendelser</CardTitle>
+          <router-link class="justify-self-end" to="/admin/map">
+            <Button>Rediger</Button>
+          </router-link>
+        </CardHeader>
+        <CardContent class="h-[85%]">
+          <Map
+            v-model="location"
+            :markers="markers"
+            :settings="settings"
+            :storages="storages"
+            class="w-full h-full rounded"
+            start-selection="current"
           />
-        </template>
-      </CardContent>
-    </Card>
-
-    <Card class="max-h-[650px] flex-1 basis-1/4 min-w-[300px]">
-      <CardHeader class="grid grid-cols-2 items-center w-full">
-        <CardTitle class="text-2xl whitespace-nowrap">Kart og hendelser</CardTitle>
-        <router-link class="justify-self-end" to="/admin/map">
-          <Button>Rediger</Button>
-        </router-link>
-      </CardHeader>
-      <CardContent class="h-[85%]">
-        <Map
-          v-model="location"
-          :markers="markers"
-          :settings="settings"
-          :storages="storages"
-          class="w-full h-full rounded"
-          start-selection="current"
-        />
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   </div>
 </template>
 
