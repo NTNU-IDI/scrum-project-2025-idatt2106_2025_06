@@ -60,20 +60,46 @@ class CheckpointRepository(private val dataSource: DataSource) {
         return checkpoints
     }
 
-    fun assignCheckpointToUser(id: String, userId: String, checkpointId: String): Boolean {
-        val sql = """
+
+fun replaceCheckpointsForUser(userId: String, entries: List<Pair<String, String>>): Boolean {
+    val deleteSql = "DELETE FROM user_checkpoint_list WHERE user_id = ?"
+    val insertSql = """
         INSERT INTO user_checkpoint_list (id, user_id, checkpoint_list_id)
         VALUES (?, ?, ?)
     """.trimIndent()
 
-        dataSource.connection.use { conn ->
-            conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, id)
-                stmt.setString(2, userId)
-                stmt.setString(3, checkpointId)
-                return stmt.executeUpdate() > 0
+    dataSource.connection.use { conn ->
+        conn.autoCommit = false
+
+        try {
+            conn.prepareStatement(deleteSql).use { stmt ->
+                stmt.setString(1, userId)
+                stmt.executeUpdate()
             }
+
+            conn.prepareStatement(insertSql).use { stmt ->
+                for ((id, checkpointId) in entries) {
+                    stmt.setString(1, id)
+                    stmt.setString(2, userId)
+                    stmt.setString(3, checkpointId)
+                    stmt.addBatch()
+                }
+                stmt.executeBatch()
+            }
+
+            conn.commit()
+            return true
+
+        } catch (e: Exception) {
+            conn.rollback()
+            e.printStackTrace()
+            return false
+        } finally {
+            conn.autoCommit = true
         }
     }
+}
+
+
 
 }

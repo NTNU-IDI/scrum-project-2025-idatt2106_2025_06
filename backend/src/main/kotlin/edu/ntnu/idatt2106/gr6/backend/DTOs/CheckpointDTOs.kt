@@ -7,5 +7,5 @@ data class CheckpointResponse(
 )
 
 data class AssignCheckpointRequest(
-    val checkpointId: String
+    val checkpointIds: List<String>
 )

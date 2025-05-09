@@ -28,9 +28,13 @@ class CheckpointService(
 
     fun assignCheckpointToCurrentUser(request: AssignCheckpointRequest): Boolean {
         val userId = userContextService.getCurrentUserId().toString()
-        val id = idGenerator.generateId(12)
 
-        return checkpointRepository.assignCheckpointToUser(id, userId, request.checkpointId)
+        val entries = request.checkpointIds.map { checkpointId ->
+            idGenerator.generateId(12) to checkpointId
+        }
+
+        return checkpointRepository.replaceCheckpointsForUser(userId, entries)
     }
+
 
 }
