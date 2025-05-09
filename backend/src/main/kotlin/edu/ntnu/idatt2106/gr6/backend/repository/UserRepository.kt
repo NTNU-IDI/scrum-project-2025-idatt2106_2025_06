@@ -51,6 +51,16 @@ class UserRepository (
         return null
     }
 
+    fun deleteUserByEmail(email: String): Boolean {
+        val sql = "DELETE FROM users WHERE email = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, email)
+                return stmt.executeUpdate() > 0
+            }
+        }
+    }
+
     fun updateUser(userId: UUID, newName: String, newEmail: String, verified: Boolean): Boolean {
         val sql = """
         UPDATE users SET name = ?, email = ?, verified = ?  WHERE id = ?
