@@ -74,6 +74,7 @@ let dashStep = 0
 let markerObjs = []
 let eventMarkerObjs = []
 
+// path animation
 const dashSequence = [
   [0, 4, 3],
   [0.5, 4, 2.5],
@@ -148,8 +149,6 @@ onBeforeUnmount(() => {
   map?.remove()
 })
 
-/* ——— Exposed Methods ——————————————————— */
-
 async function flyToNearest(type) {
   const id = await getClosestMarkerId(routeStart, type)
   if (id == null) {
@@ -173,8 +172,6 @@ function flyToUser() {
 }
 
 defineExpose({ statusMessage, flyToUser, flyToNearest })
-
-/* ——— Helpers ————————————————————— */
 
 function getLocation() {
   const [lng, lat] = map.getCenter().toArray()
@@ -322,7 +319,7 @@ function redrawAll() {
     )
       return
     if (capacity != null && capacity < s.minCapacity) return
-    if (q && `!${name} ${description}`.toLowerCase().includes(q)) return
+    if (q && !`${name} ${description}`.toLowerCase().includes(q)) return
 
     addHtmlMarker(m, type, [location.longitude, location.latitude])
   })
