@@ -285,10 +285,12 @@ onMounted(async () => {
                 <DialogTitle class="text-2xl">Rediger profil</DialogTitle>
                 <DialogDescription>
                   <Label>Her kan du endre profilen din. Trykk på "Lagre" når du er ferdig.</Label>
-                  <Input v-model="username" data-testid="username-input" placeholder="Navn"
-                         type="text" />
-                  <Input v-model="email" data-testid="email-input" placeholder="Epostadresse"
-                         type="email" />
+                  <div class="flex flex-col gap-2">
+                    <Input v-model="username" data-testid="username-input" placeholder="Navn"
+                           type="text" />
+                    <Input v-model="email" data-testid="email-input" placeholder="Epostadresse"
+                           type="email" />
+                  </div>
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter class="flex flex-col items-center">
@@ -312,10 +314,10 @@ onMounted(async () => {
                 <p v-if="passwordError" class="text-red-600 font-bold">{{ passwordError }}</p>
                 <p v-if="passwordSuccess" class="text-green-600 font-bold">{{ passwordSuccess }}</p>
               </DialogHeader>
-              <div class="flex flex-col items-center">
+              <div class="flex flex-col items-center sm:items-start">
                 <Button class="w-48" @click="submitChangePassword">Endre passord</Button>
               </div>
-              <DialogFooter class="flex flex-col items-center">
+              <DialogFooter>
                 <DialogClose>
                   <Button class="w-48">Lukk</Button>
                 </DialogClose>
@@ -386,7 +388,7 @@ onMounted(async () => {
                     type="text"
                   />
                   <DialogClose>
-                    <Button class="w-48" @click="createNewStorage()">Opprett</Button>
+                    <Button class="w-48 mt-4" @click="createNewStorage()">Opprett</Button>
                   </DialogClose>
                 </DialogHeader>
               </DialogContent>
