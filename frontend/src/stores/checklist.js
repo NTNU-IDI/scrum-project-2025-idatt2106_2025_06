@@ -18,7 +18,7 @@ export const useChecklistStore = defineStore('checklist', () => {
     percentageCompleted.value = response.completionPercentage;
   }
 
-  async function updateChecklist() {
+  async function updateChecklist(selectedCheckpoints) {
     await updateCheckpoints(selectedCheckpoints);
     await getMySelectedChecklist();
   }
