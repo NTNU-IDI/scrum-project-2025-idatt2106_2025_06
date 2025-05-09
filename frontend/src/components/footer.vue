@@ -1,4 +1,5 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+</script>
 
 <template>
   <footer class="pt-10 w-full">
@@ -12,35 +13,39 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <h3 class="font-bold text-lg">Contact</h3>
+          <h3 class="font-bold text-lg">Sider</h3>
           <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> Github </a>
+            <router-link class="opacity-60 hover:opacity-100" to="/"> Forside</router-link>
           </div>
 
           <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> Twitter </a>
+            <router-link class="opacity-60 hover:opacity-100" to="/alerts"> Varslinger</router-link>
           </div>
 
           <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> Instagram </a>
+            <router-link class="opacity-60 hover:opacity-100" to="/inventory"> Beredskapslager
+            </router-link>
+          </div>
+
+          <div>
+            <router-link class="opacity-60 hover:opacity-100" to="/map"> Kart</router-link>
+          </div>
+
+          <div>
+            <router-link class="opacity-60 hover:opacity-100" to="/profile"> Min side</router-link>
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <h3 class="font-bold text-lg">Platforms</h3>
+          <h3 class="font-bold text-lg">Personvern</h3>
           <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> iOS </a>
-          </div>
-
-          <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> Android </a>
-          </div>
-
-          <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> Web </a>
+            <router-link class="opacity-60 hover:opacity-100" to="/privacy-policy">
+              Personvernerklæring
+            </router-link>
           </div>
         </div>
 
+        <!--
         <div class="flex flex-col gap-2">
           <h3 class="font-bold text-lg">Help</h3>
           <div>
@@ -55,7 +60,9 @@
             <a class="opacity-60 hover:opacity-100" href="#"> Feedback </a>
           </div>
         </div>
+        -->
 
+        <!--
         <div class="flex flex-col gap-2">
           <h3 class="font-bold text-lg">Socials</h3>
           <div>
@@ -70,9 +77,11 @@
             <a class="opacity-60 hover:opacity-100" href="#"> Dribbble </a>
           </div>
         </div>
+        -->
       </div>
 
-      <h3>2025 Developed by Group 6</h3>
+
+      <h3>2025 Developed by Group 06</h3>
     </div>
   </footer>
 </template>
