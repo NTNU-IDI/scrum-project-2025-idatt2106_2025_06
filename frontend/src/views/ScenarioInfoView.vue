@@ -2,61 +2,31 @@
 
 import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
 import { ArrowRightIcon } from 'lucide-vue-next'
+import { useScenarioStore } from '@/stores/scenario'
+import { onMounted, computed } from 'vue'
+
+const scenarioStore = useScenarioStore()
+const displayedScenarios = computed(() => scenarioStore.scenarios)
+
+onMounted(async () => {
+  try {
+    await scenarioStore.fetchScenarios()
+    console.log(scenarioStore.scenarios)
+  }
+  catch (error) {
+    console.log(error)
+  }
+})
 
 </script>
 
 <template>
   <div class="m-3 mt-5 xl:mx-auto">
   <BentoGrid>
-    <BentoCard
-      name="Brann"
-      description="Lær hvordan du forbereder deg på og håndterer brann i hjemmet eller nærområdet."
-      href="/scenario"
-      cta="Les mer"
-      :Icon="ArrowRightIcon"
-      customClass="col-span-2 md:col-span-3 lg:col-span-2"
-    />
-
-    <BentoCard
-      name="Flom"
-      description="Få oversikt over hva du bør gjøre før, under og etter en flomsituasjon for å holde deg trygg."
-      href="/info"
-      cta="Les mer"
-      :Icon="ArrowRightIcon"
-      customClass="col-span-2 md:col-span-3 lg:col-span-2"
-    />
-
-    <BentoCard
-      name="Pandemi"
-      description="Informasjon om hygiene, isolasjon og tiltak du bør følge under en smittsom sykdomsutbrudd."
-      href="/info"
-      cta="Les mer"
-      :Icon="ArrowRightIcon"
-      customClass="col-span-2 md:col-span-3 lg:col-span-2"
-    />
-
-    <BentoCard
-      name="Krig"
-      description="Forstå hvordan du kan forberede deg mentalt og praktisk på uro, trusler og væpnet konflikt."
-      href="/info"
-      cta="Les mer"
-      :Icon="ArrowRightIcon"
-      customClass="col-span-2 md:col-span-3 lg:col-span-2"
-    />
-
-    <BentoCard
-      name="Strømbrudd"
-      description="Slik klarer du deg uten strøm i korte og lengre perioder, og hva du bør ha tilgjengelig."
-      href="/info"
-      cta="Les mer"
-      :Icon="ArrowRightIcon"
-      customClass="col-span-2 md:col-span-3 lg:col-span-2"
-    />
-
-    <BentoCard
-      name="Matmangel"
-      description="Lær hvordan du kan sikre matforsyning og ernæring i situasjoner med knapphet på mat."
-      href="/info"
+    <BentoCard v-for="scenario in displayedScenarios" :key="scenario.id"
+      :name="scenario.title"
+      :description="scenario.description"
+      :href="`/scenario/${scenario.id}`"
       cta="Les mer"
       :Icon="ArrowRightIcon"
       customClass="col-span-2 md:col-span-3 lg:col-span-2"

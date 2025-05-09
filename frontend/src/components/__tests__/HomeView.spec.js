@@ -10,7 +10,7 @@ describe('HomeView.vue', () => {
       },
     })
 
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBe(false)
 
     expect(wrapper.find('bento-grid-stub').exists()).toBe(true)
   })

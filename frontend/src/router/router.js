@@ -17,6 +17,8 @@ import AdminMap from '@/views/AdminMapView.vue'
 import EmailVerificationView from '@/views/EmailVerificationView.vue'
 import { useSessionStore } from '@/stores/session.js'
 import EventView from '@/views/EventView.vue'
+import ScenarioDetailView from '@/views/ScenarioDetailView.vue'
+
 
 const routes = [
   { path: '/', component: HomeView, name: 'home' },
@@ -43,6 +45,11 @@ const routes = [
     path: '/email-verification/:token',
     component: EmailVerificationView,
     meta: { requiresAuth: false },
+  },
+  {path: '/scenario/:id',
+    component: ScenarioDetailView,
+    name: 'scenario-detail',
+    props: true,
   },
 ]
 
