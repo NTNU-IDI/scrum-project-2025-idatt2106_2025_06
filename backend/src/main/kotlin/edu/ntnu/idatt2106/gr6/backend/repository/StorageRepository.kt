@@ -10,9 +10,23 @@ import java.sql.Timestamp
 import java.util.*
 import javax.sql.DataSource
 
+/**
+ * Repository for performing CRUD operations related to storages and user memberships in storages.
+ * Uses JDBC and raw SQL queries for accessing the database.
+ *
+ * @author Jonas Moe Bjørnbom, Mathias Hølestøl
+ */
 @Repository
 class StorageRepository(private val dataSource: DataSource) {
 
+    /**
+     * Saves a new storage to the database and assigns the owner as its first member.
+     *
+     * @param name The name of the storage.
+     * @param storageOwner The ID of the user who owns the storage.
+     * @param location Optional geographic location (latitude, longitude).
+     * @return The newly created Storage object.
+     */
     fun saveStorage(
         name: String,
         storageOwner: String,
@@ -55,6 +69,12 @@ class StorageRepository(private val dataSource: DataSource) {
         )
     }
 
+    /**
+     * Finds a storage by its unique join token.
+     *
+     * @param token The join token.
+     * @return The Storage if found, or null if not.
+     */
     fun findStorageByToken(token: String): Storage? {
         val sql = """
             SELECT id, name, storage_owner, token,
@@ -75,6 +95,13 @@ class StorageRepository(private val dataSource: DataSource) {
         }
     }
 
+    /**
+     * Adds a user to a storage, unless they are already a member.
+     *
+     * @param userId The ID of the user.
+     * @param storageId The ID of the storage.
+     * @throws IllegalArgumentException if the user is already a member.
+     */
     fun addUserToStorage(userId: String, storageId: String) {
         if (isUserAlreadyInStorage(userId, storageId)) {
             throw IllegalArgumentException("User is already a member of this storage.")
@@ -94,6 +121,13 @@ class StorageRepository(private val dataSource: DataSource) {
         }
     }
 
+    /**
+     * Checks if a user is already in a given storage.
+     *
+     * @param userId The user ID.
+     * @param storageId The storage ID.
+     * @return true if the user is already a member, false otherwise.
+     */
     private fun isUserAlreadyInStorage(userId: String, storageId: String): Boolean {
         val sql = """
         SELECT COUNT(*)
@@ -116,6 +150,13 @@ class StorageRepository(private val dataSource: DataSource) {
     }
 
 
+    /**
+     * Removes a user from a given storage.
+     *
+     * @param userId The ID of the user to remove.
+     * @param storageId The ID of the storage.
+     * @return true if the user was removed, false if not found.
+     */
     fun removeUserFromStorage(userId: String, storageId: String): Boolean {
         val sql = """
         DELETE FROM user_storages
@@ -132,7 +173,12 @@ class StorageRepository(private val dataSource: DataSource) {
         }
     }
 
-
+    /**
+     * Retrieves a list of users (id and name) in a given storage.
+     *
+     * @param storageId The ID of the storage.
+     * @return A list of SimpleUser representing members of the storage.
+     */
     fun findSimpleUsersInStorage(storageId: String): List<SimpleUser> {
         val sql = """
         SELECT u.id, u.name
@@ -162,8 +208,12 @@ class StorageRepository(private val dataSource: DataSource) {
         return users
     }
 
-
-
+    /**
+     * Retrieves all storages associated with a given user.
+     *
+     * @param userId The ID of the user.
+     * @return A list of StorageSummary representing storages the user belongs to.
+     */
     fun findStoragesByUserId(userId: String): List<StorageSummary> {
         val sql = """
         SELECT s.id, s.name, s.token, s.storage_owner,
@@ -265,6 +315,12 @@ class StorageRepository(private val dataSource: DataSource) {
         }
     }
 
+    /**
+     * Converts a SQL result row into a Storage object.
+     *
+     * @param rs The ResultSet containing storage data.
+     * @return A Storage object.
+     */
     private fun mapRowToStorage(rs: ResultSet): Storage {
         val lat = rs.getObject("latitude") as? Double
         val lon = rs.getObject("longitude") as? Double
@@ -278,6 +334,13 @@ class StorageRepository(private val dataSource: DataSource) {
             updatedAt = rs.getTimestamp("updated_at").toInstant()
         )
     }
+
+    /**
+     * Generates a random token for identifying or joining a storage.
+     *
+     * @param length Length of the token string (default 6).
+     * @return A random alphanumeric token.
+     */
     private fun generateRandomKey(length: Int = 6): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
         return (1..length)
@@ -309,6 +372,4 @@ class StorageRepository(private val dataSource: DataSource) {
             }
         }
     }
-
-
 }
