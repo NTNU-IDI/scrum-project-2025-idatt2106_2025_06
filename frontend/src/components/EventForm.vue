@@ -306,7 +306,6 @@ watch(
         {{ mode === 'new' ? 'Publiser ny hendelse' : 'Oppdater hendelse' }}
       </Button>
       <Button
-        id="clearButton"
         v-if="mode === 'edit'"
         class="flex-1 bg-red-600 text-white hover:bg-red-700"
         variant="outline"
@@ -314,7 +313,7 @@ watch(
       >
         Slett hendelse
       </Button>
-      <Button v-if="mode === 'edit'" class="flex-1" variant="outline" @click="eventFormRefresh">
+      <Button id="clearButton" v-if="mode === 'edit'" class="flex-1" variant="outline" @click="eventFormRefresh">
         Avbryt
       </Button>
     </div>
