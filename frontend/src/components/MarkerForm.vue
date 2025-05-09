@@ -132,7 +132,20 @@
       <Button class="flex-1" @click="handleSubmit">
         {{ props.mode === 'edit-marker' ? 'Oppdater markør' : 'Plasser markør' }}
       </Button>
-      <Button class="flex-1" variant="outline" @click="handleClear">Avbryt</Button>
+      <Button
+        v-if="props.mode === 'edit-marker'"
+        class="flex-1 bg-red-600 text-white hover:bg-red-700 hover:text-white"
+        variant="outline"
+        @click="handleDelete"
+        >Slett markør
+      </Button>
+      <Button
+        v-if="props.mode === 'edit-marker'"
+        class="flex-1"
+        variant="outline"
+        @click="handleClear"
+        >Avbryt
+      </Button>
     </div>
   </Card>
 </template>
@@ -151,7 +164,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select/index.js'
-import { createMarker, updateMarker } from '@/service/markerService.js'
+import { createMarker, deleteMarker, updateMarker } from '@/service/markerService.js'
 
 const props = defineProps({
   mode: { type: String, default: 'new' }, // 'new' or 'edit-marker'
@@ -167,6 +180,7 @@ const openingStart = ref('')
 const openingEnd = ref('')
 const selectedDays = ref([])
 const contactInfo = ref({ name: '', email: '', phone: '' })
+const mode = ref(props.mode)
 
 const daysOfWeek = [
   { key: 'monday', label: 'Mandag' },
@@ -221,10 +235,19 @@ function handleClear() {
   openingEnd.value = ''
   selectedDays.value = []
   contactInfo.value = { name: '', email: '', phone: '' }
-  props.mode = 'new'
+  mode.value = 'new'
+  emit('cancel')
 }
 
-const emit = defineEmits(['saved'])
+async function handleDelete() {
+  if (props.markerData) {
+    await deleteMarker(props.markerData.id)
+    emit('saved')
+    handleClear()
+  }
+}
+
+const emit = defineEmits(['saved', 'cancel'])
 
 async function handleSubmit() {
   errors.value = {
@@ -288,7 +311,7 @@ async function handleSubmit() {
   }
 
   try {
-    if (props.mode === 'edit-marker') {
+    if (mode.value === 'edit-marker') {
       body.id = props.markerData.id
       await updateMarker(body)
     } else {

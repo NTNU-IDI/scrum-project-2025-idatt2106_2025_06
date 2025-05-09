@@ -53,3 +53,15 @@ export async function updateMarker(updateMarkerRequest) {
     throw new Error(message)
   }
 }
+
+export async function deleteMarker(markerId) {
+  try {
+    console.log('Deleting marker..')
+    const response = await api.delete(`/markers/delete/${markerId}`)
+    console.log('Marker deleted successfully:')
+    return response.data
+  } catch (error) {
+    console.error('Failed to delete marker:', error)
+    throw new Error('Could not delete marker')
+  }
+}
