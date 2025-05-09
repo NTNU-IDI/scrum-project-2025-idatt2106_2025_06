@@ -150,7 +150,11 @@ onBeforeUnmount(() => {
 })
 
 async function flyToNearest(type) {
-  const id = await getClosestMarkerId(routeStart, type)
+  const start = {
+    longitude: routeStart.lng,
+    latitude: routeStart.lat,
+  }
+  const id = await getClosestMarkerId(start, type)
   if (id == null) {
     statusMessage.value = 'Ingen nærmeste markør funnet'
     return
@@ -211,7 +215,7 @@ function getGeolocation() {
 function updateRouteStart() {
   if (props.startSelection === 'current') {
     if (userMarker) {
-      const { lng, lat } = userMarker.getLngLat()
+      const { lat, lng } = userMarker.getLngLat()
       routeStart = { lng, lat }
     } else {
       getGeolocation()
@@ -219,7 +223,7 @@ function updateRouteStart() {
   } else {
     const st = props.storages.find((s) => String(s.id) === String(props.startSelection))
     if (st?.location?.longitude != null) {
-      routeStart = { lng: st.location.latitude, lat: st.location.longitude }
+      routeStart = { lng: st.location.longitude, lat: st.location.latitude }
     }
   }
 }
@@ -331,7 +335,7 @@ function redrawAll() {
       const { location, name } = st
       if (q && !`${name}`.toLowerCase().includes(q)) return
       props.storages.forEach((st) => {
-        addHtmlMarker(st, 'storage', [location.latitude, location.longitude])
+        addHtmlMarker(st, 'storage', [location.longitude, location.latitude])
       })
     })
   }

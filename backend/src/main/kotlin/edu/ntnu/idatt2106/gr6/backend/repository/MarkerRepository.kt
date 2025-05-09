@@ -22,7 +22,7 @@ class MarkerRepository(
      INSERT INTO marker (
          id, event_id, name, location, description, 
          contact_info, opening_hours, image_id, type
-     ) VALUES (?, ?, ?, ST_PointFromText(?, 4326), ?, ?, ?, ?, ?)
+     ) VALUES (?, ?, ?, POINT(?, ?), ?, ?, ?, ?, ?)
  """.trimIndent()
 
 
@@ -31,15 +31,16 @@ class MarkerRepository(
                 stmt.setString(1, marker.id)
                 stmt.setString(2, marker.eventId)
                 stmt.setString(3, marker.name)
-                stmt.setString(4, "POINT(${marker.location.longitude} ${marker.location.latitude})") // 🛠 Fixed
-                stmt.setString(5, marker.description)
-                stmt.setObject(6, marker.contactInfo.let {
+                stmt.setObject(4, marker.location.longitude)
+                stmt.setObject(5, marker.location.latitude)
+                stmt.setString(6, marker.description)
+                stmt.setObject(7, marker.contactInfo.let {
                     it?.name + "," + it?.email + "," + it?.phone })
-                stmt.setObject(7, marker.openingHours.let {
+                stmt.setObject(8, marker.openingHours.let {
                     it?.monday + "," + it?.tuesday + "," + it?.wednesday + "," +
                             it?.thursday + "," + it?.friday + "," + it?.saturday + "," + it?.sunday })
-                stmt.setString(8, marker.imageId)
-                stmt.setString(9, marker.type.toString())
+                stmt.setString(9, marker.imageId)
+                stmt.setString(10, marker.type.toString())
 
                 logger.info("raw location: ${marker.location}")
                 logger.info("location: ${marker.location.latitude}, ${marker.location.longitude}")
