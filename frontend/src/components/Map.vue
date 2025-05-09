@@ -8,7 +8,14 @@
     >
       <h3 class="font-semibold mb-2">{{ popup.item.name }}</h3>
       <p class="mb-2">{{ popup.item.description }}</p>
-      <Button class="mt-2" @click="routeToPopup"> Vis rute hit</Button>
+
+      <div class="flex gap-2 mt-2">
+        <Button v-if="!popup.isEvent" class="flex-1" @click="routeToPopup"> Vis rute hit</Button>
+
+        <RouterLink v-if="popup.isEvent" :to="`/alert/${popup.item.id}`" class="flex-1">
+          <Button>Gå til hendelse</Button>
+        </RouterLink>
+      </div>
     </div>
   </div>
 </template>
@@ -16,18 +23,10 @@
 <script setup>
 import 'mapbox-gl/dist/mapbox-gl.css'
 import mapboxgl from 'mapbox-gl'
-import {
-  createVNode,
-  defineEmits,
-  defineExpose,
-  defineProps,
-  onBeforeUnmount,
-  onMounted,
-  reactive,
-  ref,
-  render,
-  watch,
-} from 'vue'
+import { createVNode, onBeforeUnmount, onMounted, reactive, ref, render, watch } from 'vue'
+import { RouterLink } from 'vue-router'
+import { Button } from '@/components/ui/button'
+import { getClosestMarkerId } from '@/service/markerService.js'
 import {
   HeartPulse,
   Hospital,
@@ -42,8 +41,6 @@ import {
   Vault,
   Warehouse,
 } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { getClosestMarkerId } from '@/service/markerService.js'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -55,12 +52,19 @@ const props = defineProps({
   events: Array,
   startSelection: [String, Number],
 })
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'select-event', 'select-marker'])
 
 const mapContainer = ref(null)
 let map = null
-const popup = reactive({ visible: false, item: null, coords: [0, 0] })
-const statusMessage = ref('Ikke aktivert')
+
+const popup = reactive({
+  visible: false,
+  item: null,
+  coords: [0, 0],
+  isEvent: false,
+})
+
+let statusMessage = ref('Ikke aktivert')
 let userMarker = null
 let routeStart = null
 let lastDest = null
@@ -70,7 +74,6 @@ let dashStep = 0
 let markerObjs = []
 let eventMarkerObjs = []
 
-// Path animation
 const dashSequence = [
   [0, 4, 3],
   [0.5, 4, 2.5],
@@ -145,6 +148,8 @@ onBeforeUnmount(() => {
   map?.remove()
 })
 
+/* ——— Exposed Methods ——————————————————— */
+
 async function flyToNearest(type) {
   const id = await getClosestMarkerId(routeStart, type)
   if (id == null) {
@@ -155,7 +160,7 @@ async function flyToNearest(type) {
   if (!m) return
   const coords = [m.location.longitude, m.location.latitude]
   map.flyTo({ center: coords, zoom: 14, essential: true })
-  fetchAndAnimateRoute(routeStart, coords).catch(console.error)
+  fetchAndAnimateRoute(routeStart, coords)
 }
 
 function flyToUser() {
@@ -168,6 +173,8 @@ function flyToUser() {
 }
 
 defineExpose({ statusMessage, flyToUser, flyToNearest })
+
+/* ——— Helpers ————————————————————— */
 
 function getLocation() {
   const [lng, lat] = map.getCenter().toArray()
@@ -284,27 +291,24 @@ function animateDash(timestamp = 0) {
 function redrawAll() {
   if (!map?.isStyleLoaded()) return
 
+  const style = map.getStyle()?.sources || {}
+  Object.keys(style)
+    .filter((id) => id.startsWith('event-') && id.endsWith('-src'))
+    .forEach((srcId) => {
+      const layerId = srcId.replace('-src', '-layer')
+      if (map.getLayer(layerId)) map.removeLayer(layerId)
+      map.removeSource(srcId)
+    })
+
   markerObjs.forEach((o) => o.marker.remove())
   markerObjs = []
   eventMarkerObjs.forEach((o) => o.marker.remove())
   eventMarkerObjs = []
 
-  props.events?.forEach((ev) => {
-    ;[
-      'impactAreaRadiusKm',
-      'recommendedEvacuationAreaRadiusKm',
-      'mandatoryEvacuationAreaRadiusKm',
-    ].forEach((field) => {
-      const srcId = `event-${ev.id}-${field}-src`
-      const layerId = `event-${ev.id}-${field}-layer`
-      if (map.getLayer(layerId)) map.removeLayer(layerId)
-      if (map.getSource(srcId)) map.removeSource(srcId)
-    })
-  })
-
   const s = props.settings
   const q = s.searchQuery?.toLowerCase() || ''
 
+  // standard markers
   props.markers.forEach((m) => {
     const { type, location, name, description, capacity } = m
     if (
@@ -318,48 +322,52 @@ function redrawAll() {
     )
       return
     if (capacity != null && capacity < s.minCapacity) return
-    if (q && !`${name} ${description}`.toLowerCase().includes(q)) return
+    if (q && `!${name} ${description}`.toLowerCase().includes(q)) return
 
     addHtmlMarker(m, type, [location.longitude, location.latitude])
   })
 
+  // storages
   if (s.showStorages) {
     props.storages.forEach((st) => {
       console.log('st: ' + st)
       const { location, name } = st
       if (q && !`${name}`.toLowerCase().includes(q)) return
-      addHtmlMarker(st, 'storage', [location.latitude, location.longitude])
+      props.storages.forEach((st) => {
+        addHtmlMarker(st, 'storage', [location.latitude, location.longitude])
+      })
     })
   }
 
-  if (props.settings.showEvents) {
-    props.events?.forEach((ev) => {
-      const { location, severity } = ev
-      const cfg = severityConfig[severity] || severityConfig.info
-      addHtmlMarker(ev, null, [location.longitude, location.latitude], cfg)
+  // event markers + circles
+  if (s.showEvents) {
+    props.events.forEach((ev) => {
+      addHtmlMarker(
+        ev,
+        null,
+        [ev.location.longitude, ev.location.latitude],
+        severityConfig[ev.severity] || severityConfig.info,
+      )
     })
 
-    props.events?.forEach((ev) => {
+    props.events.forEach((ev) => {
       const center = [ev.location.longitude, ev.location.latitude]
       ;[
         ['impactAreaRadiusKm', 'rgba(0,0,255,0.2)', 'rgba(0,0,255,0.5)'],
         ['recommendedEvacuationAreaRadiusKm', 'rgba(255,165,0,0.2)', 'rgba(255,165,0,0.5)'],
         ['mandatoryEvacuationAreaRadiusKm', 'rgba(255,0,0,0.2)', 'rgba(255,0,0,0.5)'],
-      ].forEach(([field, fill, outline]) => {
-        const km = ev[field]
+      ].forEach(([f, fill, outline]) => {
+        const km = ev[f]
         if (km != null) {
           const feat = generateCircle(center, km)
-          const srcId = `event-${ev.id}-${field}-src`
-          const layerId = `event-${ev.id}-${field}-layer`
+          const srcId = `event-${ev.id}-${f}-src`
+          const layerId = `event-${ev.id}-${f}-layer`
           map.addSource(srcId, { type: 'geojson', data: feat })
           map.addLayer({
             id: layerId,
             type: 'fill',
             source: srcId,
-            paint: {
-              'fill-color': fill,
-              'fill-outline-color': outline,
-            },
+            paint: { 'fill-color': fill, 'fill-outline-color': outline },
           })
         }
       })
@@ -389,17 +397,29 @@ function addHtmlMarker(item, type, coords, overrideCfg) {
   el.appendChild(wrap)
 
   const marker = new mapboxgl.Marker(el).setLngLat(coords).addTo(map)
+  const isEvent = !!overrideCfg
+  const isStorage = type === 'storage'
 
-  if (!overrideCfg) {
+  if (isEvent) {
+    marker.getElement().addEventListener('click', (e) => {
+      e.stopPropagation()
+      popup.item = { ...item, id: item.id } // ensure .id
+      popup.coords = coords
+      popup.isEvent = true
+      popup.visible = true
+      emit('select-event', popup.item)
+    })
+    eventMarkerObjs.push({ marker, el })
+  } else if (!isStorage) {
     marker.getElement().addEventListener('click', (e) => {
       e.stopPropagation()
       popup.item = item
       popup.coords = coords
+      popup.isEvent = false
       popup.visible = true
+      emit('select-marker', item)
     })
     markerObjs.push({ marker, el })
-  } else {
-    eventMarkerObjs.push({ marker, el })
   }
 }
 

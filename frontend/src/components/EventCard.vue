@@ -30,10 +30,13 @@ const props = defineProps({
   content: { type: String, default: '' },
 
   // Ikke obligatoriske props
-  updatedAt: { type: [String, Object]},
+  updatedAt: { type: [String, Object] },
   startTime: { type: [String, Object], default: null },
   endTime: { type: [String, Object], default: null },
   location: { type: Object, default: null },
+  impactAreaRadiusKm: { type: Number, default: 0 },
+  recommendedEvacuationAreaRadiusKm: { type: Number, default: 0 },
+  mandatoryEvacuationAreaRadiusKm: { type: Number, default: 0 },
 })
 
 const handleDelete = async () => {
@@ -80,6 +83,9 @@ const handleEdit = () => {
     description: props.description,
     content: props.content,
     severity: props.severity,
+    impactAreaRadiusKm: props.impactAreaRadiusKm,
+    recommendedEvacuationAreaRadiusKm: props.recommendedEvacuationAreaRadiusKm,
+    mandatoryEvacuationAreaRadiusKm: props.mandatoryEvacuationAreaRadiusKm,
     type: props.type,
     status: props.status,
     location: props.location,

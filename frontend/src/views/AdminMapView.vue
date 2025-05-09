@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useEventStore } from '@/stores/event.js'
 import { useSessionStore } from '@/stores/session'
 import { Button } from '@/components/ui/button'
@@ -7,14 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import EventForm from '@/components/EventForm.vue'
 import MarkerForm from '@/components/MarkerForm.vue'
-import EventCard from '@/components/EventCard.vue'
 import Map from '@/components/Map.vue'
 import { getAllMarkers } from '@/service/markerService'
 import { fetchStorages } from '@/service/storageService'
+import EventCard from '@/components/EventCard.vue'
 
 const activeTab = ref('event')
 const formMode = ref('new')
 const selectedEvent = ref(null)
+const selectedMarker = ref(null)
+
 const eventStore = useEventStore()
 const sessionStore = useSessionStore()
 const events = computed(() => eventStore.events)
@@ -22,21 +24,28 @@ const events = computed(() => eventStore.events)
 const location = reactive({ lng: 10.40574, lat: 63.41754, bearing: 0, pitch: 0, zoom: 12 })
 const markers = ref([])
 const storages = ref([])
+
 const settings = reactive({
   searchQuery: '',
-  showPersonal: true,
-  showGeneral: true,
-  showShelters: true,
-  showDefibrillators: true,
-  showEmergencyClinics: true,
-  showDistributionPoints: true,
-  showPoliceStations: true,
-  showPharmacies: true,
-  showStorages: true,
+  showEvents: true,
+  showPersonal: false,
+  showGeneral: false,
+  showShelters: false,
+  showDefibrillators: false,
+  showEmergencyClinics: false,
+  showDistributionPoints: false,
+  showPoliceStations: false,
+  showPharmacies: false,
+  showStorages: false,
   minCapacity: 0,
   geoLocationEnabled: true,
 })
+
 const startSelection = ref('current')
+
+async function loadMarkers() {
+  markers.value = await getAllMarkers()
+}
 
 onMounted(async () => {
   try {
@@ -48,14 +57,36 @@ onMounted(async () => {
   storages.value = await fetchStorages()
 })
 
+watch(activeTab, (tab) => {
+  const isEventTab = tab === 'event'
+  const isMarkerTab = tab === 'marker'
+
+  settings.showEvents = isEventTab
+
+  settings.showPersonal = isMarkerTab
+  settings.showGeneral = isMarkerTab
+  settings.showShelters = isMarkerTab
+  settings.showDefibrillators = isMarkerTab
+  settings.showEmergencyClinics = isMarkerTab
+  settings.showDistributionPoints = isMarkerTab
+  settings.showPoliceStations = isMarkerTab
+  settings.showPharmacies = isMarkerTab
+  settings.showStorages = isMarkerTab
+})
+
 function onNewEvent() {
   formMode.value = 'new'
   selectedEvent.value = null
 }
 
-function handleEditEvent(eventData) {
+function handleEditEvent(ev) {
   formMode.value = 'edit'
-  selectedEvent.value = eventData
+  selectedEvent.value = ev
+}
+
+function handleEditMarker(marker) {
+  formMode.value = 'edit-marker'
+  selectedMarker.value = marker
 }
 </script>
 
@@ -82,7 +113,7 @@ function handleEditEvent(eventData) {
         </TabsContent>
 
         <TabsContent value="marker">
-          <MarkerForm />
+          <MarkerForm :marker-data="selectedMarker" :mode="formMode" @saved="loadMarkers" />
         </TabsContent>
       </Tabs>
     </div>
@@ -110,8 +141,11 @@ function handleEditEvent(eventData) {
             :description="ev.description"
             :endTime="ev.endTime"
             :event-id="ev.id"
+            :impactAreaRadiusKm="ev.impactAreaRadiusKm"
             :location="ev.location"
+            :mandatoryEvacuationAreaRadiusKm="ev.mandatoryEvacuationAreaRadiusKm"
             :name="ev.name"
+            :recommendedEvacuationAreaRadiusKm="ev.recommendedEvacuationAreaRadiusKm"
             :severity="ev.severity"
             :startTime="ev.startTime"
             :status="ev.status"
@@ -126,11 +160,14 @@ function handleEditEvent(eventData) {
       <Map
         ref="mapRef"
         v-model="location"
-        :markers="markers"
+        :events="activeTab === 'event' ? events : []"
+        :markers="activeTab === 'marker' ? markers : []"
         :settings="settings"
         :start-selection="startSelection"
-        :storages="storages"
+        :storages="activeTab === 'marker' ? storages : []"
         class="w-full h-full rounded"
+        @select-event="handleEditEvent"
+        @select-marker="handleEditMarker"
       />
     </div>
   </div>
