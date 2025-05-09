@@ -58,7 +58,7 @@ import { ArrowRightIcon } from 'lucide-vue-next'
         </div>
       </BentoCardCustom>
 
-      <BentoCardCustom customClass="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-3 min-h-[30rem] lg:w-[45rem]" class="cursor-default" name="Beredskap">
+      <BentoCardCustom customClass="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-3 min-h-[30rem]" class="cursor-default" name="Beredskap">
         <ExpiringSoon/>
       </BentoCardCustom>
     </BentoGrid>
