@@ -18,6 +18,7 @@ import EmailVerificationView from '@/views/EmailVerificationView.vue'
 import { useSessionStore } from '@/stores/session.js'
 import EventView from '@/views/EventView.vue'
 import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
+import AboutUsView from '@/views/AboutUsView.vue'
 
 const routes = [
   { path: '/', component: HomeView, name: 'home' },
@@ -34,6 +35,7 @@ const routes = [
   { path: '/during', component: DuringView, name: 'during' },
   { path: '/after', component: AfterView, name: 'after' },
   { path: '/privacy-policy', component: PrivacyPolicyView, name: 'privacy-policy' },
+  { path: '/about-us', component: AboutUsView, name: 'about-us' },
   {
     path: '/admin/map',
     component: AdminMap,

@@ -45,22 +45,13 @@
           </div>
         </div>
 
-        <!--
         <div class="flex flex-col gap-2">
-          <h3 class="font-bold text-lg">Help</h3>
+          <h3 class="font-bold text-lg">Om oss</h3>
           <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> Contact Us </a>
-          </div>
-
-          <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> FAQ </a>
-          </div>
-
-          <div>
-            <a class="opacity-60 hover:opacity-100" href="#"> Feedback </a>
+            <router-link class="opacity-60 hover:opacity-100" to="/about-us"> Om oss</router-link>
           </div>
         </div>
-        -->
+
 
         <!--
         <div class="flex flex-col gap-2">
