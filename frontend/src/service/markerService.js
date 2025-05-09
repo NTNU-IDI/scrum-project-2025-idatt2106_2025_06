@@ -26,7 +26,9 @@ export async function getAllMarkers() {
 
 export async function getClosestMarkerId(startLocation, type) {
   try {
+    console.log('Startlocation: ', startLocation, 'Type: ', type)
     console.log('Fetching closest marker..')
+
     const response = await api.post('/markers/closest', {
       startLocation,
       type,
@@ -49,5 +51,17 @@ export async function updateMarker(updateMarkerRequest) {
     console.error('Failed to update marker:', error)
     const message = error.response?.data?.message || 'Kunne ikke oppdatere markør'
     throw new Error(message)
+  }
+}
+
+export async function deleteMarker(markerId) {
+  try {
+    console.log('Deleting marker..')
+    const response = await api.delete(`/markers/delete/${markerId}`)
+    console.log('Marker deleted successfully:')
+    return response.data
+  } catch (error) {
+    console.error('Failed to delete marker:', error)
+    throw new Error('Could not delete marker')
   }
 }

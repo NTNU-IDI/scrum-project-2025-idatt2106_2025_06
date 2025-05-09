@@ -111,6 +111,7 @@ watch(isNewItemDialogOpen, (value) => {
     if (!value) {
       refreshFields();
     }
+    inventoryStore.getAllRegisteredItems();
   },
 )
 
