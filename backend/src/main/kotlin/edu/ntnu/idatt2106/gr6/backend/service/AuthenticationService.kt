@@ -22,6 +22,20 @@ import org.springframework.stereotype.Service
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
+/**
+ * Service class for handling user authentication and registration.
+ * It contains methods for signing up users, logging in users, verifying users.
+ *
+ *
+ * @param userRepository The repository for user data access.
+ * @param roleRepository The repository for role data access.
+ * @param authenticationManager The authentication manager for handling authentication.
+ * @param passwordEncoder The password encoder for encoding passwords.
+ * @param emailService The email service for sending verification emails.
+ * @param jwtService The JWT service for generating and validating tokens.
+ * @param idGenerator The ID generator for generating unique IDs.
+ */
+
 @Service
 class AuthenticationService(
     private val userRepository: UserRepository,
@@ -33,6 +47,12 @@ class AuthenticationService(
     private val idGenerator: IdGenerator
 ) {
     private val logger = LoggerFactory.getLogger(AuthenticationService::class.java)
+
+    /**
+     * Signs up a new user to the service. it checks if user already exits before proceeding.
+     * Request is validated and mapped to a User object. User is saved to the database.
+     *
+     */
 
         @Transactional
     fun signupUser(
@@ -60,7 +80,6 @@ class AuthenticationService(
             val token = jwtService.generateVerificationToken(
                 UUID.fromString(savedUser.id), savedUser.email
             )
-            logger.info("adasddasdas" + token)
         val verificationToken: String = token
         userRepository.saveEmailVerificationToken(generateVerificationId(), UUID.fromString(savedUser.id), verificationToken)
         emailService.sendVerificationLink(email, verificationToken)
