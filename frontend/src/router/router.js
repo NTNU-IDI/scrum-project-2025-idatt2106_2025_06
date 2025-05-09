@@ -17,6 +17,7 @@ import AdminMap from '@/views/AdminMapView.vue'
 import EmailVerificationView from '@/views/EmailVerificationView.vue'
 import { useSessionStore } from '@/stores/session.js'
 import EventView from '@/views/EventView.vue'
+import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
 
 const routes = [
   { path: '/', component: HomeView, name: 'home' },
@@ -32,23 +33,24 @@ const routes = [
   { path: '/before', component: BeforeView, name: 'before' },
   { path: '/during', component: DuringView, name: 'during' },
   { path: '/after', component: AfterView, name: 'after' },
+  { path: '/privacy-policy', component: PrivacyPolicyView, name: 'privacy-policy' },
   {
     path: '/admin/map',
     component: AdminMap,
     name: 'admin-map',
-    meta: { requiresAdminAccess: true },
+    meta: { requiresAdminAccess: true }
   },
   { path: '/admin', component: AdminView, name: 'admin', meta: { requiresAdminAccess: true } },
   {
     path: '/email-verification/:token',
     component: EmailVerificationView,
-    meta: { requiresAuth: false },
-  },
+    meta: { requiresAuth: false }
+  }
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
+  routes
 })
 
 router.beforeEach((to, from, next) => {
