@@ -5,6 +5,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
+/**
+ * Global exception handler for the application.
+ *
+ * This class handles custom exceptions thrown by the application and returns appropriate HTTP responses.
+ */
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -43,6 +48,25 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.message)
     }
 
+    @ExceptionHandler(UserEmailNotVerifiedException::class)
+    fun handleUserEmailNotVerifiedException(ex: UserEmailNotVerifiedException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.message)
+    }
+
+    @ExceptionHandler(TokenIncorrectlyFormattedException::class)
+    fun handleTokenIncorrectlyFormattedException(ex: TokenIncorrectlyFormattedException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.message)
+    }
+
+    @ExceptionHandler(TokenInvalidException::class)
+    fun handleTokenInvalidException(ex: TokenInvalidException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.message)
+    }
+
+    @ExceptionHandler(RecaptchaVerificationFailedException::class)
+    fun handleRecaptchaVerificationFailedException(ex: RecaptchaVerificationFailedException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.message)
+    }
     //EVENTS
 
     @ExceptionHandler(EventDoesNotExistException::class)

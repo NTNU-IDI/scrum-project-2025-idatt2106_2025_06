@@ -1,8 +1,10 @@
 package edu.ntnu.idatt2106.gr6.backend.service
 
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.CreateStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageResponse
 import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.StorageSummary
+import edu.ntnu.idatt2106.gr6.backend.DTOs.StorageDTOs.UpdateStorageRequest
 import edu.ntnu.idatt2106.gr6.backend.DTOs.UserDTOs.SimpleUserResponse
 import edu.ntnu.idatt2106.gr6.backend.model.Location
 import edu.ntnu.idatt2106.gr6.backend.model.toResponse
@@ -86,7 +88,48 @@ class StorageService(
 
     @Transactional
     fun getStoragesByUserId(): List<StorageSummary> {
-        val userId = userContextService.getCurrentUserId()
-        return storageRepository.findStoragesByUserId(userId.toString())
+        val userId = userContextService.getCurrentUserId().toString()
+        return storageRepository.findStoragesByUserId(userId)
+    }
+
+    /**
+     * Optionally updates the name and location of a storage
+     *
+     * @param request The update request contains the id, new name and location
+     * @return `true` if the storage was successfully updated, `false` if not
+     */
+    @Transactional
+    fun updateStorage(request: UpdateStorageRequest): Boolean {
+        val userId = userContextService.getCurrentUserId().toString()
+        logger.info("User $userId is attempting to update the storage ${request.id}")
+
+        return storageRepository.updateStorageIfOwner(
+            storageId = request.id,
+            userId = userId,
+            newName = request.name,
+            newLocation = request.location
+        )
+    }
+
+    /**
+     * Deletes the storage if the current user is the owner of the storage
+     *
+     * @param storageId The ID of the storage the user wants to delete
+     * @return          ´true´ if the storage was deleted, ´false´ if not
+     */
+    @Transactional
+    fun deleteStorage(storageId: String): Boolean {
+        val currentUserId = userContextService.getCurrentUserId().toString()
+        logger.info("User $currentUserId is attempting to delete storage $storageId")
+
+        val deleted = storageRepository.deleteStorage(storageId, currentUserId)
+
+        if (deleted) {
+            logger.info("User $currentUserId deleted storage $storageId, succesfully")
+        } else {
+            logger.info("User $currentUserId did NOT deleted storage $storageId, succesfully!!!!")
+        }
+
+        return deleted
     }
 }

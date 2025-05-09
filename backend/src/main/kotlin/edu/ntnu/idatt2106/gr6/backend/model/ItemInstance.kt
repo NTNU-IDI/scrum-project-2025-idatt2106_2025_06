@@ -4,6 +4,11 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 
+/**
+ * Data class representing an instance of an item in the system. This class allows
+ * users to store data about items that may vary from between each instance of an item
+ * . It contains information such as expiration date and amount.
+ */
 data class ItemInstance(
     val id: String,
     val itemId: String,

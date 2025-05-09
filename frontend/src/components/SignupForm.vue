@@ -9,22 +9,32 @@ import {
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {ref} from "vue";
+import { onMounted, ref } from 'vue'
 import {useRouter} from "vue-router";
 import axios from "axios";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
+const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const name = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
+const recaptchaToken = ref('');
 
 const errorMessage = ref("");
+const isDialogOpen = ref(false);
 
 const router = useRouter();
+
 
 const registerUser = async () => {
   if (password.value !== confirmPassword.value) {
     errorMessage.value = "Passordene må være like.";
+    return;
+  }
+
+  if (!recaptchaToken.value) {
+    errorMessage.value = "Vennligst fullfør reCAPTCHA.";
     return;
   }
 
@@ -34,9 +44,15 @@ const registerUser = async () => {
       name: name.value,
       email: email.value,
       password: password.value,
+      recaptcha: recaptchaToken.value,
     });
 
-    router.push("/login");
+    if(response.data.verified) {
+      router.push("/login");
+    }
+    else {
+      isDialogOpen.value = true;
+    }
 
   } catch (error) {
     if (error.response && error.response.data && error.response.data.message) {
@@ -48,6 +64,28 @@ const registerUser = async () => {
     console.error("Feil ved registrering:", error);
   }
 };
+
+const closeDialog = () => {
+  isDialogOpen.value = false;
+  router.push("/login");
+};
+
+const loadRecaptcha = () => {
+
+  const script = document.createElement("script");
+  script.src = "https://www.google.com/recaptcha/api.js";
+  script.async = true;
+  script.defer = true;
+  document.body.appendChild(script);
+}
+
+onMounted(() => {
+  window.handleRecaptchaResponse = (token) => {
+    recaptchaToken.value = token
+  }
+
+  loadRecaptcha();
+});
 </script>
 
 <template>
@@ -73,6 +111,12 @@ const registerUser = async () => {
 
             <Label for="confirmpassword">Bekreft passord</Label>
             <Input id="confirmpassword" v-model="confirmPassword" required type="password"/>
+            <div
+              class="g-recaptcha"
+              :data-sitekey="recaptchaSiteKey"
+              data-callback="handleRecaptchaResponse"
+            ></div>
+
             <Button class="w-full" type="submit">Registrer</Button>
             <p>
               <span v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</span>
@@ -86,4 +130,16 @@ const registerUser = async () => {
       </div>
     </CardContent>
   </Card>
+
+  <Dialog :open="isDialogOpen" @update:open="isDialogOpen = $event">
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>E-postbekreftelse</DialogTitle>
+        <DialogDescription>
+          En bekreftelseslenke er sendt til e-posten din. Vennligst sjekk innboksen din for å bekrefte kontoen.
+        </DialogDescription>
+      </DialogHeader>
+      <Button class="mt-4" @click="closeDialog">OK</Button>
+    </DialogContent>
+  </Dialog>
 </template>

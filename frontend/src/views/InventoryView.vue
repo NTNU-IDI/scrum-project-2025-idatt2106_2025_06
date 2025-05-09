@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import InventoryTable from '@/components/InventoryTable.vue'
 import { Button } from '@/components/ui/button/index.js'
 import NewItem from '@/components/NewItem.vue'
+import { useWindowSize } from '@vueuse/core'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,8 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { onMounted, ref, watch } from 'vue'
-import axios from 'axios'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   Select,
   SelectContent,
@@ -24,209 +24,75 @@ import {
   SelectValue
 } from '@/components/ui/select/index.js'
 import { RefreshCw } from 'lucide-vue-next';
+import { useStorageStore } from '@/stores/storage.js'
+import router from '@/router/router.js'
+import { useSessionStore } from '@/stores/session.js'
+import { useInventoryStore } from '@/stores/inventory.js'
+import Checklist from '@/components/Checklist.vue'
 
 const selectedBoxIds = ref([]);
 
-const handleDelete = () => {
-  console.log(selectedBoxIds.value);
+const handleDelete = async() => {
+  await inventoryStore.deleteAllSelectedItems(selectedBoxIds.value, activeStorageId.value, typeId.value)
 }
 
 const activeTab = ref('matOgDrikke');
-const currentItems = ref();
+const currentItems = computed(() => groupItems(inventoryStore.inventory));
 
-const items1 = [
-  {
-    id: 1,
-    name: "Pasta",
-    amount: 500,
-    unit: 2,
-    expirationDate: "2025-05-04"
-  },
-  {
-    id: 2,
-    name: "Rice",
-    amount: 1000,
-    unit: 2,
-    expirationDate: "2025-05-07"
-  },
-  {
-    id: 6,
-    name: "Tomato",
-    amount: 500,
-    unit: 2,
-    expirationDate: "2025-05-04"
-  },
-  {
-    id: 5,
-    name: "Tomato",
-    amount: 400,
-    unit: 2,
-    expirationDate: "2025-05-17"
-  },
-  {
-    id: 4,
-    name: "Olive Oil",
-    amount: 0.5,
-    unit: 3,
-    expirationDate: "2025-05-10"
-  },
-  {
-    id: 7,
-    name: "Ost",
-    amount: 500,
-    unit: 2,
-    expirationDate: "2025-05-10"
-  },
-  {
-    id: 10,
-    name: "Ost",
-    amount: 250,
-    unit: 2,
-    expirationDate: "2025-05-05"
-  }
+const types = [
+  {id: 'matOgDrikke', name: 'Mat og drikke'},
+  {id: 'varmeOgLys', name: 'Varme og lys'},
+  {id: 'informasjon', name: 'Informasjon'},
+  {id: 'legemidOgHygiene', name: 'Legemidler og hygiene'},
+  {id: 'annet', name: 'Annet'},
 ];
 
-
-const items2 = [
-  {
-    id: 1,
-    name: "LED Bulb",
-    amount: 10,
-    unit: 1,
-    expirationDate: "2025-05-30"
-  },
-  {
-    id: 2,
-    name: "Gas Heater",
-    amount: 1,
-    unit: 1,
-    expirationDate: "2025-06-30"
-  },
-  {
-    id: 3,
-    name: "Battery Pack",
-    amount: 5,
-    unit: 1,
-    expirationDate: "2025-05-20"
+const typeId = computed(() => {
+  switch (activeTab.value) {
+    case 'matOgDrikke': return 1;
+    case 'varmeOgLys': return 2;
+    case 'informasjon': return 3;
+    case 'legemidOgHygiene': return 4;
+    case 'annet': return 5;
+    default: return 1;
   }
-];
-
-const items3 = [
-  {
-    id: 1,
-    name: "User Manual for Heater",
-    amount: 1,
-    unit: 1,
-    expirationDate: "2026-04-30"
-  },
-  {
-    id: 2,
-    name: "Instruction Book for Pasta Cooker",
-    amount: 1,
-    unit: 1,
-    expirationDate: "2026-04-30"
-  },
-  {
-    id: 3,
-    name: "Safety Instructions for Gas Heater",
-    amount: 1,
-    unit: 1,
-    expirationDate: "2025-10-30"
-  }
-];
-
-const items4 = [
-  {
-    id: 1,
-    name: "Pain Reliever (Ibuprofen)",
-    amount: 20,
-    unit: 1,
-    expirationDate: "2025-05-15"
-  },
-  {
-    id: 2,
-    name: "Toothpaste",
-    amount: 1,
-    unit: 1,
-    expirationDate: "2025-06-01"
-  },
-  {
-    id: 3,
-    name: "Shampoo",
-    amount: 200,
-    unit: 2,
-    expirationDate: "2025-06-10"
-  },
-  {
-    id: 4,
-    name: "Hand Sanitizer",
-    amount: 100,
-    unit: 2,
-    expirationDate: "2025-05-10"
-  }
-];
-
-const items5 = [];
-
-const typeId = ref();
+});
 const isLoading = ref(false);
+
+const inventoryStore = useInventoryStore();
 
 const fetchItems = async () => {
   isLoading.value = true;
-  if (activeTab.value === 'matOgDrikke') {
-    typeId.value = 1;
-    currentItems.value = groupItems(items1);
-  } else if (activeTab.value === 'varmeOgLys') {
-    typeId.value = 2;
-    currentItems.value = groupItems(items2);
-  } else if (activeTab.value === 'informasjon') {
-    typeId.value = 3;
-    currentItems.value = groupItems(items3);
-  } else if (activeTab.value === 'legemidOgHygiene') {
-    typeId.value = 4;
-    currentItems.value = groupItems(items4);
-  } else if (activeTab.value === 'annet') {
-    typeId.value = 5;
-    currentItems.value = groupItems(items5);
-  }
 
-  /*const response = await axios.get(`http://localhost:8080/api/item/storage/${storageId.value}/items`,
-    {
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      },
-      params: {
-        typeId: typeId.value
-      }
-    }
-  );
-  items.value = response.data;
-
-   */
+  await inventoryStore.getAllFromInventoryType(activeStorageId.value, typeId.value);
 
   isLoading.value = false;
 }
 
-//midlertidig, for å se om loading funker
+const totItemAmount = ref(0);
+const storageStore = useStorageStore();
+const allStorages = computed(() => storageStore.storages);
+const activeStorageId = ref();
+const activeStorageName = ref();
+
 const refreshItems = async () => {
   isLoading.value = true;
-  await new Promise(resolve => setTimeout(resolve, 1000));
   await fetchItems();
   isLoading.value = false;
 }
 
 const groupItems = (items) => {
   const result = [];
-  const totItemAmount = items.length;
+  totItemAmount.value = items.length;
   let itemCount = 0;
 
-  while (itemCount < totItemAmount) {
+  while (itemCount < totItemAmount.value) {
     const currentItem = items[itemCount];
     const group = [currentItem];
 
     let subItemCount = itemCount + 1;
 
-    while ((subItemCount < totItemAmount) && (items[subItemCount].name === currentItem.name)) {
+    while ((subItemCount < totItemAmount.value) && (items[subItemCount].name === currentItem.name)) {
       group.push(items[subItemCount]);
       subItemCount++;
     }
@@ -237,11 +103,11 @@ const groupItems = (items) => {
       result.push({
         name: currentItem.name,
         amount: group.reduce((sum, item) => sum + item.amount, 0),
-        unit: currentItem.unit,
-        expirationDate:
+        unitId: currentItem.unitId,
+        expiryDate:
           group.reduce((min, item) =>
-              item.expirationDate < min ? item.expirationDate : min,
-            group[0].expirationDate
+              item.expiryDate < min ? item.expiryDate : min,
+            group[0].expiryDate
           ),
         items: group
       });
@@ -251,19 +117,12 @@ const groupItems = (items) => {
   return result;
 }
 
-const storages = ref([
-  {
-    id: 1,
-    name: 'Hjemme'
-  },
-  {
-    id: 2,
-    name: 'Hytta'
-  }
-]);
+const sessionStore = useSessionStore();
+const startupFinished = ref(false);
+const smallerScreenTab = ref("inventory");
 
-const activeStorageId = ref();
-const activeStorageName = ref();
+const { width: screenWidth } = useWindowSize();
+const isSmallerScreen = computed(() => screenWidth.value < 1280);
 
 watch(() => activeTab.value, async () => {
   selectedBoxIds.value = [];
@@ -271,49 +130,90 @@ watch(() => activeTab.value, async () => {
 })
 
 watch(() => activeStorageId.value, async (newId) => {
-  const newSelection = storages.value.find(storage => storage.id === newId);
+  const newSelection = allStorages.value.find(storage => storage.id === newId);
   activeStorageName.value = newSelection.name;
 
   selectedBoxIds.value = [];
   await fetchItems();
 })
 
-onMounted(async () => {
+onMounted( async () => {
+  if (!sessionStore.isAuthenticated) {
+    router.push('/login')
+    console.log("Det er noe galt med innloggingen, tas til logg inn");
+  }
+
+  try {
+    await storageStore.fetchAll(sessionStore.token)
+  } catch (error) {
+    console.error("Klarte ikke hente husstander:", error)
+  }
+
+  if (allStorages.value.length > 0) {
+    activeStorageId.value = allStorages.value[0].id;
+    activeStorageName.value = allStorages.value[0].name;
+  }
   await fetchItems();
-  activeStorageId.value = storages.value[0].id;
-  activeStorageName.value = storages.value[0].name;
+  startupFinished.value = true;
 })
 </script>
 
 <template>
-  <div class="m-auto mt-10" v-if="activeStorageId">
-    <div class="flex justify-between pt-2 pb-2 items-center">
+  <div class="mx-auto my-5" v-if="isSmallerScreen && activeStorageId">
+    <Tabs v-model="smallerScreenTab">
+      <TabsList>
+        <TabsTrigger value="inventory">Beredskapslager</TabsTrigger>
+        <TabsTrigger value="checklist">Beredskapsgrad</TabsTrigger>
+      </TabsList>
+    </Tabs>
+  </div>
+  <div class="mx-auto flex" v-if="activeStorageId">
+    <div class="xl:mr-10" v-if="(smallerScreenTab === 'checklist' && isSmallerScreen ) || !isSmallerScreen">
+      <Checklist />
+    </div>
+  <div class="mx-auto my-4 xl:mt-6" v-if="(smallerScreenTab === 'inventory' && isSmallerScreen ) || !isSmallerScreen">
+    <div class="flex flex-col md:flex-row justify-between pt-2 pb-2 items-center">
       <p class="text-xl font-bold"> {{ activeStorageName }} sitt beredskapslager</p>
+      <div class="flex flex-row gap-2 mt-2 w-11/12 md:justify-end">
       <Select v-if="activeStorageId" v-model="activeStorageId">
-        <SelectTrigger class="w-2/5">
+        <SelectTrigger class="w-1/2">
           <SelectValue placeholder="Velg sted" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem v-for="storage in storages" :key="storage.id" :value="storage.id">
+            <SelectItem v-for="storage in allStorages" :key="storage.id" :value="storage.id">
               {{ storage.name }}
             </SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
+      <Select v-if="currentItems && allStorages.length > 0 && screenWidth < 768" v-model="activeTab">
+        <SelectTrigger class="w-1/2">
+          <SelectValue placeholder="Velg type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem v-for="type in types" :key="type.id" :value="type.id">
+              {{ type.name }}
+            </SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      </div>
     </div>
 
-    <div class="flex justify-end pt-2 pb-2">
+    <div class="flex justify-center md:justify-end pt-2 pb-2">
       <Button variant="outline" class="mr-2" @click="refreshItems" :disabled="isLoading">
         <RefreshCw :class="isLoading ? 'animate-spin' : '' "/>
       </Button>
-      <NewItem v-if="typeId" :typeId="typeId"/>
+      <NewItem v-if="typeId" :typeId="typeId" :storageId="activeStorageId"/>
       <AlertDialog>
         <AlertDialogTrigger :disabled="selectedBoxIds.length === 0" class="disabled:cursor-not-allowed">
           <Button
             :disabled="selectedBoxIds.length === 0"
-            class="ml-2 bg-red-800 hover:bg-red-900 selected"
-            @click="handleDelete">Slett markerte</Button>
+            variant="destructive"
+            class="ml-2">
+            Slett markerte</Button>
         </AlertDialogTrigger>
         <AlertDialogContent v-if="selectedBoxIds.length > 0">
           <AlertDialogHeader>
@@ -324,13 +224,13 @@ onMounted(async () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Avbryt</AlertDialogCancel>
-            <AlertDialogAction class="bg-red-800 hover:bg-red-900">Slett</AlertDialogAction>
+            <AlertDialogAction class="bg-red-800 hover:bg-red-900" @click="handleDelete">Slett</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
 
-    <Tabs v-model="activeTab" v-if="currentItems" class="w-full max-w-5xl">
+    <Tabs v-model="activeTab" v-if="currentItems && allStorages.length > 0 && screenWidth >= 768">
       <TabsList>
         <TabsTrigger value="matOgDrikke">Mat og drikke</TabsTrigger>
         <TabsTrigger value="varmeOgLys">Varme og lys</TabsTrigger>
@@ -340,25 +240,37 @@ onMounted(async () => {
       </TabsList>
 
       <TabsContent value="matOgDrikke">
-        <InventoryTable :newItems="currentItems" :typeId="1" tab="matOgDrikke" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="1" :totItemAmount="totItemAmount" :storageId="activeStorageId" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
 
       <TabsContent value="varmeOgLys">
-        <InventoryTable :newItems="currentItems" :typeId="2" tab="varmeOgLys" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="2" :totItemAmount="totItemAmount" :storageId="activeStorageId" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
 
       <TabsContent value="informasjon">
-        <InventoryTable :newItems="currentItems" :typeId="3" tab="informasjon" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="3" :totItemAmount="totItemAmount" :storageId="activeStorageId" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
 
       <TabsContent value="legemidOgHygiene">
-        <InventoryTable :newItems="currentItems" :typeId="4" tab="legemidOgHygiene" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="4" :totItemAmount="totItemAmount" :storageId="activeStorageId" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
 
       <TabsContent value="annet">
-        <InventoryTable :newItems="currentItems" :typeId="5" tab="annet" @selectionChanged="selectedBoxIds = $event"/>
+        <InventoryTable :newItems="currentItems" :typeId="5" :totItemAmount="totItemAmount" :storageId="activeStorageId" @selectionChanged="selectedBoxIds = $event"/>
       </TabsContent>
     </Tabs>
+
+    <div v-if="screenWidth < 768">
+      <InventoryTable :newItems="currentItems" :typeId="typeId" :totItemAmount="totItemAmount" :storageId="activeStorageId" @selectionChanged="selectedBoxIds = $event"/>
+    </div>
+  </div>
+  </div>
+  <div v-else-if="startupFinished && allStorages.length === 0" class="flex-col m-auto mt-10 justify-center">
+    <p class="text-xl font-bold m-1 text-center"> Finner ingen husstander </p>
+    <p class="m-1 text-center">For å se lager må du være med i en husstand eller opprett en egen.</p>
+    <RouterLink to="/profile" class="my-2 w-full">
+      <Button>Bli med i husstand</Button>
+    </RouterLink>
   </div>
 </template>
 

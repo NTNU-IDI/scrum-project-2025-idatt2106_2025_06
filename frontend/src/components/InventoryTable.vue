@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   Table,
   TableBody,
@@ -14,7 +14,7 @@ import {
   CollapsibleTrigger
 } from '@/components/ui/collapsible/index.js'
 import { Checkbox } from '@/components/ui/checkbox/index.js'
-import { ChevronDown, ChevronRight } from 'lucide-vue-next';
+import { ChevronDown, ChevronRight, Pencil } from 'lucide-vue-next'
 import {
   Tooltip,
   TooltipContent,
@@ -27,7 +27,8 @@ import EditItem from '@/components/EditItem.vue'
 const props = defineProps({
   newItems: { type: Array, required: true },
   typeId: {type: Number, required: true},
-  tab: { type: String }
+  totItemAmount: {type: Number, required: true},
+  storageId: { type: String, required: true },
 });
 const emit = defineEmits(['selectionChanged']);
 
@@ -35,7 +36,7 @@ const currentItems = ref();
 
 const selectedBoxes = ref(new Set());
 const areAllBoxesChecked = ref(false);
-const totalItemAmount = ref(0);
+const totalItemAmount = computed(() => props.totItemAmount);
 
 const selectedAllSubBoxes = (subItems) => {
   return subItems.every(item => selectedBoxes.value.has(item.id));
@@ -157,21 +158,27 @@ const getExpirationColor = (expDate) => {
   }
 }
 
+watch(() => props.newItems, (newItems) => {
+  currentItems.value = newItems;
+
+  selectedBoxes.value.clear();
+});
+
 onMounted(() => {
   currentItems.value = props.newItems;
 })
 </script>
 
 <template>
-    <Table>
+    <Table class="w-[50%] min-w-[335px] s:w-[60%] m-auto md:w-full">
       <TableHeader>
         <TableRow class="bg-gray-100">
-          <TableHead></TableHead>
-          <TableHead class="w-[100px]">Vare</TableHead>
-          <TableHead class="text-center">Total mengde</TableHead>
-          <TableHead class="text-center">Utløpsdato</TableHead>
-          <TableHead></TableHead>
-          <TableHead>
+          <TableHead class="w-[5%]"></TableHead>
+          <TableHead class="w-[35%]">Vare</TableHead>
+          <TableHead class="text-center w-[20%]">Total mengde</TableHead>
+          <TableHead class="text-center w-[20%]">Utløpsdato</TableHead>
+          <TableHead class="w-[10%]"></TableHead>
+          <TableHead class="w-[10%]">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -188,30 +195,33 @@ onMounted(() => {
       <TableBody>
         <Collapsible v-slot="{ open }" v-for="item in currentItems" :key="item.id" as="template">
         <TableRow>
-          <TableCell>
+          <TableCell class="w-[5%]">
             <CollapsibleTrigger as="button" v-if="item.items">
               <ChevronRight v-if="!open" />
               <ChevronDown v-if="open" />
             </CollapsibleTrigger>
           </TableCell>
-          <TableCell class="font-medium">{{ item.name }}</TableCell>
-          <TableCell class="text-center">{{ getAmountAndUnit(item.amount, item.unit) }}</TableCell>
-          <TableCell class="text-center" :class="getExpirationColor(item.expirationDate)">
-            {{ getDaysLeft(item.expirationDate) }}
+          <TableCell class="font-medium w-[35%]">{{ item.name }}</TableCell>
+          <TableCell class="text-center w-[20%]">{{ getAmountAndUnit(item.amount, item.unitId) }}</TableCell>
+          <TableCell class="text-center w-[20%]" :class="item.expiryDate ? getExpirationColor(item.expiryDate) : ''">
+            {{ item.expiryDate ? getDaysLeft(item.expiryDate) : '' }}
           </TableCell>
-          <TableCell>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <EditItem v-if="!item.items" :item="item" :typeId="typeId" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Endre</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <TableCell class="w-[10%]">
+            <div v-if="!item.items">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <EditItem :item="item" :typeId="typeId" :storageId="props.storageId"/>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Endre</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <Pencil v-else class="invisible"/>
           </TableCell>
-          <TableCell>
+          <TableCell class="w-[10%]">
             <Checkbox
               v-if="item.items"
               :model-value="selectedAllSubBoxes(item.items)"
@@ -226,17 +236,17 @@ onMounted(() => {
         </TableRow>
         <CollapsibleContent as="template" v-if="item.items">
           <TableRow v-for="item in item.items" :key="item.id" class="bg-gray-50 hover:bg-gray-100">
-            <TableCell></TableCell>
-            <TableCell class="font-medium"></TableCell>
-            <TableCell class="text-center">{{ getAmountAndUnit(item.amount, item.unit) }}</TableCell>
-            <TableCell class="text-center" :class="getExpirationColor(item.expirationDate)">
-              {{ getDaysLeft(item.expirationDate) }}
+            <TableCell class="w-[5%]"></TableCell>
+            <TableCell class="font-medium w-[35%]"></TableCell>
+            <TableCell class="text-center w-[20%]">{{ getAmountAndUnit(item.amount, item.unitId) }}</TableCell>
+            <TableCell class="text-center w-[20%]" :class="item.expiryDate ? getExpirationColor(item.expiryDate) : ''">
+              {{ item.expiryDate ? getDaysLeft(item.expiryDate) : '' }}
             </TableCell>
-            <TableCell>
+            <TableCell class="w-[10%]">
               <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <EditItem :item="item" :typeId="typeId" />
+                  <EditItem :item="item" :typeId="typeId" :storageId="props.storageId"/>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Endre</p>
@@ -244,7 +254,7 @@ onMounted(() => {
               </Tooltip>
               </TooltipProvider>
             </TableCell>
-            <TableCell>
+            <TableCell class="w-[10%]">
               <Checkbox
                 :model-value="selectedBoxes.has(item.id)"
                 @update:modelValue="value => toggleItem(item.id, value)"

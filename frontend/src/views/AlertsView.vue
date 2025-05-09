@@ -3,13 +3,11 @@ import AlertCard from '@/components/AlertCard.vue'
 import EventCard from '@/components/EventCard.vue'
 import { RouterLink } from 'vue-router'
 
-import { useWebSocketStore } from '@/stores/websocket.js';
-import { useSessionStore} from '@/stores/session.js'
+import { useWebSocketStore } from '@/stores/websocket.js'
 
-const jwtToken = useSessionStore().token;
-const webSocketStore = useWebSocketStore();
-const alerts = webSocketStore.alerts;
-const events = webSocketStore.events;
+const webSocketStore = useWebSocketStore()
+const alerts = webSocketStore.alerts
+const events = webSocketStore.events
 </script>
 
 <template>
@@ -33,13 +31,19 @@ const events = webSocketStore.events;
     <div class="mt-16">
       <div class="flex flex-col gap-2">
         <div class="grid w-full gap-2 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
-          <template v-for="(event, index) in events" :key="index">
-            <RouterLink :to="'events/' + event.id" class="relative">
+          <template v-for="event in events" :key="event.id">
+            <RouterLink :to="'/alerts/' + event.id">
               <EventCard
+                :content="event.content"
                 :description="event.description"
+                :event-id="event.id"
+                :location="event.location"
+                :name="event.title"
                 :severity="event.severity"
-                :time="event.startDate ? new Date(event.startDate).toISOString() : ''"
-                :title="event.title"
+                :status="event.status"
+                :type="event.type"
+                :updatedAt="event.time"
+                :createdAt="event.created"
                 variant="default"
               />
             </RouterLink>

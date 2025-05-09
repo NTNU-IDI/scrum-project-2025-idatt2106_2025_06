@@ -1,10 +1,10 @@
 <script setup>
 
-import { BentoCard } from '@/components/ui/bento/index.js'
+import { BentoCard, BentoGrid } from '@/components/ui/bento/index.js'
+import { ArrowRightIcon } from 'lucide-vue-next'
 import { useScenarioStore } from '@/stores/scenario'
 import { useSessionStore } from '@/stores/session'
 import { onMounted, computed } from 'vue'
-import { ArrowRightIcon } from 'lucide-vue-next'
 
 const scenarioStore = useScenarioStore()
 const sessionStore = useSessionStore()
@@ -23,18 +23,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="m-auto max-w-5xl p-6">
-    <div class="grid grid-cols-2 gap-6">
-      <div v-for="scenario in displayedScenarios" :key="scenario.id">
-      <BentoCard
-        :name="scenario.title"
-        :description="scenario.description"
-        :href="`/scenario/${scenario.id}`"
-        cta="Les mer"
-        :Icon="ArrowRightIcon"
-      />
-      </div>
-    </div>
+  <div class="m-3 mt-5 xl:mx-auto">
+  <BentoGrid>
+    <BentoCard v-for="scenario in displayedScenarios" :key="scenario.id"
+      :name="scenario.title"
+      :description="scenario.description"
+      :href="`/scenario/${scenario.id}`"
+      cta="Les mer"
+      :Icon="ArrowRightIcon"
+      customClass="col-span-2 md:col-span-3 lg:col-span-2"
+    />
+  </BentoGrid>
   </div>
 </template>
 
