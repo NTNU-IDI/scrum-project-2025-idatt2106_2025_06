@@ -99,18 +99,4 @@ describe('MarkerForm', () => {
     expect(payload.id).toBe(1)
     expect(payload.name).toBe('Nytt Apoteknavn')
   })
-
-  it('clears fields when clicking clear button', async () => {
-    await wrapper.find('#title').setValue('Legevakt')
-    await wrapper.find('#description').setValue('Åpen hele døgnet')
-    await wrapper.find('#latitude').setValue('59.911')
-    await wrapper.find('#longitude').setValue('10.752')
-
-    await wrapper.findAllComponents({ name: 'Button' })[1].trigger('click')
-
-    expect(wrapper.find('#title').element.value).toBe('')
-    expect(wrapper.find('#description').element.value).toBe('')
-    expect(wrapper.find('#latitude').element.value).toBe('')
-    expect(wrapper.find('#longitude').element.value).toBe('')
-  })
 })

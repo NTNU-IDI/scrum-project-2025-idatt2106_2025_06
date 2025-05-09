@@ -5,11 +5,20 @@ import { createTestingPinia } from '@pinia/testing'
 import { useSessionStore } from '@/stores/session'
 import Navbar from '@/components/NavBar.vue'
 import NavBarAdmin from '@/components/NavBarAdmin.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 
-describe('YourComponent', () => {
+describe('AppView', () => {
   let wrapper
+  let session
+  let router
 
   beforeEach(() => {
+    // Create a mock router instance
+    router = createRouter({
+      history: createWebHistory(),
+      routes: [] // You can add actual routes if needed, but it's not required for this test
+    })
+
     const pinia = createTestingPinia({
       createSpy: vi.fn,
       initialState: {
@@ -21,7 +30,7 @@ describe('YourComponent', () => {
 
     wrapper = mount(AppView, {
       global: {
-        plugins: [pinia],
+        plugins: [pinia, router], // Inject the router here
         stubs: {
           RouterView: true,
           RouterLink: true,
@@ -29,10 +38,11 @@ describe('YourComponent', () => {
         },
       },
     })
+
+    session = useSessionStore()  // Access the store here
   })
 
   it('renders Navbar when user is not an admin', async () => {
-    const session = useSessionStore()
     session.user = { role: 'ROLE_USER' }
     await wrapper.vm.$nextTick()
 
@@ -41,7 +51,6 @@ describe('YourComponent', () => {
   })
 
   it('renders NavBarAdmin when user is an admin', async () => {
-    const session = useSessionStore()
     session.user = { role: 'ROLE_ADMIN' }
     await wrapper.vm.$nextTick()
 
@@ -50,7 +59,6 @@ describe('YourComponent', () => {
   })
 
   it('renders NavBarAdmin when user is a moderator', async () => {
-    const session = useSessionStore()
     session.user = { role: 'ROLE_MODERATOR' }
     await wrapper.vm.$nextTick()
 
