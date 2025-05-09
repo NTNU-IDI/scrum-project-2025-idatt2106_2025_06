@@ -27,7 +27,7 @@ class CheckpointController(private val checkpointService: CheckpointService) {
      * @return [CheckpointResponse] A list with all checkpoints
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // Optional permission
+    @PreAuthorize("hasAuthority('GET_ALL_CHECKPOINTS')")
     @Operation(summary = "Get all checkpoints", description = "Returns a list of all available checkpoints.")
     @ApiResponses(
         value = [
@@ -48,7 +48,7 @@ class CheckpointController(private val checkpointService: CheckpointService) {
      *          and the percentage of the total cheks lists
      */
     @GetMapping("/my-checkpoints")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // Optional permission
+    @PreAuthorize("hasAuthority('GET_MY_CHECKPOINTS')") // Optional permission
     @Operation(
         summary = "Get user's checkpoints with progress",
         description = "Returns all checkpoints assigned to the currently authenticated user along with completion percentage."
@@ -72,7 +72,7 @@ class CheckpointController(private val checkpointService: CheckpointService) {
      * @return 200 OK if assignment succeeded, 500 if not
      */
     @PostMapping("/assign")
-    @PreAuthorize("hasAuthority('CREATE_STORAGE')") // Optional permission check
+    @PreAuthorize("hasAuthority('ASSIGN_CHECKPOINTS')")
     @Operation(
         summary = "Assign checkpoints to user",
         description = "Assigns a new list of checkpoints to the currently authenticated user. Previous assignments will be removed."
