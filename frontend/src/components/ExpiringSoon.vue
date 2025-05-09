@@ -15,10 +15,12 @@ import {
 } from '@/components/ui/select/index.js'
 import { DonutChart } from '@/components/ui/chart-donut/index.js'
 import { useSessionStore } from '@/stores/session.js'
+import { useChecklistStore } from '@/stores/checklist.js'
 
 const storageStore = useStorageStore();
 const inventoryStore = useInventoryStore();
 const sessionStore = useSessionStore();
+const checklistStore = useChecklistStore();
 
 const items = computed(() => inventoryStore.expiresSoonItems)
 const storages = computed(() => storageStore.storages)
@@ -27,17 +29,23 @@ const activeStorageName = ref();
 
 const userLoggedIn = computed(() => sessionStore.token);
 
-const percentage = 74;
+const percentage = ref();
 
-const data = [
-  { name: 'Klar', total: Math.floor(percentage) },
-  { name: 'Ikke klar', total: Math.floor(100-percentage)},
-];
+const data = computed(() => {
+  if (percentage.value === undefined) {
+    return [];
+  } else {
+    return [
+      { name: 'Klar', total: Math.floor(percentage.value) },
+      { name: 'Ikke klar', total: Math.floor(100 - percentage.value) },
+    ];
+  }
+});
 
 const percentageColors = computed(() => {
-  if (percentage === 100) {
+  if (percentage.value === 100) {
     return ['#34D399', '#e5e7eb']
-  } else if (percentage >= 50) {
+  } else if (percentage.value >= 50) {
     return ['#facc15', '#e5e7eb']
   } else {
     return ['#ef4444', '#e5e7eb']
@@ -145,8 +153,9 @@ onMounted(async () => {
     } catch (error) {
       console.error("Klarte ikke hente husstander:", error)
     }
-
     await inventoryStore.getExpiresSoonItems(activeStorageId.value);
+    await checklistStore.getMySelectedChecklist();
+    percentage.value = checklistStore.percentageCompleted;
   }
 
   startupFinished.value = true;
