@@ -105,6 +105,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div class="m-auto">
   <Card class="mx-auto max-w-sm">
     <CardHeader>
       <CardTitle class="text-2xl"> Registrer ny bruker</CardTitle>
@@ -127,11 +128,13 @@ onMounted(async () => {
 
             <Label for="confirmpassword">Bekreft passord</Label>
             <Input id="confirmpassword" v-model="confirmPassword" required type="password"/>
-            <div
-              class="g-recaptcha"
-              :data-sitekey="recaptchaSiteKey"
-              data-callback="handleRecaptchaResponse"
-            ></div>
+            <div class="w-full overflow-x-auto">
+              <div
+                class="g-recaptcha"
+                :data-sitekey="recaptchaSiteKey"
+                data-callback="handleRecaptchaResponse"
+              ></div>
+            </div>
 
             <div class="flex items-start gap-2 mt-2">
               <input
@@ -165,7 +168,7 @@ onMounted(async () => {
       </div>
     </CardContent>
   </Card>
-
+  </div>
   <Dialog :open="isDialogOpen" @update:open="isDialogOpen = $event">
     <DialogContent>
       <DialogHeader>
