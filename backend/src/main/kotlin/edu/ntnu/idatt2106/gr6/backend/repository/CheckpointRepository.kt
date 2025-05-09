@@ -76,7 +76,6 @@ class CheckpointRepository(private val dataSource: DataSource) {
         return checkpoints
     }
 
-
     /**
      * Updated the checkpoints linked to a user
      *
@@ -84,7 +83,7 @@ class CheckpointRepository(private val dataSource: DataSource) {
      * @param entries List of [Pair]s containing an ID and checkpoint ID to assign
      * @return True if the transaction is successful, otherwise false
      */
-    fun replaceCheckpointsForUser(userId: String, entries: List<Pair<String, String>>): Boolean {
+    fun checkpointsForUser(userId: String, entries: List<Pair<String, String>>): Boolean {
         val deleteSql = "DELETE FROM user_checkpoint_list WHERE user_id = ?"
         val insertSql = """
         INSERT INTO user_checkpoint_list (id, user_id, checkpoint_list_id)
@@ -149,5 +148,4 @@ class CheckpointRepository(private val dataSource: DataSource) {
             }
         }
     }
-
 }
