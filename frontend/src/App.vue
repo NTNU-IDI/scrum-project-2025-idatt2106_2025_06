@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router'
 import { useSessionStore } from '@/stores/session.js'
 import Navbar from '@/components/NavBar.vue'
 import NavBarAdmin from '@/components/NavBarAdmin.vue'
-import Footer from '@/components/footer.vue'
+import Footer from '@/components/Footer.vue'
 
 const session = useSessionStore()
 
@@ -17,7 +17,7 @@ watch(
       console.log('User session updated', newUser)
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 </script>
 
