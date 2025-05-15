@@ -8,15 +8,16 @@
 cd backend
 ```
 
-2. Create a database instance with Docker
-    * Make  
+2. Create a database instance with Docker (2 alternatives)
+   To set up the database, you need docker installed and running. You can use either of the following methods:
+    * Alternative 1: Use make  
       Sets up the database and removes any existing instance
 
        ```sh
        make fresh
        ```
 
-    * Docker compose
+    * Alternative 2: Use Docker compose manually
 
       Sets up the database
 
